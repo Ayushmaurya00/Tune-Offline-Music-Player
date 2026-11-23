@@ -24,13 +24,17 @@ interface LibraryStore {
   getFilteredAndSortedSongs: () => Song[];
 }
 
+const savedFolder = typeof localStorage !== 'undefined' ? localStorage.getItem('tune_watched_folder_v1') || '' : '';
+const savedSortField = (typeof localStorage !== 'undefined' ? localStorage.getItem('tune_sort_field_v1') : null) as SortField || 'fileModified';
+const savedSortOrder = (typeof localStorage !== 'undefined' ? localStorage.getItem('tune_sort_order_v1') : null) as SortOrder || 'desc';
+
 export const useLibraryStore = create<LibraryStore>((set, get) => ({
   songs: [],
-  watchedFolderPath: '',
+  watchedFolderPath: savedFolder,
   isLoading: false,
   searchQuery: '',
-  sortField: 'fileModified',
-  sortOrder: 'desc',
+  sortField: savedSortField,
+  sortOrder: savedSortOrder,
   activeView: 'library',
   selectedPlaylistId: null,
 
@@ -54,7 +58,14 @@ export const useLibraryStore = create<LibraryStore>((set, get) => ({
     set((state) => ({ songs: state.songs.filter((s) => s.filePath !== filePath) }));
   },
 
-  setWatchedFolder: (watchedFolderPath: string) => set({ watchedFolderPath }),
+  setWatchedFolder: (watchedFolderPath: string) => {
+    try {
+      localStorage.setItem('tune_watched_folder_v1', watchedFolderPath);
+    } catch {
+      // ignore
+    }
+    set({ watchedFolderPath });
+  },
 
   setIsLoading: (isLoading: boolean) => set({ isLoading }),
 
@@ -68,6 +79,12 @@ export const useLibraryStore = create<LibraryStore>((set, get) => ({
       } else {
         order = field === 'fileModified' || field === 'dateAdded' ? 'desc' : 'asc';
       }
+    }
+    try {
+      localStorage.setItem('tune_sort_field_v1', field);
+      localStorage.setItem('tune_sort_order_v1', order);
+    } catch {
+      // ignore
     }
     set({ sortField: field, sortOrder: order });
   },

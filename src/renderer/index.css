@@ -27,3 +27,40 @@
   background: #3f3f3f;
 }
 
+/* Frameless Window Drag Regions */
+.app-drag-region {
+  -webkit-app-region: drag;
+}
+
+.app-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* Animated 3-Bar Equalizer Wave */
+@keyframes eqBar1 {
+  0%, 100% { height: 4px; }
+  50% { height: 14px; }
+}
+
+@keyframes eqBar2 {
+  0%, 100% { height: 14px; }
+  50% { height: 5px; }
+}
+
+@keyframes eqBar3 {
+  0%, 100% { height: 7px; }
+  50% { height: 13px; }
+}
+
+.animate-eq-1 {
+  animation: eqBar1 0.75s ease-in-out infinite;
+}
+
+.animate-eq-2 {
+  animation: eqBar2 0.5s ease-in-out infinite;
+}
+
+.animate-eq-3 {
+  animation: eqBar3 0.85s ease-in-out infinite;
+}
+

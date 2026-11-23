@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, FolderDown, Heart, Plus, FolderOpen, Music2, Trash2, Sparkles, FolderTree } from 'lucide-react';
+import { Home, FolderDown, Heart, Plus, FolderOpen, Music2, Trash2, Sparkles, FolderTree, Keyboard } from 'lucide-react';
 import { useLibraryStore } from '../../store/libraryStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 
@@ -9,6 +9,7 @@ interface SidebarProps {
   onOpenWrapped: () => void;
   onSelectFolder: () => void;
   onOpenScanSummary?: () => void;
+  onOpenShortcuts?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -16,7 +17,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenSpotifyModal,
   onOpenWrapped,
   onSelectFolder,
-  onOpenScanSummary
+  onOpenScanSummary,
+  onOpenShortcuts
 }) => {
   const { activeView, selectedPlaylistId, setActiveView, watchedFolderPath, songs } = useLibraryStore();
   const { playlists, deletePlaylist } = usePlaylistStore();
@@ -178,8 +180,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
       </div>
 
-      {/* Open Custom Folder Button */}
-      <div className="p-3 border-t border-tune-border">
+      {/* Open Custom Folder Button & Pro Shortcuts */}
+      <div className="p-3 border-t border-tune-border space-y-2">
         <button
           onClick={onSelectFolder}
           className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-tune-elevated hover:bg-tune-card text-xs font-medium text-tune-textSecondary hover:text-white border border-tune-border transition"
@@ -187,6 +189,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <FolderOpen size={15} />
           <span>Scan Custom Folder</span>
         </button>
+
+        {onOpenShortcuts && (
+          <button
+            onClick={onOpenShortcuts}
+            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[11px] text-tune-textMuted hover:text-white hover:bg-tune-elevated/40 transition"
+            title="View Keyboard Shortcuts Cheatsheet (?)"
+          >
+            <span className="flex items-center gap-1.5">
+              <Keyboard size={13} className="text-tune-accent" />
+              <span>Shortcuts</span>
+            </span>
+            <kbd className="px-1.5 py-0.5 rounded bg-[#2a2a2a] text-[10px] font-mono text-tune-textSecondary border border-tune-border">
+              ?
+            </kbd>
+          </button>
+        )}
       </div>
     </aside>
   );

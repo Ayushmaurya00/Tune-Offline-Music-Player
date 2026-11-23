@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Play, Pause, Heart, PlusCircle, Trash2, Folder, Wand2 } from 'lucide-react';
 import { Song } from '@/types/music';
 import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { AlbumArt } from '../shared/AlbumArt';
+import { SongContextMenu } from './SongContextMenu';
 import { formatDuration, formatDate } from '../../utils/formatters';
 
 interface SongRowProps {
@@ -23,8 +24,9 @@ export const SongRow: React.FC<SongRowProps> = ({
   onShowInFolder,
   onAutoTag
 }) => {
-  const { currentSong, isPlaying, playSong, togglePlay, addToQueue } = usePlayerStore();
-  const { isSongLiked, toggleLikeSong } = usePlaylistStore();
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const { currentSong, isPlaying, playSong, togglePlay, addToQueue, playNext } = usePlayerStore();
+  const { isSongLiked, toggleLikeSong, playlists, addSongToPlaylist } = usePlaylistStore();
 
   const isCurrent = currentSong?.id === song.id;
   const isPlayingThis = isCurrent && isPlaying;
@@ -38,25 +40,40 @@ export const SongRow: React.FC<SongRowProps> = ({
     }
   };
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setContextMenu({ x: e.clientX, y: e.clientY });
+  };
+
   return (
-    <div
-      onClick={handleRowClick}
-      className={`group grid grid-cols-[36px_minmax(200px,2fr)_minmax(120px,1.5fr)_minmax(100px,1fr)_80px_100px] items-center px-4 py-2.5 rounded-lg text-xs cursor-pointer select-none transition ${
-        isCurrent ? 'bg-tune-elevated text-tune-accent font-medium' : 'hover:bg-tune-card/60 text-tune-textSecondary'
-      }`}
-    >
-      <div className="flex items-center justify-start text-tune-textMuted font-mono">
-        <span className="group-hover:hidden">{isCurrent && isPlaying ? '▶' : index + 1}</span>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleRowClick();
-          }}
-          className="hidden group-hover:flex items-center justify-center text-white"
-        >
-          {isPlayingThis ? <Pause size={15} /> : <Play size={15} className="ml-0.5" />}
-        </button>
-      </div>
+    <>
+      <div
+        onClick={handleRowClick}
+        onContextMenu={handleContextMenu}
+        className={`group grid grid-cols-[36px_minmax(200px,2fr)_minmax(120px,1.5fr)_minmax(100px,1fr)_80px_100px] items-center px-4 py-2.5 rounded-lg text-xs cursor-pointer select-none transition ${
+          isCurrent ? 'bg-tune-elevated text-tune-accent font-medium' : 'hover:bg-tune-card/60 text-tune-textSecondary'
+        }`}
+      >
+        <div className="flex items-center justify-start text-tune-textMuted font-mono">
+          {isPlayingThis ? (
+            <div className="flex items-end gap-0.5 h-3.5 w-3.5 group-hover:hidden">
+              <span className="w-1 bg-tune-accent rounded-sm animate-eq-1" />
+              <span className="w-1 bg-tune-accent rounded-sm animate-eq-2" />
+              <span className="w-1 bg-tune-accent rounded-sm animate-eq-3" />
+            </div>
+          ) : (
+            <span className="group-hover:hidden">{isCurrent ? '▶' : index + 1}</span>
+          )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRowClick();
+            }}
+            className="hidden group-hover:flex items-center justify-center text-white"
+          >
+            {isPlayingThis ? <Pause size={15} /> : <Play size={15} className="ml-0.5" />}
+          </button>
+        </div>
 
       <div className="flex items-center gap-3 min-w-0 pr-3">
         <AlbumArt
@@ -131,5 +148,23 @@ export const SongRow: React.FC<SongRowProps> = ({
         )}
       </div>
     </div>
-  );
+
+    {contextMenu && (
+      <SongContextMenu
+        x={contextMenu.x}
+        y={contextMenu.y}
+        song={song}
+        playlists={playlists}
+        onClose={() => setContextMenu(null)}
+        onPlay={() => playSong(song, playlistContext)}
+        onPlayNext={() => playNext(song)}
+        onAddToQueue={() => addToQueue(song)}
+        onAddToPlaylist={(playlistId) => addSongToPlaylist(playlistId, song.id)}
+        onAutoTag={onAutoTag ? () => onAutoTag(song) : undefined}
+        onShowInFolder={onShowInFolder ? () => onShowInFolder(song) : undefined}
+        onDelete={onDelete ? () => onDelete(song) : undefined}
+      />
+    )}
+  </>
+);
 };

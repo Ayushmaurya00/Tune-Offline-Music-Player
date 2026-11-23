@@ -54,19 +54,24 @@ interface PlayerStore {
   toggleShuffle: () => void;
   toggleQueue: () => void;
   addToQueue: (song: Song) => void;
+  playNext: (song: Song) => void;
   removeFromQueue: (queueId: string) => void;
   reorderQueue: (oldIndex: number, newIndex: number) => void;
   clearQueue: () => void;
 }
+
+const savedVol = typeof localStorage !== 'undefined' ? localStorage.getItem('tune_volume_v1') : null;
+const initialVolume = savedVol !== null && !isNaN(parseFloat(savedVol)) ? parseFloat(savedVol) : 0.8;
+const savedMuted = typeof localStorage !== 'undefined' ? localStorage.getItem('tune_muted_v1') === 'true' : false;
 
 export const usePlayerStore = create<PlayerStore>((set, get) => ({
   currentSong: null,
   isPlaying: false,
   currentTime: 0,
   duration: 0,
-  volume: 0.8,
+  volume: initialVolume,
   playbackRate: 1.0,
-  isMuted: false,
+  isMuted: savedMuted,
   repeatMode: 'none',
   isShuffled: false,
   isQueueOpen: false,
@@ -182,6 +187,11 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
 
   setVolume: (val: number) => {
     const clamped = Math.max(0, Math.min(1, val));
+    try {
+      localStorage.setItem('tune_volume_v1', String(clamped));
+    } catch {
+      // ignore
+    }
     audioController.setVolume(clamped);
     set({ volume: clamped, isMuted: clamped === 0 });
   },
@@ -193,6 +203,12 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
 
   toggleMute: () => {
     const { isMuted, volume } = get();
+    const nextMuted = !isMuted;
+    try {
+      localStorage.setItem('tune_muted_v1', String(nextMuted));
+    } catch {
+      // ignore
+    }
     if (isMuted) {
       audioController.setVolume(volume > 0 ? volume : 0.8);
       set({ isMuted: false, volume: volume > 0 ? volume : 0.8 });
@@ -229,6 +245,14 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
       song
     };
     set((state) => ({ queue: [...state.queue, newItem] }));
+  },
+
+  playNext: (song: Song) => {
+    const newItem: QueueItem = {
+      queueId: `${song.id}-${Math.random().toString(36).substring(2, 9)}`,
+      song
+    };
+    set((state) => ({ queue: [newItem, ...state.queue] }));
   },
 
   removeFromQueue: (queueId: string) => {
