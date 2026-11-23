@@ -33,7 +33,9 @@ jobs:
         run: npm install
 
       - name: Build Web Assets & Sync Capacitor
-        run: npm run build:mobile
+        run: |
+          npm run build
+          npx cap sync android
 
       - name: Build Debug APK with Gradle
         run: |
