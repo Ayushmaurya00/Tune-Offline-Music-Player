@@ -15,7 +15,6 @@ import { ScanResultModal, ScanResultData } from './components/library/ScanResult
 import { FileDropOverlay } from './components/shared/FileDropOverlay';
 import { ShortcutsModal } from './components/shared/ShortcutsModal';
 import { pickFolder, pickAudioFiles, convertFileListToSongs } from './utils/folderPicker';
-import { generateDemoTracks } from './utils/demoTracks';
 import { useLibraryStore } from './store/libraryStore';
 import { usePlayerStore } from './store/playerStore';
 import { extractDominantColor } from './utils/colorExtractor';
@@ -238,15 +237,6 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleLoadDemoTracks = () => {
-    const startTime = performance.now();
-    const demoSongs = generateDemoTracks();
-    applyScanResult('Tune Offline Demo Library', demoSongs, performance.now() - startTime, 0, []);
-    if (demoSongs.length > 0) {
-      playSong(demoSongs[0], demoSongs);
-    }
-  };
-
   const handleFilesDropped = (files: File[]) => {
     const startTime = performance.now();
     const result = convertFileListToSongs(files);
@@ -399,7 +389,6 @@ export const App: React.FC = () => {
             onScanFolder={(path, popup) => handleScan(path, popup)}
             onSelectFolderDialog={handleSelectFolder}
             onSelectFilesDialog={handleSelectFiles}
-            onLoadDemoTracks={handleLoadDemoTracks}
             onOpenScanSummary={handleOpenScanSummary}
             onOpenNewPlaylistModal={() => setIsModalOpen(true)}
           />
@@ -465,7 +454,6 @@ export const App: React.FC = () => {
         onClose={() => setIsScanModalOpen(false)}
         result={scanResult}
         accentColor={accentColor}
-        onLoadDemoTracks={handleLoadDemoTracks}
         onChangeFolder={handleSelectFolder}
         onPlayAll={() => {
           if (songs.length > 0) {

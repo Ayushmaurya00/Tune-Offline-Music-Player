@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, CheckCircle2, Folder, Clock, Music, Play, Sparkles, AlertCircle } from 'lucide-react';
+import { X, CheckCircle2, Folder, Clock, Music, Play, AlertCircle } from 'lucide-react';
 
 export interface ScanResultData {
   folderPath: string;
@@ -16,7 +16,6 @@ interface ScanResultModalProps {
   onClose: () => void;
   result: ScanResultData | null;
   onPlayAll?: () => void;
-  onLoadDemoTracks?: () => void;
   onChangeFolder?: () => void;
   accentColor?: string;
 }
@@ -26,7 +25,6 @@ export const ScanResultModal: React.FC<ScanResultModalProps> = ({
   onClose,
   result,
   onPlayAll,
-  onLoadDemoTracks,
   onChangeFolder,
   accentColor = '#1db954'
 }) => {
@@ -159,33 +157,20 @@ export const ScanResultModal: React.FC<ScanResultModalProps> = ({
               <span>No audio files found in this folder</span>
             </div>
             <p className="text-[11px] text-tune-textSecondary">
-              Your selected directory has no MP3, WAV, or FLAC files. Load demo tracks to test all player features instantly, or choose another folder.
+              Your selected directory has no MP3, WAV, FLAC, or M4A files. Please choose another folder with offline audio files.
             </p>
           </div>
         )}
 
         {/* Footer Actions */}
         <div className="flex flex-wrap items-center justify-end gap-2.5 pt-2 border-t border-tune-border/60">
-          {result.totalSongs === 0 && onLoadDemoTracks && (
-            <button
-              onClick={() => {
-                onLoadDemoTracks();
-                onClose();
-              }}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-tune-accent hover:bg-tune-accentHover text-black text-xs font-bold transition shadow-md"
-            >
-              <Sparkles size={14} />
-              <span>Load Demo Songs</span>
-            </button>
-          )}
-
           {result.totalSongs === 0 && onChangeFolder && (
             <button
               onClick={() => {
                 onClose();
                 onChangeFolder();
               }}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-tune-elevated hover:bg-tune-card text-white text-xs font-semibold border border-tune-border transition"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-tune-accent hover:bg-tune-accentHover text-black text-xs font-bold transition shadow-md shadow-tune-accent/20 active:scale-95"
             >
               <Folder size={14} />
               <span>Choose Another Folder</span>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FolderDown, RefreshCw, FolderOpen, Sparkles, Music, BarChart2 } from 'lucide-react';
+import { FolderDown, RefreshCw, FolderOpen, Music, BarChart2 } from 'lucide-react';
 import { Song } from '@/types/music';
 import { useLibraryStore } from '../../store/libraryStore';
 import { usePlaylistStore } from '../../store/playlistStore';
@@ -15,7 +15,6 @@ interface LibraryViewProps {
   onScanFolder: (path?: string, showPopup?: boolean) => Promise<void>;
   onSelectFolderDialog: () => Promise<void>;
   onSelectFilesDialog: () => Promise<void>;
-  onLoadDemoTracks: () => void;
   onOpenScanSummary: () => void;
   onOpenNewPlaylistModal: () => void;
 }
@@ -24,7 +23,6 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   onScanFolder,
   onSelectFolderDialog,
   onSelectFilesDialog,
-  onLoadDemoTracks,
   onOpenScanSummary,
   onOpenNewPlaylistModal
 }) => {
@@ -155,16 +153,8 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
             <div className="flex flex-wrap items-center justify-center gap-3 mt-5">
               <button
-                onClick={onLoadDemoTracks}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-tune-accent hover:bg-tune-accentHover text-black text-xs font-bold transition shadow-lg shadow-tune-accent/25 hover:scale-105 active:scale-95"
-              >
-                <Sparkles size={16} />
-                <span>Load Demo Songs (Instant Test)</span>
-              </button>
-
-              <button
                 onClick={onSelectFolderDialog}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-tune-elevated hover:bg-tune-card text-white text-xs font-semibold border border-tune-border transition hover:border-tune-accent"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-tune-accent hover:bg-tune-accentHover text-black text-xs font-bold transition shadow-lg shadow-tune-accent/25 hover:scale-105 active:scale-95"
               >
                 <FolderOpen size={16} />
                 <span>Choose Music Folder</span>
@@ -172,7 +162,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
               <button
                 onClick={onSelectFilesDialog}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-tune-elevated hover:bg-tune-card text-white text-xs font-semibold border border-tune-border transition hover:border-tune-accent"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-tune-elevated hover:bg-tune-card text-white text-xs font-semibold border border-tune-border transition hover:border-tune-accent active:scale-95"
               >
                 <Music size={16} />
                 <span>Select Audio Files</span>
