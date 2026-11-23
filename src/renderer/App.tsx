@@ -5,6 +5,7 @@ import { LibraryView } from './components/library/LibraryView';
 import { QueuePanel } from './components/queue/QueuePanel';
 import { NewPlaylistModal } from './components/playlist/NewPlaylistModal';
 import { LyricsModal } from './components/lyrics/LyricsModal';
+import { SpotifyImportModal } from './components/importer/SpotifyImportModal';
 import { useLibraryStore } from './store/libraryStore';
 import { usePlayerStore } from './store/playerStore';
 import { extractDominantColor } from './utils/colorExtractor';
@@ -12,12 +13,13 @@ import { extractDominantColor } from './utils/colorExtractor';
 export const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLyricsOpen, setIsLyricsOpen] = useState(false);
+  const [isSpotifyModalOpen, setIsSpotifyModalOpen] = useState(false);
   const [accentColor, setAccentColor] = useState('#1db954');
   const [ambientGradient, setAmbientGradient] = useState(
     'radial-gradient(ellipse at top, rgba(29, 185, 84, 0.12) 0%, transparent 70%)'
   );
 
-  const { setSongs, addSong, removeSong, setWatchedFolder, setIsLoading, watchedFolderPath } =
+  const { songs, setSongs, addSong, removeSong, setWatchedFolder, setIsLoading, watchedFolderPath } =
     useLibraryStore();
   const { currentSong, togglePlay, nextTrack, prevTrack, seek, currentTime } = usePlayerStore();
 
@@ -129,6 +131,7 @@ export const App: React.FC = () => {
         {/* Sidebar */}
         <Sidebar
           onOpenNewPlaylistModal={() => setIsModalOpen(true)}
+          onOpenSpotifyModal={() => setIsSpotifyModalOpen(true)}
           onSelectFolder={handleSelectFolder}
         />
 
@@ -153,6 +156,13 @@ export const App: React.FC = () => {
 
       {/* Create Playlist Modal */}
       <NewPlaylistModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+
+      {/* Spotify Playlist Importer Modal */}
+      <SpotifyImportModal
+        isOpen={isSpotifyModalOpen}
+        onClose={() => setIsSpotifyModalOpen(false)}
+        localSongs={songs}
+      />
 
       {/* Synced Karaoke Lyrics Modal */}
       <LyricsModal

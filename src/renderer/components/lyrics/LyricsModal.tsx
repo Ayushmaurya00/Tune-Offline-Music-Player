@@ -158,3 +158,4 @@ export const LyricsModal: React.FC<LyricsModalProps> = ({
     </div>
   );
 };
+

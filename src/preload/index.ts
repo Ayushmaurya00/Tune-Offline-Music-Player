@@ -9,6 +9,7 @@ const api: TuneAPI = {
   deleteSongFile: (filePath: string) => ipcRenderer.invoke('tune:delete-song-file', filePath),
   showInFolder: (filePath: string) => ipcRenderer.invoke('tune:show-in-folder', filePath),
   selectFolderDialog: () => ipcRenderer.invoke('tune:select-folder-dialog'),
+  fetchSpotifyPlaylist: (url: string) => ipcRenderer.invoke('tune:fetch-spotify-playlist', url),
   onFileAdded: (callback: (song: Song) => void) => {
     const handler = (_: unknown, song: Song) => callback(song);
     ipcRenderer.on('tune:file-added', handler);

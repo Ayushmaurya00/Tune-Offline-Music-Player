@@ -40,6 +40,19 @@ export type SortOrder = 'asc' | 'desc';
 
 export type ViewType = 'library' | 'playlist' | 'liked';
 
+export interface SpotifyTrack {
+  title: string;
+  artist: string;
+  duration: number;
+}
+
+export interface SpotifyPlaylistResult {
+  id: string;
+  name: string;
+  tracks: SpotifyTrack[];
+  coverArt?: string | null;
+}
+
 export interface TuneAPI {
   getDownloadsPath: () => Promise<string>;
   scanFolder: (folderPath: string) => Promise<Song[]>;
@@ -48,6 +61,7 @@ export interface TuneAPI {
   deleteSongFile: (filePath: string) => Promise<boolean>;
   showInFolder: (filePath: string) => Promise<void>;
   selectFolderDialog: () => Promise<string | null>;
+  fetchSpotifyPlaylist: (url: string) => Promise<SpotifyPlaylistResult>;
   onFileAdded: (callback: (song: Song) => void) => () => void;
   onFileRemoved: (callback: (filePath: string) => void) => () => void;
 }

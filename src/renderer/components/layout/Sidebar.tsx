@@ -5,11 +5,13 @@ import { usePlaylistStore } from '../../store/playlistStore';
 
 interface SidebarProps {
   onOpenNewPlaylistModal: () => void;
+  onOpenSpotifyModal: () => void;
   onSelectFolder: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   onOpenNewPlaylistModal,
+  onOpenSpotifyModal,
   onSelectFolder
 }) => {
   const { activeView, selectedPlaylistId, setActiveView, watchedFolderPath, songs } = useLibraryStore();
@@ -81,13 +83,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <span className="text-xs font-semibold text-tune-textMuted uppercase tracking-wider">
           Playlists
         </span>
-        <button
-          onClick={onOpenNewPlaylistModal}
-          className="p-1 rounded-md text-tune-textSecondary hover:text-white hover:bg-tune-elevated transition"
-          title="Create Playlist"
-        >
-          <Plus size={16} />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={onOpenSpotifyModal}
+            className="px-2 py-0.5 rounded text-[11px] font-semibold text-[#1db954] bg-[#1db954]/10 hover:bg-[#1db954]/20 transition flex items-center gap-1"
+            title="Import Spotify Playlist"
+          >
+            <span>+ Spotify</span>
+          </button>
+
+          <button
+            onClick={onOpenNewPlaylistModal}
+            className="p-1 rounded-md text-tune-textSecondary hover:text-white hover:bg-tune-elevated transition"
+            title="Create Playlist"
+          >
+            <Plus size={16} />
+          </button>
+        </div>
       </div>
 
       {/* Playlists List */}

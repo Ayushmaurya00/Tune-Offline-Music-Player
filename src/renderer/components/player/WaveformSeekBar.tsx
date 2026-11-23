@@ -141,3 +141,4 @@ export const WaveformSeekBar: React.FC<WaveformSeekBarProps> = ({
     </div>
   );
 };
+

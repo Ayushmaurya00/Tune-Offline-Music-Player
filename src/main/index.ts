@@ -4,6 +4,7 @@ import url, { fileURLToPath } from 'node:url';
 import { scanDirectory } from './services/scanner';
 import { setupFolderWatcher, stopFolderWatcher } from './services/watcher';
 import { deleteFileToTrash, showFileInFolder, selectFolder } from './services/fileOps';
+import { fetchSpotifyPlaylistTracks } from './services/spotifyService';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -99,6 +100,10 @@ ipcMain.handle('tune:show-in-folder', async (_, filePath: string) => {
 ipcMain.handle('tune:select-folder-dialog', async () => {
   if (!win) return null;
   return await selectFolder(win);
+});
+
+ipcMain.handle('tune:fetch-spotify-playlist', async (_, url: string) => {
+  return await fetchSpotifyPlaylistTracks(url);
 });
 
 app.on('window-all-closed', () => {
