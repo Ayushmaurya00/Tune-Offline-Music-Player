@@ -31,6 +31,7 @@ export const App: React.FC = () => {
   const [isSleepTimerOpen, setIsSleepTimerOpen] = useState(false);
   const [isMiniPlayer, setIsMiniPlayer] = useState(false);
   const [scanResult, setScanResult] = useState<ScanResultData | null>(null);
+  const [isScanModalOpen, setIsScanModalOpen] = useState(false);
   const [taggerSong, setTaggerSong] = useState<Song | null>(null);
   const [accentColor, setAccentColor] = useState('#1db954');
   const [ambientGradient, setAmbientGradient] = useState(
@@ -90,6 +91,7 @@ export const App: React.FC = () => {
             durationMs,
             formatCounts
           });
+          setIsScanModalOpen(true);
         }
       } catch (err) {
         console.error('Scan error:', err);
@@ -128,9 +130,31 @@ export const App: React.FC = () => {
         rejectedCount,
         rejectedNames
       });
+      setIsScanModalOpen(true);
     },
     [songs.length, setWatchedFolder, setSongs]
   );
+
+  const handleOpenScanSummary = () => {
+    if (!scanResult) {
+      const formatCounts: Record<string, number> = {};
+      for (const s of songs) {
+        const fmt = (s.format || s.fileName.split('.').pop() || 'mp3').toLowerCase();
+        formatCounts[fmt] = (formatCounts[fmt] || 0) + 1;
+      }
+
+      setScanResult({
+        folderPath: watchedFolderPath || 'Downloads',
+        totalSongs: songs.length,
+        newSongsCount: 0,
+        durationMs: 35,
+        formatCounts,
+        rejectedCount: 0,
+        rejectedNames: []
+      });
+    }
+    setIsScanModalOpen(true);
+  };
 
   const handleSelectFolder = async () => {
     setIsLoading(true);
@@ -293,6 +317,7 @@ export const App: React.FC = () => {
           onOpenSpotifyModal={() => setIsSpotifyModalOpen(true)}
           onOpenWrapped={() => setIsWrappedOpen(true)}
           onSelectFolder={handleSelectFolder}
+          onOpenScanSummary={handleOpenScanSummary}
         />
 
         {/* Central Library & Views */}
@@ -302,6 +327,7 @@ export const App: React.FC = () => {
             onSelectFolderDialog={handleSelectFolder}
             onSelectFilesDialog={handleSelectFiles}
             onLoadDemoTracks={handleLoadDemoTracks}
+            onOpenScanSummary={handleOpenScanSummary}
             onAutoTag={(song) => setTaggerSong(song)}
           />
         </main>
@@ -374,8 +400,8 @@ export const App: React.FC = () => {
 
       {/* Custom Scan Result Popup */}
       <ScanResultModal
-        isOpen={Boolean(scanResult)}
-        onClose={() => setScanResult(null)}
+        isOpen={isScanModalOpen}
+        onClose={() => setIsScanModalOpen(false)}
         result={scanResult}
         accentColor={accentColor}
         onLoadDemoTracks={handleLoadDemoTracks}

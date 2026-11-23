@@ -8,7 +8,8 @@ import {
   ListPlus,
   FolderTree,
   Music,
-  RefreshCw
+  RefreshCw,
+  BarChart2
 } from 'lucide-react';
 import { Song } from '@/types/music';
 import { buildFolderTree, FolderNode } from '../../utils/folderTree';
@@ -24,6 +25,7 @@ interface FolderViewProps {
   onShowInFolder?: (song: Song) => void;
   onChangeFolder?: () => void;
   onRefresh?: () => void;
+  onOpenScanSummary?: () => void;
   isLoading?: boolean;
 }
 
@@ -102,6 +104,7 @@ export const FolderView: React.FC<FolderViewProps> = ({
   onShowInFolder,
   onChangeFolder,
   onRefresh,
+  onOpenScanSummary,
   isLoading = false
 }) => {
   const tree = useMemo(() => buildFolderTree(songs, rootPath), [songs, rootPath]);
@@ -206,6 +209,17 @@ export const FolderView: React.FC<FolderViewProps> = ({
           </div>
 
           <div className="flex items-center gap-2.5">
+            {onOpenScanSummary && (
+              <button
+                onClick={onOpenScanSummary}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-tune-elevated hover:bg-tune-card text-xs font-semibold text-tune-textSecondary hover:text-white border border-tune-border transition"
+                title="View Scan Summary"
+              >
+                <BarChart2 size={14} className="text-tune-accent" />
+                <span>Scan Summary</span>
+              </button>
+            )}
+
             {onRefresh && (
               <button
                 onClick={onRefresh}

@@ -8,13 +8,15 @@ interface SidebarProps {
   onOpenSpotifyModal: () => void;
   onOpenWrapped: () => void;
   onSelectFolder: () => void;
+  onOpenScanSummary?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   onOpenNewPlaylistModal,
   onOpenSpotifyModal,
   onOpenWrapped,
-  onSelectFolder
+  onSelectFolder,
+  onOpenScanSummary
 }) => {
   const { activeView, selectedPlaylistId, setActiveView, watchedFolderPath, songs } = useLibraryStore();
   const { playlists, deletePlaylist } = usePlaylistStore();
@@ -88,13 +90,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <FolderDown size={14} className="text-tune-accent" />
             Watched Folder
           </span>
-          <button
-            onClick={onSelectFolder}
-            className="text-[11px] text-tune-accent hover:underline lowercase font-normal"
-            title="Change watched directory"
-          >
-            change
-          </button>
+          <div className="flex items-center gap-2">
+            {onOpenScanSummary && (
+              <button
+                onClick={onOpenScanSummary}
+                className="text-[11px] text-tune-accent hover:underline lowercase font-normal"
+                title="View scan summary and library diagnostics"
+              >
+                summary
+              </button>
+            )}
+            <button
+              onClick={onSelectFolder}
+              className="text-[11px] text-tune-textMuted hover:text-white lowercase font-normal"
+              title="Change watched directory"
+            >
+              change
+            </button>
+          </div>
         </div>
         <p className="text-xs text-tune-textSecondary truncate font-mono" title={watchedFolderPath}>
           {watchedFolderPath ? watchedFolderPath.split('\\').pop() || watchedFolderPath : 'Downloads'}

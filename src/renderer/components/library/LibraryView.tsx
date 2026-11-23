@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FolderDown, RefreshCw, FolderOpen, Sparkles, Music } from 'lucide-react';
+import { FolderDown, RefreshCw, FolderOpen, Sparkles, Music, BarChart2 } from 'lucide-react';
 import { Song } from '@/types/music';
 import { useLibraryStore } from '../../store/libraryStore';
 import { usePlaylistStore } from '../../store/playlistStore';
@@ -14,6 +14,7 @@ interface LibraryViewProps {
   onSelectFolderDialog: () => Promise<void>;
   onSelectFilesDialog: () => Promise<void>;
   onLoadDemoTracks: () => void;
+  onOpenScanSummary: () => void;
   onAutoTag?: (song: Song) => void;
 }
 
@@ -22,6 +23,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   onSelectFolderDialog,
   onSelectFilesDialog,
   onLoadDemoTracks,
+  onOpenScanSummary,
   onAutoTag
 }) => {
   const [isGridView, setIsGridView] = useState(false);
@@ -75,6 +77,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         onShowInFolder={handleShowInFolder}
         onChangeFolder={onSelectFolderDialog}
         onRefresh={() => onScanFolder(undefined, true)}
+        onOpenScanSummary={onOpenScanSummary}
         isLoading={isLoading}
       />
     );
@@ -97,14 +100,26 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
           </p>
         </div>
 
-        <button
-          onClick={() => onScanFolder(undefined, true)}
-          disabled={isLoading}
-          className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-tune-elevated hover:bg-tune-card text-xs font-medium text-tune-textSecondary hover:text-white border border-tune-border transition shadow-sm"
-        >
-          <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
-          <span>Refresh</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Custom Pop-up Button: Scan Summary */}
+          <button
+            onClick={onOpenScanSummary}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-tune-elevated hover:bg-tune-card text-xs font-semibold text-tune-textSecondary hover:text-white border border-tune-border transition shadow-sm hover:border-tune-accent"
+            title="Open Scan Summary & Library Diagnostics"
+          >
+            <BarChart2 size={14} className="text-tune-accent" />
+            <span>Scan Summary</span>
+          </button>
+
+          <button
+            onClick={() => onScanFolder(undefined, true)}
+            disabled={isLoading}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-tune-elevated hover:bg-tune-card text-xs font-medium text-tune-textSecondary hover:text-white border border-tune-border transition shadow-sm"
+          >
+            <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
+            <span>Refresh</span>
+          </button>
+        </div>
       </div>
 
       <SortFilterBar isGridView={isGridView} setIsGridView={setIsGridView} />
