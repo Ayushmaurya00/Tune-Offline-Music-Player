@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { Song, QueueItem, RepeatMode } from '@/types/music';
 import { audioController } from '../audio/audioController';
+import { sleepTimerService } from '../audio/sleepTimerService';
 
 function syncDiscordRPC(song: Song | null, isPlaying: boolean, currentTime: number) {
   if (window.tuneAPI) {
@@ -32,6 +33,7 @@ interface PlayerStore {
   currentTime: number;
   duration: number;
   volume: number;
+  playbackRate: number;
   isMuted: boolean;
   repeatMode: RepeatMode;
   isShuffled: boolean;
@@ -46,6 +48,7 @@ interface PlayerStore {
   prevTrack: () => void;
   seek: (seconds: number) => void;
   setVolume: (val: number) => void;
+  setPlaybackRate: (rate: number) => void;
   toggleMute: () => void;
   toggleRepeat: () => void;
   toggleShuffle: () => void;
@@ -62,6 +65,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
   currentTime: 0,
   duration: 0,
   volume: 0.8,
+  playbackRate: 1.0,
   isMuted: false,
   repeatMode: 'none',
   isShuffled: false,
@@ -89,7 +93,15 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
     audioController.playSong(
       song,
       isMuted ? 0 : volume,
-      () => get().nextTrack(),
+      () => {
+        const timerState = sleepTimerService.getState();
+        if (timerState.isActive && timerState.isEndOfTrack) {
+          sleepTimerService.onTrackEnded();
+          set({ isPlaying: false });
+          return;
+        }
+        get().nextTrack();
+      },
       (currentTime) => set({ currentTime })
     );
 
@@ -172,6 +184,11 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
     const clamped = Math.max(0, Math.min(1, val));
     audioController.setVolume(clamped);
     set({ volume: clamped, isMuted: clamped === 0 });
+  },
+
+  setPlaybackRate: (rate: number) => {
+    audioController.setRate(rate);
+    set({ playbackRate: rate });
   },
 
   toggleMute: () => {

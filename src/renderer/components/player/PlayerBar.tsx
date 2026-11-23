@@ -1,11 +1,13 @@
-import React from 'react';
-import { ListMusic, Heart, Mic2, Sliders } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ListMusic, Heart, Mic2, Sliders, Moon } from 'lucide-react';
 import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { PlaybackControls } from './PlaybackControls';
 import { WaveformSeekBar } from './WaveformSeekBar';
 import { VolumeControl } from './VolumeControl';
 import { AlbumArt } from '../shared/AlbumArt';
+import { SpeedSelector } from './SpeedSelector';
+import { sleepTimerService, SleepTimerState } from '../../audio/sleepTimerService';
 
 interface PlayerBarProps {
   accentColor?: string;
@@ -13,6 +15,7 @@ interface PlayerBarProps {
   isLyricsOpen: boolean;
   onOpenEq: () => void;
   isEqOpen: boolean;
+  onOpenSleepTimer: () => void;
 }
 
 export const PlayerBar: React.FC<PlayerBarProps> = ({
@@ -20,10 +23,18 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   onOpenLyrics,
   isLyricsOpen,
   onOpenEq,
-  isEqOpen
+  isEqOpen,
+  onOpenSleepTimer
 }) => {
   const { currentSong, isQueueOpen, toggleQueue } = usePlayerStore();
   const { isSongLiked, toggleLikeSong } = usePlaylistStore();
+  const [timerState, setTimerState] = useState<SleepTimerState>(sleepTimerService.getState());
+
+  useEffect(() => {
+    return sleepTimerService.subscribe((state) => {
+      setTimerState(state);
+    });
+  }, []);
 
   const isLiked = currentSong ? isSongLiked(currentSong.id) : false;
 
@@ -73,8 +84,30 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         <WaveformSeekBar accentColor={accentColor} />
       </div>
 
-      {/* Right: Lyrics, EQ, Queue & Volume */}
-      <div className="flex items-center justify-end gap-2.5 w-1/4 min-w-[200px]">
+      {/* Right: Controls, Lyrics, EQ, Queue & Volume */}
+      <div className="flex items-center justify-end gap-2 w-1/3 min-w-[280px]">
+        {/* Playback Speed Selector */}
+        <SpeedSelector accentColor={accentColor} />
+
+        {/* Sleep Timer Button */}
+        <button
+          onClick={onOpenSleepTimer}
+          className={`flex items-center gap-1.5 p-2 rounded-lg transition hover:bg-tune-card ${
+            timerState.isActive ? 'bg-tune-elevated text-tune-accent' : 'text-tune-textSecondary hover:text-white'
+          }`}
+          style={timerState.isActive ? { color: accentColor } : {}}
+          title={timerState.isActive ? 'Sleep Timer Active' : 'Set Sleep Timer'}
+        >
+          <Moon size={18} />
+          {timerState.isActive && (
+            <span className="text-[11px] font-mono font-bold">
+              {timerState.isEndOfTrack
+                ? 'End'
+                : `${Math.ceil(timerState.remainingSeconds / 60)}m`}
+            </span>
+          )}
+        </button>
+
         {/* Equalizer Button */}
         <button
           onClick={onOpenEq}

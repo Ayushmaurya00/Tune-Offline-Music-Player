@@ -9,6 +9,7 @@ import { SpotifyImportModal } from './components/importer/SpotifyImportModal';
 import { TuneWrappedModal } from './components/wrapped/TuneWrappedModal';
 import { AutoTaggerModal } from './components/tagger/AutoTaggerModal';
 import { EqualizerModal } from './components/player/EqualizerModal';
+import { SleepTimerModal } from './components/player/SleepTimerModal';
 import { useLibraryStore } from './store/libraryStore';
 import { usePlayerStore } from './store/playerStore';
 import { extractDominantColor } from './utils/colorExtractor';
@@ -21,6 +22,7 @@ export const App: React.FC = () => {
   const [isSpotifyModalOpen, setIsSpotifyModalOpen] = useState(false);
   const [isWrappedOpen, setIsWrappedOpen] = useState(false);
   const [isEqOpen, setIsEqOpen] = useState(false);
+  const [isSleepTimerOpen, setIsSleepTimerOpen] = useState(false);
   const [taggerSong, setTaggerSong] = useState<Song | null>(null);
   const [accentColor, setAccentColor] = useState('#1db954');
   const [ambientGradient, setAmbientGradient] = useState(
@@ -166,6 +168,7 @@ export const App: React.FC = () => {
         isLyricsOpen={isLyricsOpen}
         onOpenEq={() => setIsEqOpen(true)}
         isEqOpen={isEqOpen}
+        onOpenSleepTimer={() => setIsSleepTimerOpen(true)}
       />
 
       {/* Create Playlist Modal */}
@@ -203,6 +206,13 @@ export const App: React.FC = () => {
       <EqualizerModal
         isOpen={isEqOpen}
         onClose={() => setIsEqOpen(false)}
+        accentColor={accentColor}
+      />
+
+      {/* Sleep Timer Modal */}
+      <SleepTimerModal
+        isOpen={isSleepTimerOpen}
+        onClose={() => setIsSleepTimerOpen(false)}
         accentColor={accentColor}
       />
     </div>

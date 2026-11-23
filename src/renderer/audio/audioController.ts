@@ -7,6 +7,7 @@ class AudioController {
   private onTimeUpdateCallback?: (currentTime: number) => void;
   private onEndCallback?: () => void;
   private timerId: number | null = null;
+  private playbackRate: number = 1.0;
 
   public playSong(
     song: Song,
@@ -52,6 +53,7 @@ class AudioController {
       src: [mediaUrl],
       html5: true,
       volume: initialVolume,
+      rate: this.playbackRate,
       onend: () => {
         this.stopTimer();
         if (this.onEndCallback) this.onEndCallback();
@@ -117,6 +119,17 @@ class AudioController {
     if (this.howl) {
       this.howl.volume(volume);
     }
+  }
+
+  public setRate(rate: number) {
+    this.playbackRate = Math.max(0.5, Math.min(2.0, rate));
+    if (this.howl) {
+      this.howl.rate(this.playbackRate);
+    }
+  }
+
+  public getRate(): number {
+    return this.playbackRate;
   }
 
   public getSeek(): number {
