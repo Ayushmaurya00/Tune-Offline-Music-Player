@@ -104,8 +104,8 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       {/* Header Bar */}
-      <div className="p-4 sm:p-6 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex flex-col">
+      <div className="p-4 sm:p-6 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 app-drag-region">
+        <div className="flex flex-col app-no-drag">
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
             <span>Offline Library</span>
             {isLoading && <RefreshCw size={18} className="animate-spin text-tune-accent" />}
@@ -118,7 +118,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 app-no-drag">
           {/* Custom Pop-up Button: Scan Summary */}
           <button
             onClick={onOpenScanSummary}

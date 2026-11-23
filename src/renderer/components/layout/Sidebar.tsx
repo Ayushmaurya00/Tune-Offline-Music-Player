@@ -28,8 +28,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside className="hidden md:flex w-64 bg-tune-surface flex-col h-full border-r border-tune-border select-none flex-shrink-0">
       {/* App Branding */}
-      <div className="p-5">
-        <BrandLogo size={36} showText />
+      <div className="p-5 app-drag-region">
+        <BrandLogo size={36} showText className="app-no-drag" />
       </div>
 
       {/* Main Navigation */}

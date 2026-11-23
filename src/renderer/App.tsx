@@ -14,7 +14,6 @@ import { NotificationDrawer } from './components/player/NotificationDrawer';
 import { ScanResultModal, ScanResultData } from './components/library/ScanResultModal';
 import { FileDropOverlay } from './components/shared/FileDropOverlay';
 import { ShortcutsModal } from './components/shared/ShortcutsModal';
-import { BrandLogo } from './components/shared/BrandLogo';
 import { pickFolder, pickAudioFiles, convertFileListToSongs } from './utils/folderPicker';
 import { generateDemoTracks } from './utils/demoTracks';
 import { useLibraryStore } from './store/libraryStore';
@@ -382,17 +381,6 @@ export const App: React.FC = () => {
         className="absolute inset-0 pointer-events-none transition-all duration-1000 ease-out z-0"
         style={{ background: ambientGradient }}
       />
-
-      {/* Sleek Windows 10/11 Titlebar Overlay Drag Area (Desktop Only, No Lines) */}
-      <div className="hidden md:flex h-8 w-full app-drag-region items-center justify-between px-3 z-30 select-none bg-transparent flex-shrink-0">
-        <div className="flex items-center gap-2 app-no-drag">
-          <BrandLogo size={16} />
-          <span className="text-[11px] font-bold text-white tracking-widest uppercase">Tune</span>
-        </div>
-        <div className="flex-1" />
-        {/* Titlebar Overlay space for Windows native minimize/maximize/close buttons */}
-        <div className="w-36 h-full pointer-events-none" />
-      </div>
 
       {/* Top Application Body */}
       <div className="relative z-10 flex flex-1 overflow-hidden">
