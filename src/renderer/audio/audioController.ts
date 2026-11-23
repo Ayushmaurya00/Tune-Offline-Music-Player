@@ -1,5 +1,6 @@
 import { Howl } from 'howler';
 import { Song } from '@/types/music';
+import { eqService } from './eqService';
 
 class AudioController {
   private howl: Howl | null = null;
@@ -13,23 +14,56 @@ class AudioController {
     onEnd: () => void,
     onTimeUpdate: (currentTime: number) => void
   ) {
-    this.stop();
     this.onEndCallback = onEnd;
     this.onTimeUpdateCallback = onTimeUpdate;
 
     const normalizedPath = song.filePath.replace(/\\/g, '/');
     const mediaUrl = `tune-media://local/${encodeURI(normalizedPath)}`;
 
+    const { crossfadeDuration } = eqService.getSettings();
+    const shouldCrossfade = crossfadeDuration > 0 && this.howl && this.howl.playing();
+    const fadeMs = Math.min(5000, crossfadeDuration * 1000);
+
+    // Fade out previous track smoothly if crossfade is enabled
+    if (this.howl) {
+      const oldHowl = this.howl;
+      this.stopTimer();
+
+      if (shouldCrossfade) {
+        try {
+          oldHowl.fade(oldHowl.volume(), 0, fadeMs);
+          setTimeout(() => {
+            oldHowl.stop();
+            oldHowl.unload();
+          }, fadeMs + 100);
+        } catch {
+          oldHowl.stop();
+          oldHowl.unload();
+        }
+      } else {
+        oldHowl.stop();
+        oldHowl.unload();
+      }
+    }
+
+    const initialVolume = shouldCrossfade ? 0 : volume;
+
     this.howl = new Howl({
       src: [mediaUrl],
       html5: true,
-      volume: volume,
+      volume: initialVolume,
       onend: () => {
         this.stopTimer();
         if (this.onEndCallback) this.onEndCallback();
       },
       onplay: () => {
         this.startTimer();
+        eqService.init();
+
+        // Fade in new track
+        if (shouldCrossfade && this.howl) {
+          this.howl.fade(0, volume, fadeMs);
+        }
       },
       onpause: () => {
         this.stopTimer();

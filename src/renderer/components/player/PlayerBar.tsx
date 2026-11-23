@@ -1,5 +1,5 @@
 import React from 'react';
-import { ListMusic, Heart, Mic2 } from 'lucide-react';
+import { ListMusic, Heart, Mic2, Sliders } from 'lucide-react';
 import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { PlaybackControls } from './PlaybackControls';
@@ -11,12 +11,16 @@ interface PlayerBarProps {
   accentColor?: string;
   onOpenLyrics: () => void;
   isLyricsOpen: boolean;
+  onOpenEq: () => void;
+  isEqOpen: boolean;
 }
 
 export const PlayerBar: React.FC<PlayerBarProps> = ({
   accentColor = '#1db954',
   onOpenLyrics,
-  isLyricsOpen
+  isLyricsOpen,
+  onOpenEq,
+  isEqOpen
 }) => {
   const { currentSong, isQueueOpen, toggleQueue } = usePlayerStore();
   const { isSongLiked, toggleLikeSong } = usePlaylistStore();
@@ -69,8 +73,20 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         <WaveformSeekBar accentColor={accentColor} />
       </div>
 
-      {/* Right: Lyrics, Queue & Volume */}
-      <div className="flex items-center justify-end gap-3 w-1/4 min-w-[200px]">
+      {/* Right: Lyrics, EQ, Queue & Volume */}
+      <div className="flex items-center justify-end gap-2.5 w-1/4 min-w-[200px]">
+        {/* Equalizer Button */}
+        <button
+          onClick={onOpenEq}
+          className={`p-2 rounded-lg transition hover:bg-tune-card ${
+            isEqOpen ? 'bg-tune-elevated' : 'text-tune-textSecondary hover:text-white'
+          }`}
+          style={isEqOpen ? { color: accentColor } : {}}
+          title="10-Band Equalizer & Crossfade"
+        >
+          <Sliders size={18} />
+        </button>
+
         {/* Synced Lyrics Button */}
         <button
           onClick={onOpenLyrics}

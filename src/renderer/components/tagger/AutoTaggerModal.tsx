@@ -286,3 +286,4 @@ export const AutoTaggerModal: React.FC<AutoTaggerModalProps> = ({
     </div>
   );
 };
+

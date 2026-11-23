@@ -8,6 +8,7 @@ import { LyricsModal } from './components/lyrics/LyricsModal';
 import { SpotifyImportModal } from './components/importer/SpotifyImportModal';
 import { TuneWrappedModal } from './components/wrapped/TuneWrappedModal';
 import { AutoTaggerModal } from './components/tagger/AutoTaggerModal';
+import { EqualizerModal } from './components/player/EqualizerModal';
 import { useLibraryStore } from './store/libraryStore';
 import { usePlayerStore } from './store/playerStore';
 import { extractDominantColor } from './utils/colorExtractor';
@@ -19,6 +20,7 @@ export const App: React.FC = () => {
   const [isLyricsOpen, setIsLyricsOpen] = useState(false);
   const [isSpotifyModalOpen, setIsSpotifyModalOpen] = useState(false);
   const [isWrappedOpen, setIsWrappedOpen] = useState(false);
+  const [isEqOpen, setIsEqOpen] = useState(false);
   const [taggerSong, setTaggerSong] = useState<Song | null>(null);
   const [accentColor, setAccentColor] = useState('#1db954');
   const [ambientGradient, setAmbientGradient] = useState(
@@ -162,6 +164,8 @@ export const App: React.FC = () => {
         accentColor={accentColor}
         onOpenLyrics={() => setIsLyricsOpen(true)}
         isLyricsOpen={isLyricsOpen}
+        onOpenEq={() => setIsEqOpen(true)}
+        isEqOpen={isEqOpen}
       />
 
       {/* Create Playlist Modal */}
@@ -193,6 +197,13 @@ export const App: React.FC = () => {
         isOpen={Boolean(taggerSong)}
         onClose={() => setTaggerSong(null)}
         song={taggerSong}
+      />
+
+      {/* 10-Band Equalizer & Crossfade Modal */}
+      <EqualizerModal
+        isOpen={isEqOpen}
+        onClose={() => setIsEqOpen(false)}
+        accentColor={accentColor}
       />
     </div>
   );
