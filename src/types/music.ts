@@ -81,6 +81,8 @@ export interface TuneAPI {
   deleteSongFile: (filePath: string) => Promise<boolean>;
   showInFolder: (filePath: string) => Promise<void>;
   selectFolderDialog: () => Promise<string | null>;
+  selectFilesDialog: () => Promise<string[]>;
+  parseAudioFile: (filePath: string) => Promise<Song | null>;
   fetchSpotifyPlaylist: (url: string) => Promise<SpotifyPlaylistResult>;
   updateDiscordPresence: (data: DiscordPresenceData) => Promise<void>;
   suggestMetadata: (query: string) => Promise<TagSuggestion[]>;

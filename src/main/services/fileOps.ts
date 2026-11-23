@@ -36,3 +36,25 @@ export async function selectFolder(win?: BrowserWindow | null): Promise<string |
   return result.filePaths[0];
 }
 
+export async function selectAudioFiles(win?: BrowserWindow | null): Promise<string[]> {
+  const options: Electron.OpenDialogOptions = {
+    title: 'Select Audio Files',
+    properties: ['openFile', 'multiSelections'],
+    filters: [
+      { name: 'Audio Files', extensions: ['mp3', 'wav', 'flac', 'm4a', 'mp4', 'ogg', 'aac', 'opus'] },
+      { name: 'All Files', extensions: ['*'] }
+    ]
+  };
+
+  const result =
+    win && !win.isDestroyed()
+      ? await dialog.showOpenDialog(win, options)
+      : await dialog.showOpenDialog(options);
+
+  if (result.canceled || result.filePaths.length === 0) {
+    return [];
+  }
+
+  return result.filePaths;
+}
+

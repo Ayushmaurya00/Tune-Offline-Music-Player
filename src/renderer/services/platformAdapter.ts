@@ -67,6 +67,8 @@ export const mobileTuneAPI: TuneAPI = {
   showInFolder: async () => {},
 
   selectFolderDialog: async () => null,
+  selectFilesDialog: async () => [],
+  parseAudioFile: async () => null,
 
   fetchSpotifyPlaylist: async (url: string): Promise<SpotifyPlaylistResult> => {
     try {

@@ -1,9 +1,9 @@
 import { app, BrowserWindow, ipcMain, protocol, net } from 'electron';
 import path from 'node:path';
 import url, { fileURLToPath } from 'node:url';
-import { scanDirectory } from './services/scanner';
+import { scanDirectory, parseAudioFile } from './services/scanner';
 import { setupFolderWatcher, stopFolderWatcher } from './services/watcher';
-import { deleteFileToTrash, showFileInFolder, selectFolder } from './services/fileOps';
+import { deleteFileToTrash, showFileInFolder, selectFolder, selectAudioFiles } from './services/fileOps';
 import { fetchSpotifyPlaylistTracks } from './services/spotifyService';
 import { initDiscordRPC, setDiscordPresence, clearDiscordPresence } from './services/discordService';
 import { fetchSuggestedMetadata } from './services/autoTagger';
@@ -111,8 +111,15 @@ ipcMain.handle('tune:show-in-folder', async (_, filePath: string) => {
 });
 
 ipcMain.handle('tune:select-folder-dialog', async () => {
-  if (!win) return null;
   return await selectFolder(win);
+});
+
+ipcMain.handle('tune:select-files-dialog', async () => {
+  return await selectAudioFiles(win);
+});
+
+ipcMain.handle('tune:parse-audio-file', async (_, filePath: string) => {
+  return await parseAudioFile(filePath);
 });
 
 ipcMain.handle('tune:fetch-spotify-playlist', async (_, url: string) => {

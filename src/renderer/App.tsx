@@ -13,7 +13,9 @@ import { EqualizerModal } from './components/player/EqualizerModal';
 import { SleepTimerModal } from './components/player/SleepTimerModal';
 import { MiniPlayerView } from './components/player/MiniPlayerView';
 import { ScanResultModal, ScanResultData } from './components/library/ScanResultModal';
-import { pickFolderOrFiles } from './utils/folderPicker';
+import { FileDropOverlay } from './components/shared/FileDropOverlay';
+import { pickFolder, pickAudioFiles, convertFileListToSongs } from './utils/folderPicker';
+import { generateDemoTracks } from './utils/demoTracks';
 import { useLibraryStore } from './store/libraryStore';
 import { usePlayerStore } from './store/playerStore';
 import { extractDominantColor } from './utils/colorExtractor';
@@ -98,26 +100,13 @@ export const App: React.FC = () => {
     [watchedFolderPath, setIsLoading, setWatchedFolder, setSongs, songs.length]
   );
 
-  const handleSelectFolder = async () => {
-    setIsLoading(true);
-    const startTime = performance.now();
-    try {
-      const picked = await pickFolderOrFiles();
-      if (!picked) return;
-
-      const { folderPath, songs: scannedSongs } = picked;
+  const applyScanResult = useCallback(
+    (folderPath: string, scannedSongs: Song[], durationMs: number) => {
       setWatchedFolder(folderPath);
-
       const prevCount = songs.length;
       setSongs(scannedSongs);
 
-      if (window.tuneAPI) {
-        await window.tuneAPI.startWatching(folderPath);
-      }
-
-      const durationMs = performance.now() - startTime;
       const newSongsCount = Math.max(0, scannedSongs.length - prevCount);
-
       const formatCounts: Record<string, number> = {};
       for (const s of scannedSongs) {
         const fmt = (s.format || s.fileName.split('.').pop() || 'mp3').toLowerCase();
@@ -131,11 +120,58 @@ export const App: React.FC = () => {
         durationMs,
         formatCounts
       });
+    },
+    [songs.length, setWatchedFolder, setSongs]
+  );
+
+  const handleSelectFolder = async () => {
+    setIsLoading(true);
+    const startTime = performance.now();
+    try {
+      const picked = await pickFolder();
+      if (!picked) return;
+      applyScanResult(picked.folderPath, picked.songs, performance.now() - startTime);
+      if (window.tuneAPI) {
+        await window.tuneAPI.startWatching(picked.folderPath);
+      }
     } catch (err) {
       console.error('Folder selection error:', err);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSelectFiles = async () => {
+    setIsLoading(true);
+    const startTime = performance.now();
+    try {
+      const picked = await pickAudioFiles();
+      if (!picked) return;
+      // Append to existing songs or replace if empty
+      const merged = [...songs.filter((s) => !picked.songs.some((p) => p.id === s.id)), ...picked.songs];
+      applyScanResult(picked.folderPath, merged, performance.now() - startTime);
+    } catch (err) {
+      console.error('File selection error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLoadDemoTracks = () => {
+    const startTime = performance.now();
+    const demoSongs = generateDemoTracks();
+    applyScanResult('Tune Offline Demo Library', demoSongs, performance.now() - startTime);
+    if (demoSongs.length > 0) {
+      playSong(demoSongs[0], demoSongs);
+    }
+  };
+
+  const handleFilesDropped = (files: File[]) => {
+    const startTime = performance.now();
+    const result = convertFileListToSongs(files);
+    if (result.songs.length === 0) return;
+    const merged = [...songs.filter((s) => !result.songs.some((p) => p.id === s.id)), ...result.songs];
+    applyScanResult(result.folderPath, merged, performance.now() - startTime);
   };
 
   // Keyboard Shortcuts Listener
@@ -240,6 +276,8 @@ export const App: React.FC = () => {
           <LibraryView
             onScanFolder={(path, popup) => handleScan(path, popup)}
             onSelectFolderDialog={handleSelectFolder}
+            onSelectFilesDialog={handleSelectFiles}
+            onLoadDemoTracks={handleLoadDemoTracks}
             onAutoTag={(song) => setTaggerSong(song)}
           />
         </main>
@@ -316,11 +354,19 @@ export const App: React.FC = () => {
         onClose={() => setScanResult(null)}
         result={scanResult}
         accentColor={accentColor}
+        onLoadDemoTracks={handleLoadDemoTracks}
+        onChangeFolder={handleSelectFolder}
         onPlayAll={() => {
           if (songs.length > 0) {
             playSong(songs[0], songs);
           }
         }}
+      />
+
+      {/* Global Drag and Drop Audio Files Overlay */}
+      <FileDropOverlay
+        onFilesDropped={handleFilesDropped}
+        accentColor={accentColor}
       />
     </div>
   );

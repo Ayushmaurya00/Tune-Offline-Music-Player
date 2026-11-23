@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FolderDown, RefreshCw, FolderOpen } from 'lucide-react';
+import { FolderDown, RefreshCw, FolderOpen, Sparkles, Music } from 'lucide-react';
 import { Song } from '@/types/music';
 import { useLibraryStore } from '../../store/libraryStore';
 import { usePlaylistStore } from '../../store/playlistStore';
@@ -12,12 +12,16 @@ import { FolderView } from '../folders/FolderView';
 interface LibraryViewProps {
   onScanFolder: (path?: string, showPopup?: boolean) => Promise<void>;
   onSelectFolderDialog: () => Promise<void>;
+  onSelectFilesDialog: () => Promise<void>;
+  onLoadDemoTracks: () => void;
   onAutoTag?: (song: Song) => void;
 }
 
 export const LibraryView: React.FC<LibraryViewProps> = ({
   onScanFolder,
   onSelectFolderDialog,
+  onSelectFilesDialog,
+  onLoadDemoTracks,
   onAutoTag
 }) => {
   const [isGridView, setIsGridView] = useState(false);
@@ -113,15 +117,34 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             </div>
             <h3 className="text-base font-semibold text-white">No audio files found</h3>
             <p className="text-xs text-tune-textMuted max-w-sm mt-1.5 leading-relaxed">
-              Drop MP3, MP4, WAV, or FLAC files into your Downloads folder, or select another directory on your PC.
+              Drop MP3, WAV, FLAC, or M4A files anywhere into this window, or pick from below:
             </p>
-            <button
-              onClick={onSelectFolderDialog}
-              className="mt-5 flex items-center gap-2 px-4 py-2.5 rounded-full bg-tune-accent hover:bg-tune-accentHover text-black text-xs font-semibold transition shadow-md"
-            >
-              <FolderOpen size={16} />
-              <span>Choose Custom Music Folder</span>
-            </button>
+
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-5">
+              <button
+                onClick={onLoadDemoTracks}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-tune-accent hover:bg-tune-accentHover text-black text-xs font-bold transition shadow-lg shadow-tune-accent/25 hover:scale-105 active:scale-95"
+              >
+                <Sparkles size={16} />
+                <span>Load Demo Songs (Instant Test)</span>
+              </button>
+
+              <button
+                onClick={onSelectFolderDialog}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-tune-elevated hover:bg-tune-card text-white text-xs font-semibold border border-tune-border transition hover:border-tune-accent"
+              >
+                <FolderOpen size={16} />
+                <span>Choose Music Folder</span>
+              </button>
+
+              <button
+                onClick={onSelectFilesDialog}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-tune-elevated hover:bg-tune-card text-white text-xs font-semibold border border-tune-border transition hover:border-tune-accent"
+              >
+                <Music size={16} />
+                <span>Select Audio Files</span>
+              </button>
+            </div>
           </div>
         ) : isGridView ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">

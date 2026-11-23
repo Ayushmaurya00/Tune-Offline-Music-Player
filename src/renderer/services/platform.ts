@@ -1,7 +1,11 @@
 import { Capacitor } from '@capacitor/core';
 
 export const isElectron = (): boolean => {
-  return typeof window !== 'undefined' && typeof window.tuneAPI !== 'undefined';
+  return (
+    typeof navigator !== 'undefined' &&
+    typeof navigator.userAgent === 'string' &&
+    navigator.userAgent.toLowerCase().includes('electron')
+  );
 };
 
 export const isCapacitor = (): boolean => {
