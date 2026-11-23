@@ -51,3 +51,4 @@ export interface TuneAPI {
   onFileAdded: (callback: (song: Song) => void) => () => void;
   onFileRemoved: (callback: (filePath: string) => void) => () => void;
 }
+

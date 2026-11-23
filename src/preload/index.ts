@@ -22,3 +22,4 @@ const api: TuneAPI = {
 };
 
 contextBridge.exposeInMainWorld('tuneAPI', api);
+

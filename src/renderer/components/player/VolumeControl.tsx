@@ -44,3 +44,4 @@ export const VolumeControl: React.FC = () => {
     </div>
   );
 };
+

@@ -1,9 +1,12 @@
 import { app, BrowserWindow, ipcMain, protocol, net } from 'electron';
 import path from 'node:path';
-import url from 'node:url';
+import url, { fileURLToPath } from 'node:url';
 import { scanDirectory } from './services/scanner';
 import { setupFolderWatcher, stopFolderWatcher } from './services/watcher';
 import { deleteFileToTrash, showFileInFolder, selectFolder } from './services/fileOps';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 process.env.DIST = path.join(__dirname, '../dist');
 process.env.VITE_PUBLIC = app.isPackaged

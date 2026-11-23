@@ -29,3 +29,4 @@ export async function selectFolder(win: BrowserWindow): Promise<string | null> {
 
   return result.filePaths[0];
 }
+

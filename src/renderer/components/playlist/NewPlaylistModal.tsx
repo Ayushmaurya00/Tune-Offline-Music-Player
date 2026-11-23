@@ -93,3 +93,4 @@ export const NewPlaylistModal: React.FC<NewPlaylistModalProps> = ({ isOpen, onCl
     </div>
   );
 };
+

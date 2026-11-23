@@ -50,3 +50,4 @@ export function stopFolderWatcher(): boolean {
   }
   return false;
 }
+

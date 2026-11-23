@@ -33,3 +33,4 @@ export const AlbumArt: React.FC<AlbumArtProps> = ({
     </div>
   );
 };
+
