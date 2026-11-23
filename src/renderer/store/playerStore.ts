@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { Song, QueueItem, RepeatMode } from '@/types/music';
 import { audioController } from '../audio/audioController';
 import { sleepTimerService } from '../audio/sleepTimerService';
+import { mediaSessionService } from '../services/mediaSession';
 
 function syncDiscordRPC(song: Song | null, isPlaying: boolean, currentTime: number) {
   if (window.tuneAPI) {
@@ -40,6 +41,7 @@ interface PlayerStore {
   isQueueOpen: boolean;
   queue: QueueItem[];
   history: Song[];
+  activeContextSongs: Song[];
 
   // Actions
   playSong: (song: Song, newQueue?: Song[]) => void;
@@ -47,6 +49,8 @@ interface PlayerStore {
   nextTrack: () => void;
   prevTrack: () => void;
   seek: (seconds: number) => void;
+  seekForward: (offset?: number) => void;
+  seekBackward: (offset?: number) => void;
   setVolume: (val: number) => void;
   setPlaybackRate: (rate: number) => void;
   toggleMute: () => void;
@@ -77,6 +81,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
   isQueueOpen: false,
   queue: [],
   history: [],
+  activeContextSongs: [],
 
   playSong: (song: Song, newQueue?: Song[]) => {
     const { volume, isMuted } = get();
@@ -85,7 +90,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
       const items: QueueItem[] = newQueue
         .filter((s) => s.id !== song.id)
         .map((s) => ({ queueId: `${s.id}-${Math.random().toString(36).substring(2, 9)}`, song: s }));
-      set({ queue: items });
+      set({ queue: items, activeContextSongs: newQueue });
     }
 
     set({
@@ -107,10 +112,14 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
         }
         get().nextTrack();
       },
-      (currentTime) => set({ currentTime })
+      (currentTime) => {
+        set({ currentTime });
+        mediaSessionService.updatePositionState(song.duration, currentTime, get().playbackRate);
+      }
     );
 
     syncDiscordRPC(song, true, 0);
+    mediaSessionService.updateMetadata(song, true);
   },
 
   togglePlay: () => {
@@ -121,27 +130,40 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
       audioController.pause();
       set({ isPlaying: false });
       syncDiscordRPC(currentSong, false, currentTime);
+      mediaSessionService.updateMetadata(currentSong, false);
     } else {
       audioController.resume();
       set({ isPlaying: true });
       syncDiscordRPC(currentSong, true, currentTime);
+      mediaSessionService.updateMetadata(currentSong, true);
     }
   },
 
   nextTrack: () => {
-    const { queue, repeatMode, currentSong } = get();
+    const { queue, repeatMode, currentSong, activeContextSongs } = get();
 
     if (repeatMode === 'one' && currentSong) {
-      audioController.seek(0);
-      set({ currentTime: 0, isPlaying: true });
-      audioController.resume();
+      get().playSong(currentSong);
       return;
     }
 
     if (queue.length === 0) {
+      if (repeatMode === 'all' && activeContextSongs.length > 0) {
+        const first = activeContextSongs[0];
+        const rest = activeContextSongs.filter((s) => s.id !== first.id);
+        const newItems: QueueItem[] = rest.map((s) => ({
+          queueId: `${s.id}-${Math.random().toString(36).substring(2, 9)}`,
+          song: s
+        }));
+        set({ queue: newItems });
+        get().playSong(first);
+        return;
+      }
+
       set({ isPlaying: false, currentTime: 0 });
       audioController.stop();
       syncDiscordRPC(null, false, 0);
+      mediaSessionService.updateMetadata(null, false);
       return;
     }
 
@@ -181,8 +203,20 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
   },
 
   seek: (seconds: number) => {
-    audioController.seek(seconds);
-    set({ currentTime: seconds });
+    const clamped = Math.max(0, Math.min(get().duration || 0, seconds));
+    audioController.seek(clamped);
+    set({ currentTime: clamped });
+    mediaSessionService.updatePositionState(get().duration, clamped, get().playbackRate);
+  },
+
+  seekForward: (offset = 10) => {
+    const { currentTime, duration } = get();
+    get().seek(Math.min(duration || 0, currentTime + offset));
+  },
+
+  seekBackward: (offset = 10) => {
+    const { currentTime } = get();
+    get().seek(Math.max(0, currentTime - offset));
   },
 
   setVolume: (val: number) => {

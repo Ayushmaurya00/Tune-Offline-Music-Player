@@ -1,12 +1,13 @@
-import React from 'react';
-import { Home, FolderDown, Heart, Plus, FolderOpen, Music2, Trash2, Sparkles, FolderTree, Keyboard } from 'lucide-react';
+import React, { useState } from 'react';
+import { Home, FolderDown, Heart, Plus, FolderOpen, Music2, Trash2, FolderTree, Keyboard } from 'lucide-react';
 import { useLibraryStore } from '../../store/libraryStore';
 import { usePlaylistStore } from '../../store/playlistStore';
+import { ConfirmModal } from '../shared/ConfirmModal';
+import { Playlist } from '@/types/music';
 
 interface SidebarProps {
   onOpenNewPlaylistModal: () => void;
   onOpenSpotifyModal: () => void;
-  onOpenWrapped: () => void;
   onSelectFolder: () => void;
   onOpenScanSummary?: () => void;
   onOpenShortcuts?: () => void;
@@ -15,11 +16,11 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
   onOpenNewPlaylistModal,
   onOpenSpotifyModal,
-  onOpenWrapped,
   onSelectFolder,
   onOpenScanSummary,
   onOpenShortcuts
 }) => {
+  const [playlistToDelete, setPlaylistToDelete] = useState<Playlist | null>(null);
   const { activeView, selectedPlaylistId, setActiveView, watchedFolderPath, songs } = useLibraryStore();
   const { playlists, deletePlaylist } = usePlaylistStore();
 
@@ -76,12 +77,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
 
         <button
-          onClick={onOpenWrapped}
-          className="w-full flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-sm font-medium text-purple-300 hover:text-white hover:bg-purple-950/30 transition group"
+          onClick={() => setActiveView('playlists')}
+          className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+            activeView === 'playlists' || activeView === 'playlist'
+              ? 'bg-tune-elevated text-white'
+              : 'text-tune-textSecondary hover:text-white hover:bg-tune-elevated/50'
+          }`}
         >
-          <Sparkles size={18} className="text-purple-400 group-hover:rotate-12 transition-transform" />
-          <span>Tune Wrapped</span>
-          <span className="ml-auto text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300">New</span>
+          <Music2 size={18} className="text-tune-accent" />
+          <span>Playlists</span>
+          <span className="ml-auto text-xs text-tune-textMuted font-mono">{playlists.length}</span>
         </button>
       </div>
 
@@ -167,7 +172,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    deletePlaylist(playlist.id);
+                    setPlaylistToDelete(playlist);
                   }}
                   className="opacity-0 group-hover:opacity-100 p-1 text-tune-textMuted hover:text-red-400 transition"
                   title="Delete playlist"
@@ -206,6 +211,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={Boolean(playlistToDelete)}
+        title="Delete Playlist"
+        message={`Are you sure you want to delete "${playlistToDelete?.name}"? Your local music files will remain safe.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDestructive
+        onConfirm={() => {
+          if (playlistToDelete) {
+            deletePlaylist(playlistToDelete.id);
+            setPlaylistToDelete(null);
+          }
+        }}
+        onCancel={() => setPlaylistToDelete(null)}
+      />
     </aside>
   );
 };

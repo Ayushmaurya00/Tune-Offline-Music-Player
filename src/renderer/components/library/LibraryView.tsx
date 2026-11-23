@@ -7,7 +7,9 @@ import { SortFilterBar } from './SortFilterBar';
 import { SongCard } from './SongCard';
 import { SongRow } from './SongRow';
 import { PlaylistDetailView } from '../playlist/PlaylistDetailView';
+import { PlaylistsView } from '../playlist/PlaylistsView';
 import { FolderView } from '../folders/FolderView';
+import { ConfirmModal } from '../shared/ConfirmModal';
 
 interface LibraryViewProps {
   onScanFolder: (path?: string, showPopup?: boolean) => Promise<void>;
@@ -15,7 +17,7 @@ interface LibraryViewProps {
   onSelectFilesDialog: () => Promise<void>;
   onLoadDemoTracks: () => void;
   onOpenScanSummary: () => void;
-  onAutoTag?: (song: Song) => void;
+  onOpenNewPlaylistModal: () => void;
 }
 
 export const LibraryView: React.FC<LibraryViewProps> = ({
@@ -24,9 +26,10 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   onSelectFilesDialog,
   onLoadDemoTracks,
   onOpenScanSummary,
-  onAutoTag
+  onOpenNewPlaylistModal
 }) => {
   const [isGridView, setIsGridView] = useState(false);
+  const [songToDelete, setSongToDelete] = useState<Song | null>(null);
   const {
     songs,
     isLoading,
@@ -40,15 +43,22 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
   const sortedSongs = getFilteredAndSortedSongs();
 
-  const handleDeleteSong = async (song: Song) => {
-    const confirm = window.confirm(`Move "${song.title}" to Recycle Bin?`);
-    if (!confirm) return;
+  const handleDeleteSong = (song: Song) => {
+    setSongToDelete(song);
+  };
+
+  const confirmDeleteSong = async () => {
+    if (!songToDelete) return;
+    const targetSong = songToDelete;
+    setSongToDelete(null);
 
     if (window.tuneAPI) {
-      const ok = await window.tuneAPI.deleteSongFile(song.filePath);
+      const ok = await window.tuneAPI.deleteSongFile(targetSong.filePath);
       if (ok) {
-        removeSong(song.filePath);
+        removeSong(targetSong.filePath);
       }
+    } else {
+      removeSong(targetSong.filePath);
     }
   };
 
@@ -62,6 +72,15 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     return <PlaylistDetailView isLikedView allSongs={songs} />;
   }
 
+  if (activeView === 'playlists') {
+    return (
+      <PlaylistsView
+        allSongs={songs}
+        onOpenNewPlaylistModal={onOpenNewPlaylistModal}
+      />
+    );
+  }
+
   if (activeView === 'playlist' && selectedPlaylistId) {
     const currentPlaylist = playlists.find((p) => p.id === selectedPlaylistId);
     return <PlaylistDetailView playlist={currentPlaylist} allSongs={songs} />;
@@ -72,7 +91,6 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
       <FolderView
         songs={songs}
         rootPath={watchedFolderPath || ''}
-        onAutoTag={onAutoTag}
         onDelete={handleDeleteSong}
         onShowInFolder={handleShowInFolder}
         onChangeFolder={onSelectFolderDialog}
@@ -169,7 +187,6 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 song={song}
                 playlistContext={sortedSongs}
                 onDelete={handleDeleteSong}
-                onAutoTag={onAutoTag}
               />
             ))}
           </div>
@@ -192,12 +209,22 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 playlistContext={sortedSongs}
                 onDelete={handleDeleteSong}
                 onShowInFolder={handleShowInFolder}
-                onAutoTag={onAutoTag}
               />
             ))}
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={Boolean(songToDelete)}
+        title="Delete Audio File"
+        message={`Are you sure you want to move "${songToDelete?.title}" to the Recycle Bin? This will delete the local file from disk.`}
+        confirmText="Move to Trash"
+        cancelText="Cancel"
+        isDestructive
+        onConfirm={confirmDeleteSong}
+        onCancel={() => setSongToDelete(null)}
+      />
     </div>
   );
 };

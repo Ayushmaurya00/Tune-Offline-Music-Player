@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Pause, Heart, PlusCircle, Trash2, Folder, Wand2, MoreVertical } from 'lucide-react';
+import { Play, Pause, Heart, PlusCircle, Trash2, Folder, MoreVertical } from 'lucide-react';
 import { Song } from '@/types/music';
 import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
@@ -13,7 +13,6 @@ interface SongRowProps {
   playlistContext?: Song[];
   onDelete?: (song: Song) => void;
   onShowInFolder?: (song: Song) => void;
-  onAutoTag?: (song: Song) => void;
 }
 
 export const SongRow: React.FC<SongRowProps> = ({
@@ -21,8 +20,7 @@ export const SongRow: React.FC<SongRowProps> = ({
   song,
   playlistContext,
   onDelete,
-  onShowInFolder,
-  onAutoTag
+  onShowInFolder
 }) => {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const { currentSong, isPlaying, playSong, togglePlay, addToQueue, playNext } = usePlayerStore();
@@ -129,16 +127,6 @@ export const SongRow: React.FC<SongRowProps> = ({
           </button>
         )}
 
-        {onAutoTag && (
-          <button
-            onClick={() => onAutoTag(song)}
-            className="hidden md:flex p-1 text-purple-400 hover:text-purple-300 opacity-0 group-hover:opacity-100 transition"
-            title="Auto-tag with AI"
-          >
-            <Wand2 size={15} />
-          </button>
-        )}
-
         {onDelete && (
           <button
             onClick={() => onDelete(song)}
@@ -175,7 +163,6 @@ export const SongRow: React.FC<SongRowProps> = ({
         onPlayNext={() => playNext(song)}
         onAddToQueue={() => addToQueue(song)}
         onAddToPlaylist={(playlistId) => addSongToPlaylist(playlistId, song.id)}
-        onAutoTag={onAutoTag ? () => onAutoTag(song) : undefined}
         onShowInFolder={onShowInFolder ? () => onShowInFolder(song) : undefined}
         onDelete={onDelete ? () => onDelete(song) : undefined}
       />

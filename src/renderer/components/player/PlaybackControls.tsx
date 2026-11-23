@@ -81,12 +81,15 @@ export const PlaybackControls: React.FC = () => {
       {/* Repeat */}
       <button
         onClick={toggleRepeat}
-        className={`p-1.5 transition rounded-full hover:scale-105 ${
-          repeatMode !== 'none' ? 'text-tune-accent' : 'text-tune-textSecondary hover:text-white'
+        className={`relative p-1.5 transition rounded-full hover:scale-105 ${
+          repeatMode !== 'none' ? 'text-tune-accent font-bold' : 'text-tune-textSecondary hover:text-white'
         }`}
-        title={`Repeat: ${repeatMode}`}
+        title={`Repeat: ${repeatMode === 'one' ? 'Repeat Current Song' : repeatMode === 'all' ? 'Repeat All Songs' : 'Off'}`}
       >
         {repeatMode === 'one' ? <Repeat1 size={18} /> : <Repeat size={17} />}
+        {repeatMode !== 'none' && (
+          <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-tune-accent" />
+        )}
       </button>
     </div>
   );

@@ -7,11 +7,10 @@ import { QueuePanel } from './components/queue/QueuePanel';
 import { NewPlaylistModal } from './components/playlist/NewPlaylistModal';
 import { LyricsModal } from './components/lyrics/LyricsModal';
 import { SpotifyImportModal } from './components/importer/SpotifyImportModal';
-import { TuneWrappedModal } from './components/wrapped/TuneWrappedModal';
-import { AutoTaggerModal } from './components/tagger/AutoTaggerModal';
 import { EqualizerModal } from './components/player/EqualizerModal';
 import { SleepTimerModal } from './components/player/SleepTimerModal';
 import { MiniPlayerView } from './components/player/MiniPlayerView';
+import { NotificationDrawer } from './components/player/NotificationDrawer';
 import { ScanResultModal, ScanResultData } from './components/library/ScanResultModal';
 import { FileDropOverlay } from './components/shared/FileDropOverlay';
 import { ShortcutsModal } from './components/shared/ShortcutsModal';
@@ -21,20 +20,20 @@ import { useLibraryStore } from './store/libraryStore';
 import { usePlayerStore } from './store/playerStore';
 import { extractDominantColor } from './utils/colorExtractor';
 import { recordSongPlay } from './utils/statsTracker';
+import { mediaSessionService } from './services/mediaSession';
 import { Song } from '@/types/music';
 
 export const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLyricsOpen, setIsLyricsOpen] = useState(false);
   const [isSpotifyModalOpen, setIsSpotifyModalOpen] = useState(false);
-  const [isWrappedOpen, setIsWrappedOpen] = useState(false);
   const [isEqOpen, setIsEqOpen] = useState(false);
   const [isSleepTimerOpen, setIsSleepTimerOpen] = useState(false);
   const [isMiniPlayer, setIsMiniPlayer] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
   const [scanResult, setScanResult] = useState<ScanResultData | null>(null);
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
-  const [taggerSong, setTaggerSong] = useState<Song | null>(null);
   const [accentColor, setAccentColor] = useState('#1db954');
   const [ambientGradient, setAmbientGradient] = useState(
     'radial-gradient(ellipse at top, rgba(29, 185, 84, 0.12) 0%, transparent 70%)'
@@ -324,6 +323,19 @@ export const App: React.FC = () => {
     }
   }, [togglePlay, nextTrack, prevTrack]);
 
+  // Initialize System MediaSession for native OS Lockscreen & Notification Shade
+  useEffect(() => {
+    mediaSessionService.init({
+      play: togglePlay,
+      pause: togglePlay,
+      next: nextTrack,
+      prev: prevTrack,
+      seek: seek,
+      seekForward: (offset) => seek(currentTime + offset),
+      seekBackward: (offset) => seek(Math.max(0, currentTime - offset))
+    });
+  }, [togglePlay, nextTrack, prevTrack, seek, currentTime]);
+
   if (isMiniPlayer) {
     return (
       <MiniPlayerView
@@ -335,6 +347,13 @@ export const App: React.FC = () => {
 
   return (
     <div className="relative flex flex-col h-screen w-screen bg-tune-bg text-white overflow-hidden select-none">
+      {/* Top Slide-Down In-App Notification Drawer */}
+      <NotificationDrawer
+        isOpen={isNotificationDrawerOpen}
+        onClose={() => setIsNotificationDrawerOpen(false)}
+        accentColor={accentColor}
+      />
+
       {/* Dynamic Ambient Background Glow */}
       <div
         className="absolute inset-0 pointer-events-none transition-all duration-1000 ease-out z-0"
@@ -359,7 +378,6 @@ export const App: React.FC = () => {
         <Sidebar
           onOpenNewPlaylistModal={() => setIsModalOpen(true)}
           onOpenSpotifyModal={() => setIsSpotifyModalOpen(true)}
-          onOpenWrapped={() => setIsWrappedOpen(true)}
           onSelectFolder={handleSelectFolder}
           onOpenScanSummary={handleOpenScanSummary}
           onOpenShortcuts={() => setIsShortcutsOpen(true)}
@@ -373,7 +391,7 @@ export const App: React.FC = () => {
             onSelectFilesDialog={handleSelectFiles}
             onLoadDemoTracks={handleLoadDemoTracks}
             onOpenScanSummary={handleOpenScanSummary}
-            onAutoTag={(song) => setTaggerSong(song)}
+            onOpenNewPlaylistModal={() => setIsModalOpen(true)}
           />
         </main>
 
@@ -390,12 +408,14 @@ export const App: React.FC = () => {
         isEqOpen={isEqOpen}
         onOpenSleepTimer={() => setIsSleepTimerOpen(true)}
         onToggleMiniPlayer={handleToggleMiniPlayer}
+        onToggleNotificationDrawer={() => setIsNotificationDrawerOpen((prev) => !prev)}
+        isNotificationDrawerOpen={isNotificationDrawerOpen}
       />
 
       {/* Mobile Bottom Navigation Bar */}
       <MobileNav
-        onOpenWrapped={() => setIsWrappedOpen(true)}
         onOpenSpotifyModal={() => setIsSpotifyModalOpen(true)}
+        onOpenNewPlaylistModal={() => setIsModalOpen(true)}
       />
 
       {/* Create Playlist Modal */}
@@ -413,20 +433,6 @@ export const App: React.FC = () => {
         isOpen={isLyricsOpen}
         onClose={() => setIsLyricsOpen(false)}
         accentColor={accentColor}
-      />
-
-      {/* Tune Wrapped Modal */}
-      <TuneWrappedModal
-        isOpen={isWrappedOpen}
-        onClose={() => setIsWrappedOpen(false)}
-        allSongs={songs}
-      />
-
-      {/* AI Metadata Auto-Tagger Modal */}
-      <AutoTaggerModal
-        isOpen={Boolean(taggerSong)}
-        onClose={() => setTaggerSong(null)}
-        song={taggerSong}
       />
 
       {/* 10-Band Equalizer & Crossfade Modal */}

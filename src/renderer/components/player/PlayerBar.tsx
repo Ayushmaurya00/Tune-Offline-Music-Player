@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ListMusic, Heart, Mic2, Sliders, Moon, Minimize2, Play, Pause, SkipForward } from 'lucide-react';
+import { ListMusic, Heart, Mic2, Sliders, Moon, Minimize2, Play, Pause, SkipForward, Repeat, Repeat1, Radio } from 'lucide-react';
 import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { PlaybackControls } from './PlaybackControls';
@@ -18,6 +18,8 @@ interface PlayerBarProps {
   isEqOpen: boolean;
   onOpenSleepTimer: () => void;
   onToggleMiniPlayer: () => void;
+  onToggleNotificationDrawer?: () => void;
+  isNotificationDrawerOpen?: boolean;
 }
 
 export const PlayerBar: React.FC<PlayerBarProps> = ({
@@ -27,7 +29,9 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   onOpenEq,
   isEqOpen,
   onOpenSleepTimer,
-  onToggleMiniPlayer
+  onToggleMiniPlayer,
+  onToggleNotificationDrawer,
+  isNotificationDrawerOpen = false
 }) => {
   const {
     currentSong,
@@ -37,7 +41,9 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
     togglePlay,
     nextTrack,
     currentTime,
-    duration
+    duration,
+    repeatMode,
+    toggleRepeat
   } = usePlayerStore();
   const { isSongLiked, toggleLikeSong } = usePlaylistStore();
   const [timerState, setTimerState] = useState<SleepTimerState>(sleepTimerService.getState());
@@ -112,8 +118,38 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         )}
       </div>
 
-      {/* Mobile Play, Skip, Lyrics & EQ Quick Controls */}
+      {/* Mobile Play, Skip, Repeat, Lyrics & EQ Quick Controls */}
       <div className="flex md:hidden items-center gap-1 flex-shrink-0">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleRepeat();
+          }}
+          className={`p-1.5 transition rounded-full ${
+            repeatMode !== 'none' ? 'text-tune-accent font-bold' : 'text-tune-textSecondary hover:text-white'
+          }`}
+          style={repeatMode !== 'none' ? { color: accentColor } : {}}
+          title={`Repeat: ${repeatMode === 'one' ? 'Current Song' : repeatMode === 'all' ? 'All Songs' : 'Off'}`}
+        >
+          {repeatMode === 'one' ? <Repeat1 size={18} /> : <Repeat size={17} />}
+        </button>
+
+        {onToggleNotificationDrawer && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleNotificationDrawer();
+            }}
+            className={`p-1.5 transition rounded-full ${
+              isNotificationDrawerOpen ? 'text-tune-accent' : 'text-tune-textSecondary hover:text-white'
+            }`}
+            style={isNotificationDrawerOpen ? { color: accentColor } : {}}
+            title="Notification Controller"
+          >
+            <Radio size={17} />
+          </button>
+        )}
+
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -191,6 +227,20 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
             </span>
           )}
         </button>
+
+        {/* Notification Drawer Controller Button */}
+        {onToggleNotificationDrawer && (
+          <button
+            onClick={onToggleNotificationDrawer}
+            className={`p-2 rounded-lg transition hover:bg-tune-card ${
+              isNotificationDrawerOpen ? 'bg-tune-elevated' : 'text-tune-textSecondary hover:text-white'
+            }`}
+            style={isNotificationDrawerOpen ? { color: accentColor } : {}}
+            title="Open Notification Drawer Controller"
+          >
+            <Radio size={18} />
+          </button>
+        )}
 
         {/* Mini Player Mode Button */}
         <button

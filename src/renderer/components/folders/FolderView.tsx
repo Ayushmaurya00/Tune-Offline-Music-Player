@@ -20,7 +20,6 @@ import { formatDuration } from '../../utils/formatters';
 interface FolderViewProps {
   songs: Song[];
   rootPath: string;
-  onAutoTag?: (song: Song) => void;
   onDelete?: (song: Song) => void;
   onShowInFolder?: (song: Song) => void;
   onChangeFolder?: () => void;
@@ -99,7 +98,6 @@ const TreeItem: React.FC<TreeItemProps> = ({ node, selectedPath, onSelect, depth
 export const FolderView: React.FC<FolderViewProps> = ({
   songs,
   rootPath,
-  onAutoTag,
   onDelete,
   onShowInFolder,
   onChangeFolder,
@@ -281,7 +279,6 @@ export const FolderView: React.FC<FolderViewProps> = ({
                   playlistContext={activeSongs}
                   onDelete={onDelete}
                   onShowInFolder={onShowInFolder}
-                  onAutoTag={onAutoTag}
                 />
               ))}
             </div>

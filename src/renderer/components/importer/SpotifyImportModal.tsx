@@ -59,7 +59,7 @@ export const SpotifyImportModal: React.FC<SpotifyImportModalProps> = ({
       .map((m) => m.matchedSong!.id);
 
     if (matchedSongs.length === 0) {
-      alert('No matching songs found in your offline library.');
+      setErrorMsg('No matching songs found in your offline library. Please add corresponding local audio files first.');
       return;
     }
 

@@ -4,11 +4,11 @@ import {
   CornerDownRight,
   PlusCircle,
   FolderPlus,
-  Wand2,
   Folder,
   Trash2,
   ChevronRight,
-  Music2
+  Music2,
+  Plus
 } from 'lucide-react';
 import { Song, Playlist } from '@/types/music';
 
@@ -22,7 +22,7 @@ interface SongContextMenuProps {
   onPlayNext: () => void;
   onAddToQueue: () => void;
   onAddToPlaylist: (playlistId: string) => void;
-  onAutoTag?: () => void;
+  onCreatePlaylist?: () => void;
   onShowInFolder?: () => void;
   onDelete?: () => void;
 }
@@ -37,7 +37,7 @@ export const SongContextMenu: React.FC<SongContextMenuProps> = ({
   onPlayNext,
   onAddToQueue,
   onAddToPlaylist,
-  onAutoTag,
+  onCreatePlaylist,
   onShowInFolder,
   onDelete
 }) => {
@@ -132,6 +132,19 @@ export const SongContextMenu: React.FC<SongContextMenuProps> = ({
 
         {showPlaylists && (
           <div className="absolute left-full top-0 ml-1 w-48 bg-[#1a1a1a] border border-[#2f2f2f] rounded-xl shadow-xl p-1.5 max-h-48 overflow-y-auto">
+            {onCreatePlaylist && (
+              <button
+                onClick={() => {
+                  onCreatePlaylist();
+                  onClose();
+                }}
+                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-tune-accent hover:bg-tune-accent/15 transition text-left text-[11px] font-semibold mb-1 border-b border-[#2f2f2f]"
+              >
+                <Plus size={12} />
+                <span>+ Create Playlist</span>
+              </button>
+            )}
+
             {playlists.length === 0 ? (
               <div className="px-2.5 py-2 text-[11px] text-tune-textMuted text-center">No playlists yet</div>
             ) : (
@@ -154,20 +167,6 @@ export const SongContextMenu: React.FC<SongContextMenuProps> = ({
       </div>
 
       <div className="my-1 border-t border-[#262626]" />
-
-      {/* Auto-Tagger */}
-      {onAutoTag && (
-        <button
-          onClick={() => {
-            onAutoTag();
-            onClose();
-          }}
-          className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg hover:bg-purple-950/40 text-purple-300 hover:text-purple-200 transition text-left"
-        >
-          <Wand2 size={14} className="text-purple-400" />
-          <span>Auto-Tag with AI</span>
-        </button>
-      )}
 
       {/* Show in Explorer */}
       {onShowInFolder && (
