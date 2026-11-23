@@ -2,3 +2,4 @@
   "yaml.validate": true,
   "github-actions.workflows.pinnedVersionWarning": "never"
 }
+
