@@ -11,3 +11,4 @@ export const isCapacitor = (): boolean => {
 export const isMobileScreen = (): boolean => {
   return typeof window !== 'undefined' && window.innerWidth < 768;
 };
+

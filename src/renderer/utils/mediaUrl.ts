@@ -13,3 +13,4 @@ export function resolveMediaUrl(filePath: string): string {
 
   return Capacitor.convertFileSrc(filePath);
 }
+
