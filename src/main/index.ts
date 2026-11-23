@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, protocol, net } from 'electron';
 import path from 'node:path';
 import url, { fileURLToPath } from 'node:url';
-import { scanDirectory, parseAudioFile } from './services/scanner';
+import { scanDirectory, scanDirectoryDetailed, parseAudioFile } from './services/scanner';
 import { setupFolderWatcher, stopFolderWatcher } from './services/watcher';
 import { deleteFileToTrash, showFileInFolder, selectFolder, selectAudioFiles } from './services/fileOps';
 import { fetchSpotifyPlaylistTracks } from './services/spotifyService';
@@ -50,7 +50,7 @@ function createWindow() {
     } : false,
     autoHideMenuBar: true,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.cjs'),
       sandbox: false,
       contextIsolation: true,
       nodeIntegration: false
@@ -96,6 +96,10 @@ ipcMain.handle('tune:get-downloads-path', () => {
 
 ipcMain.handle('tune:scan-folder', async (_, folderPath: string) => {
   return await scanDirectory(folderPath);
+});
+
+ipcMain.handle('tune:scan-folder-detailed', async (_, folderPath: string) => {
+  return await scanDirectoryDetailed(folderPath);
 });
 
 ipcMain.handle('tune:start-watching', async (_, folderPath: string) => {

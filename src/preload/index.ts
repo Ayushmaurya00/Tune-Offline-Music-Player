@@ -4,6 +4,7 @@ import { Song, TuneAPI, MediaKeyAction } from '../types/music';
 const api: TuneAPI = {
   getDownloadsPath: () => ipcRenderer.invoke('tune:get-downloads-path'),
   scanFolder: (folderPath: string) => ipcRenderer.invoke('tune:scan-folder', folderPath),
+  scanFolderDetailed: (folderPath: string) => ipcRenderer.invoke('tune:scan-folder-detailed', folderPath),
   startWatching: (folderPath: string) => ipcRenderer.invoke('tune:start-watching', folderPath),
   stopWatching: () => ipcRenderer.invoke('tune:stop-watching'),
   deleteSongFile: (filePath: string) => ipcRenderer.invoke('tune:delete-song-file', filePath),

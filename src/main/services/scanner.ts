@@ -66,8 +66,15 @@ export async function parseAudioFile(filePath: string): Promise<Song | null> {
   }
 }
 
-export async function scanDirectory(dirPath: string): Promise<Song[]> {
+export interface ScanDirectoryResult {
+  songs: Song[];
+  rejectedCount: number;
+  rejectedNames: string[];
+}
+
+export async function scanDirectoryDetailed(dirPath: string): Promise<ScanDirectoryResult> {
   const songs: Song[] = [];
+  const rejectedNames: string[] = [];
 
   async function walk(currentDir: string) {
     try {
@@ -85,6 +92,8 @@ export async function scanDirectory(dirPath: string): Promise<Song[]> {
             if (song) {
               songs.push(song);
             }
+          } else if (!entry.name.startsWith('.')) {
+            rejectedNames.push(entry.name);
           }
         }
       }
@@ -94,5 +103,14 @@ export async function scanDirectory(dirPath: string): Promise<Song[]> {
   }
 
   await walk(dirPath);
-  return songs;
+  return {
+    songs,
+    rejectedCount: rejectedNames.length,
+    rejectedNames: rejectedNames.slice(0, 50)
+  };
+}
+
+export async function scanDirectory(dirPath: string): Promise<Song[]> {
+  const result = await scanDirectoryDetailed(dirPath);
+  return result.songs;
 }

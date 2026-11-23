@@ -25,7 +25,8 @@ export default defineConfig(({ mode }) => {
               rollupOptions: {
                 external: ['music-metadata', 'chokidar', 'discord-rpc'],
                 output: {
-                  entryFileNames: 'main.js'
+                  format: 'cjs',
+                  entryFileNames: 'main.cjs'
                 }
               }
             }
@@ -38,7 +39,8 @@ export default defineConfig(({ mode }) => {
               outDir: 'dist-electron',
               rollupOptions: {
                 output: {
-                  entryFileNames: 'preload.js'
+                  format: 'cjs',
+                  entryFileNames: 'preload.cjs'
                 }
               }
             }

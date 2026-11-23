@@ -76,6 +76,7 @@ export type MediaKeyAction = 'play-pause' | 'next' | 'prev';
 export interface TuneAPI {
   getDownloadsPath: () => Promise<string>;
   scanFolder: (folderPath: string) => Promise<Song[]>;
+  scanFolderDetailed?: (folderPath: string) => Promise<{ songs: Song[]; rejectedCount: number; rejectedNames: string[] }>;
   startWatching: (folderPath: string) => Promise<boolean>;
   stopWatching: () => Promise<boolean>;
   deleteSongFile: (filePath: string) => Promise<boolean>;

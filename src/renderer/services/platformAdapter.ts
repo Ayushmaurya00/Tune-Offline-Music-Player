@@ -42,12 +42,21 @@ async function scanMobileDirectory(dir: Directory, path = ''): Promise<Song[]> {
 }
 
 export const mobileTuneAPI: TuneAPI = {
-  getDownloadsPath: async () => 'Mobile/Music',
+  getDownloadsPath: async () => 'Local Music',
 
   scanFolder: async (_folderPath: string) => {
-    if (!isCapacitor()) return [];
-    const songs = await scanMobileDirectory(Directory.Documents);
-    return songs;
+    if (isCapacitor()) {
+      return await scanMobileDirectory(Directory.Documents);
+    }
+    return [];
+  },
+
+  scanFolderDetailed: async (_folderPath: string) => {
+    if (isCapacitor()) {
+      const songs = await scanMobileDirectory(Directory.Documents);
+      return { songs, rejectedCount: 0, rejectedNames: [] };
+    }
+    return { songs: [], rejectedCount: 0, rejectedNames: [] };
   },
 
   startWatching: async () => true,

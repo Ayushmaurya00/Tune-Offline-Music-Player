@@ -14,6 +14,15 @@ export async function pickFolder(): Promise<PickFolderResult | null> {
   if (isElectron()) {
     const folderPath = await window.tuneAPI.selectFolderDialog();
     if (!folderPath) return null;
+    if (window.tuneAPI.scanFolderDetailed) {
+      const detail = await window.tuneAPI.scanFolderDetailed(folderPath);
+      return {
+        folderPath,
+        songs: detail.songs,
+        rejectedCount: detail.rejectedCount,
+        rejectedNames: detail.rejectedNames
+      };
+    }
     const songs = await window.tuneAPI.scanFolder(folderPath);
     return { folderPath, songs, rejectedCount: 0, rejectedNames: [] };
   }

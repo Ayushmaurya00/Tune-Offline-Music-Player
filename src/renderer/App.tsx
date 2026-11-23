@@ -71,7 +71,19 @@ export const App: React.FC = () => {
         const folder = targetPath || watchedFolderPath || (await window.tuneAPI.getDownloadsPath());
         setWatchedFolder(folder);
 
-        const scannedSongs = await window.tuneAPI.scanFolder(folder);
+        let scannedSongs: Song[] = [];
+        let rejectedCount = 0;
+        let rejectedNames: string[] = [];
+
+        if (window.tuneAPI.scanFolderDetailed) {
+          const detail = await window.tuneAPI.scanFolderDetailed(folder);
+          scannedSongs = detail.songs;
+          rejectedCount = detail.rejectedCount;
+          rejectedNames = detail.rejectedNames;
+        } else {
+          scannedSongs = await window.tuneAPI.scanFolder(folder);
+        }
+
         const prevCount = songs.length;
         setSongs(scannedSongs);
 
@@ -92,7 +104,9 @@ export const App: React.FC = () => {
             totalSongs: scannedSongs.length,
             newSongsCount,
             durationMs,
-            formatCounts
+            formatCounts,
+            rejectedCount,
+            rejectedNames
           });
           setIsScanModalOpen(true);
         }

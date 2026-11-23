@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Tune - Modern Offline Music Player",
-  "main": "dist-electron/main.js",
+  "main": "dist-electron/main.cjs",
   "scripts": {
+    "start": "electron .",
     "dev": "vite",
+    "dev:electron": "npm run build && electron .",
     "dev:web": "vite --mode web --host",
     "dev:mobile": "vite --mode web --host",
     "build": "tsc && vite build",
