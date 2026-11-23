@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FolderDown, RefreshCw, FolderOpen, Music, BarChart2 } from 'lucide-react';
+import { FolderDown, RefreshCw, FolderOpen, Music, BarChart2, ChevronDown } from 'lucide-react';
 import { Song } from '@/types/music';
 import { useLibraryStore } from '../../store/libraryStore';
 import { usePlaylistStore } from '../../store/playlistStore';
@@ -27,6 +27,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   onOpenNewPlaylistModal
 }) => {
   const [isGridView, setIsGridView] = useState(false);
+  const [isHeaderDropdownOpen, setIsHeaderDropdownOpen] = useState(false);
   const [songToDelete, setSongToDelete] = useState<Song | null>(null);
   const {
     songs,
@@ -101,10 +102,99 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
-      {/* Header Bar */}
-      <div className="p-4 sm:p-6 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 app-drag-region">
+      {/* Mobile Compact Dropdown Header Bar */}
+      <div className="md:hidden flex items-center justify-between px-4 py-2.5 border-b border-tune-border/40 bg-tune-surface/80 backdrop-blur-md select-none">
+        <button
+          onClick={() => setIsHeaderDropdownOpen((prev) => !prev)}
+          className="flex items-center gap-1.5 py-1 px-2 -ml-2 rounded-lg active:bg-tune-elevated transition text-left"
+          title="Toggle library details dropdown"
+        >
+          <h1 className="text-base font-bold text-white flex items-center gap-1.5">
+            <span>Offline Library</span>
+            <ChevronDown
+              size={16}
+              className={`text-tune-textMuted transition-transform duration-200 ${
+                isHeaderDropdownOpen ? 'rotate-180 text-tune-accent' : ''
+              }`}
+            />
+          </h1>
+          <span className="text-[11px] font-mono text-tune-textMuted">
+            ({sortedSongs.length})
+          </span>
+          {isLoading && <RefreshCw size={13} className="animate-spin text-tune-accent ml-1" />}
+        </button>
+
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => onScanFolder(undefined, true)}
+            disabled={isLoading}
+            className="p-2 text-tune-textSecondary hover:text-white rounded-lg active:bg-tune-elevated transition"
+            title="Refresh Library"
+          >
+            <RefreshCw size={15} className={isLoading ? 'animate-spin' : ''} />
+          </button>
+          <button
+            onClick={onOpenScanSummary}
+            className="p-2 text-tune-textSecondary hover:text-white rounded-lg active:bg-tune-elevated transition"
+            title="Scan Summary"
+          >
+            <BarChart2 size={15} className="text-white" />
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Dropdown Panel */}
+      {isHeaderDropdownOpen && (
+        <div className="md:hidden p-3.5 mx-3 mt-2 rounded-xl bg-tune-elevated/95 border border-tune-border shadow-2xl animate-in slide-in-from-top-2 duration-150 space-y-3 select-none">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] uppercase font-bold text-tune-textMuted tracking-wider">
+              Music Directory
+            </span>
+            <button
+              onClick={() => {
+                setIsHeaderDropdownOpen(false);
+                onSelectFolderDialog();
+              }}
+              className="text-xs text-tune-accent hover:underline lowercase font-medium"
+            >
+              change folder
+            </button>
+          </div>
+          <p className="text-xs font-mono text-white truncate bg-tune-card/90 px-2.5 py-1.5 rounded-lg border border-tune-border/50">
+            {watchedFolderPath ? watchedFolderPath : 'Downloads'}
+          </p>
+
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            <button
+              onClick={() => {
+                setIsHeaderDropdownOpen(false);
+                onOpenScanSummary();
+              }}
+              className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-tune-card hover:bg-tune-elevated text-xs font-semibold text-white border border-tune-border transition active:scale-95"
+            >
+              <BarChart2 size={14} className="text-white" />
+              <span>Scan Summary</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setIsHeaderDropdownOpen(false);
+                onScanFolder(undefined, true);
+              }}
+              disabled={isLoading}
+              className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-tune-card hover:bg-tune-elevated text-xs font-semibold text-white border border-tune-border transition active:scale-95"
+            >
+              <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
+              <span>Rescan</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Header Bar */}
+      <div className="hidden md:flex p-6 pb-2 items-center justify-between gap-3 app-drag-region">
         <div className="flex flex-col app-no-drag">
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
             <span>Offline Library</span>
             {isLoading && <RefreshCw size={18} className="animate-spin text-tune-accent" />}
           </h1>
@@ -123,7 +213,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-tune-elevated hover:bg-tune-card text-xs font-semibold text-tune-textSecondary hover:text-white border border-tune-border transition shadow-sm hover:border-tune-accent"
             title="Open Scan Summary & Library Diagnostics"
           >
-            <BarChart2 size={14} className="text-tune-accent" />
+            <BarChart2 size={14} className="text-white" />
             <span>Scan Summary</span>
           </button>
 

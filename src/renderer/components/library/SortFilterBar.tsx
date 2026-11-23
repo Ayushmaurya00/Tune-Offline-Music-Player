@@ -19,7 +19,7 @@ export const SortFilterBar: React.FC<SortFilterBarProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 py-2 px-6 bg-tune-bg/80 backdrop-blur-sm sticky top-0 z-10 border-b border-tune-border/50">
+    <div className="flex flex-wrap items-center justify-between gap-3 py-2 px-3 sm:px-6 bg-tune-bg/80 backdrop-blur-sm sticky top-0 z-10 border-b border-tune-border/50">
       <div className="relative flex-1 max-w-md">
         <Search
           size={16}
