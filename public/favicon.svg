@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <!-- Smooth Dark Squircle -->
+  <rect width="100" height="100" rx="26" fill="#121212" />
+  
+  <!-- Tuning Fork Prongs and U-Curve -->
+  <path
+    d="M 37.2,17.5 L 37.2,56.5 A 12.8,12.8 0 0,0 62.8,56.5 L 62.8,17.5"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="7.2"
+    stroke-linecap="round"
+  />
+
+  <!-- Tuning Fork Stem / Handle -->
+  <path
+    d="M 50,69.3 L 50,86.5"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="7.2"
+    stroke-linecap="round"
+  />
+
+  <!-- Left Acoustic Soundwave Arc -->
+  <path
+    d="M 23.8,30.5 A 16,16 0 0,0 23.8,42"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="4.2"
+    stroke-linecap="round"
+  />
+
+  <!-- Right Acoustic Soundwave Arc -->
+  <path
+    d="M 76.2,30.5 A 16,16 0 0,1 76.2,42"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="4.2"
+    stroke-linecap="round"
+  />
+</svg>
+

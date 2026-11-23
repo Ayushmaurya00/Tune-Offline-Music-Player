@@ -14,6 +14,7 @@ import { NotificationDrawer } from './components/player/NotificationDrawer';
 import { ScanResultModal, ScanResultData } from './components/library/ScanResultModal';
 import { FileDropOverlay } from './components/shared/FileDropOverlay';
 import { ShortcutsModal } from './components/shared/ShortcutsModal';
+import { BrandLogo } from './components/shared/BrandLogo';
 import { pickFolder, pickAudioFiles, convertFileListToSongs } from './utils/folderPicker';
 import { generateDemoTracks } from './utils/demoTracks';
 import { useLibraryStore } from './store/libraryStore';
@@ -382,16 +383,15 @@ export const App: React.FC = () => {
         style={{ background: ambientGradient }}
       />
 
-      {/* Sleek Windows 10/11 Titlebar Overlay Drag Area */}
-      <div className="hidden md:flex h-8 w-full app-drag-region items-center justify-between px-3 z-30 select-none bg-tune-bg/90 backdrop-blur-sm border-b border-tune-border/40 flex-shrink-0">
+      {/* Sleek Titlebar / Top Bar: Desktop Drag Area & Mobile Brand Bar */}
+      <div className="flex h-9 md:h-8 w-full app-drag-region items-center justify-between px-3 z-30 select-none bg-tune-bg/95 backdrop-blur-sm border-b border-tune-border/40 flex-shrink-0">
         <div className="flex items-center gap-2 app-no-drag">
-          <span className="w-2 h-2 rounded-full bg-tune-accent animate-pulse" />
-          <span className="text-[11px] font-bold text-white tracking-widest uppercase">Tune</span>
-          <span className="text-[10px] text-tune-textMuted font-mono">v1.0</span>
+          <BrandLogo size={20} showText showSubtitle={false} />
+          <span className="text-[10px] text-tune-textMuted font-mono ml-1">v1.0</span>
         </div>
         <div className="flex-1" />
-        {/* Titlebar Overlay space for Windows native minimize/maximize/close buttons */}
-        <div className="w-36 h-full pointer-events-none" />
+        {/* Titlebar Overlay space for Windows native minimize/maximize/close buttons on desktop */}
+        <div className="hidden md:block w-36 h-full pointer-events-none" />
       </div>
 
       {/* Top Application Body */}
