@@ -10,6 +10,7 @@ const api: TuneAPI = {
   showInFolder: (filePath: string) => ipcRenderer.invoke('tune:show-in-folder', filePath),
   selectFolderDialog: () => ipcRenderer.invoke('tune:select-folder-dialog'),
   fetchSpotifyPlaylist: (url: string) => ipcRenderer.invoke('tune:fetch-spotify-playlist', url),
+  updateDiscordPresence: (data: unknown) => ipcRenderer.invoke('tune:update-discord-presence', data),
   onFileAdded: (callback: (song: Song) => void) => {
     const handler = (_: unknown, song: Song) => callback(song);
     ipcRenderer.on('tune:file-added', handler);

@@ -2,6 +2,30 @@ import { create } from 'zustand';
 import { Song, QueueItem, RepeatMode } from '@/types/music';
 import { audioController } from '../audio/audioController';
 
+function syncDiscordRPC(song: Song | null, isPlaying: boolean, currentTime: number) {
+  if (window.tuneAPI) {
+    if (!song || !isPlaying) {
+      window.tuneAPI.updateDiscordPresence({
+        title: '',
+        artist: '',
+        duration: 0,
+        currentTime: 0,
+        isPlaying: false
+      });
+      return;
+    }
+
+    window.tuneAPI.updateDiscordPresence({
+      title: song.title,
+      artist: song.artist,
+      album: song.album,
+      duration: song.duration,
+      currentTime,
+      isPlaying: true
+    });
+  }
+}
+
 interface PlayerStore {
   currentSong: Song | null;
   isPlaying: boolean;
@@ -68,18 +92,22 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
       () => get().nextTrack(),
       (currentTime) => set({ currentTime })
     );
+
+    syncDiscordRPC(song, true, 0);
   },
 
   togglePlay: () => {
-    const { currentSong, isPlaying } = get();
+    const { currentSong, isPlaying, currentTime } = get();
     if (!currentSong) return;
 
     if (isPlaying) {
       audioController.pause();
       set({ isPlaying: false });
+      syncDiscordRPC(currentSong, false, currentTime);
     } else {
       audioController.resume();
       set({ isPlaying: true });
+      syncDiscordRPC(currentSong, true, currentTime);
     }
   },
 
@@ -96,6 +124,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
     if (queue.length === 0) {
       set({ isPlaying: false, currentTime: 0 });
       audioController.stop();
+      syncDiscordRPC(null, false, 0);
       return;
     }
 

@@ -53,6 +53,15 @@ export interface SpotifyPlaylistResult {
   coverArt?: string | null;
 }
 
+export interface DiscordPresenceData {
+  title: string;
+  artist: string;
+  album?: string;
+  duration: number;
+  currentTime: number;
+  isPlaying: boolean;
+}
+
 export interface TuneAPI {
   getDownloadsPath: () => Promise<string>;
   scanFolder: (folderPath: string) => Promise<Song[]>;
@@ -62,6 +71,7 @@ export interface TuneAPI {
   showInFolder: (filePath: string) => Promise<void>;
   selectFolderDialog: () => Promise<string | null>;
   fetchSpotifyPlaylist: (url: string) => Promise<SpotifyPlaylistResult>;
+  updateDiscordPresence: (data: DiscordPresenceData) => Promise<void>;
   onFileAdded: (callback: (song: Song) => void) => () => void;
   onFileRemoved: (callback: (filePath: string) => void) => () => void;
 }

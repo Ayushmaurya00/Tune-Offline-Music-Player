@@ -5,6 +5,7 @@ import { scanDirectory } from './services/scanner';
 import { setupFolderWatcher, stopFolderWatcher } from './services/watcher';
 import { deleteFileToTrash, showFileInFolder, selectFolder } from './services/fileOps';
 import { fetchSpotifyPlaylistTracks } from './services/spotifyService';
+import { initDiscordRPC, setDiscordPresence, clearDiscordPresence } from './services/discordService';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -106,7 +107,12 @@ ipcMain.handle('tune:fetch-spotify-playlist', async (_, url: string) => {
   return await fetchSpotifyPlaylistTracks(url);
 });
 
+ipcMain.handle('tune:update-discord-presence', (_, data) => {
+  setDiscordPresence(data);
+});
+
 app.on('window-all-closed', () => {
+  clearDiscordPresence();
   stopFolderWatcher();
   if (process.platform !== 'darwin') {
     app.quit();
@@ -120,4 +126,7 @@ app.on('activate', () => {
   }
 });
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  initDiscordRPC();
+  createWindow();
+});

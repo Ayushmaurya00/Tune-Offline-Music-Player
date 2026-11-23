@@ -16,7 +16,7 @@ export default defineConfig({
           build: {
             outDir: 'dist-electron',
             rollupOptions: {
-              external: ['music-metadata', 'chokidar'],
+              external: ['music-metadata', 'chokidar', 'discord-rpc'],
               output: {
                 entryFileNames: 'main.js'
               }

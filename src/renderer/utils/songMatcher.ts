@@ -88,3 +88,4 @@ export function matchSpotifyTracks(
 ): MatchResult[] {
   return spotifyTracks.map((track) => matchSingleTrack(track, localSongs));
 }
+
