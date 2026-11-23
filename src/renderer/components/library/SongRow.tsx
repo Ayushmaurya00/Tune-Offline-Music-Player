@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Pause, Heart, PlusCircle, Trash2, Folder } from 'lucide-react';
+import { Play, Pause, Heart, PlusCircle, Trash2, Folder, Wand2 } from 'lucide-react';
 import { Song } from '@/types/music';
 import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
@@ -12,6 +12,7 @@ interface SongRowProps {
   playlistContext?: Song[];
   onDelete?: (song: Song) => void;
   onShowInFolder?: (song: Song) => void;
+  onAutoTag?: (song: Song) => void;
 }
 
 export const SongRow: React.FC<SongRowProps> = ({
@@ -19,7 +20,8 @@ export const SongRow: React.FC<SongRowProps> = ({
   song,
   playlistContext,
   onDelete,
-  onShowInFolder
+  onShowInFolder,
+  onAutoTag
 }) => {
   const { currentSong, isPlaying, playSong, togglePlay, addToQueue } = usePlayerStore();
   const { isSongLiked, toggleLikeSong } = usePlaylistStore();
@@ -105,6 +107,16 @@ export const SongRow: React.FC<SongRowProps> = ({
             title="Show in folder"
           >
             <Folder size={15} />
+          </button>
+        )}
+
+        {onAutoTag && (
+          <button
+            onClick={() => onAutoTag(song)}
+            className="p-1 text-purple-400 hover:text-purple-300 opacity-0 group-hover:opacity-100 transition"
+            title="Auto-tag with AI"
+          >
+            <Wand2 size={15} />
           </button>
         )}
 

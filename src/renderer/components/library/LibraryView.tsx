@@ -11,11 +11,13 @@ import { PlaylistDetailView } from '../playlist/PlaylistDetailView';
 interface LibraryViewProps {
   onScanFolder: (path?: string) => Promise<void>;
   onSelectFolderDialog: () => Promise<void>;
+  onAutoTag?: (song: Song) => void;
 }
 
 export const LibraryView: React.FC<LibraryViewProps> = ({
   onScanFolder,
-  onSelectFolderDialog
+  onSelectFolderDialog,
+  onAutoTag
 }) => {
   const [isGridView, setIsGridView] = useState(false);
   const {
@@ -113,6 +115,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 song={song}
                 playlistContext={sortedSongs}
                 onDelete={handleDeleteSong}
+                onAutoTag={onAutoTag}
               />
             ))}
           </div>
@@ -135,6 +138,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 playlistContext={sortedSongs}
                 onDelete={handleDeleteSong}
                 onShowInFolder={handleShowInFolder}
+                onAutoTag={onAutoTag}
               />
             ))}
           </div>

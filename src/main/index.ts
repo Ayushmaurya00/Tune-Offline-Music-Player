@@ -6,6 +6,7 @@ import { setupFolderWatcher, stopFolderWatcher } from './services/watcher';
 import { deleteFileToTrash, showFileInFolder, selectFolder } from './services/fileOps';
 import { fetchSpotifyPlaylistTracks } from './services/spotifyService';
 import { initDiscordRPC, setDiscordPresence, clearDiscordPresence } from './services/discordService';
+import { fetchSuggestedMetadata } from './services/autoTagger';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -109,6 +110,10 @@ ipcMain.handle('tune:fetch-spotify-playlist', async (_, url: string) => {
 
 ipcMain.handle('tune:update-discord-presence', (_, data) => {
   setDiscordPresence(data);
+});
+
+ipcMain.handle('tune:suggest-metadata', async (_, query: string) => {
+  return await fetchSuggestedMetadata(query);
 });
 
 app.on('window-all-closed', () => {

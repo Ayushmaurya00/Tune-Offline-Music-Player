@@ -11,6 +11,7 @@ const api: TuneAPI = {
   selectFolderDialog: () => ipcRenderer.invoke('tune:select-folder-dialog'),
   fetchSpotifyPlaylist: (url: string) => ipcRenderer.invoke('tune:fetch-spotify-playlist', url),
   updateDiscordPresence: (data: unknown) => ipcRenderer.invoke('tune:update-discord-presence', data),
+  suggestMetadata: (query: string) => ipcRenderer.invoke('tune:suggest-metadata', query),
   onFileAdded: (callback: (song: Song) => void) => {
     const handler = (_: unknown, song: Song) => callback(song);
     ipcRenderer.on('tune:file-added', handler);

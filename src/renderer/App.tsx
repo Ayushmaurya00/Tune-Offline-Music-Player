@@ -6,14 +6,20 @@ import { QueuePanel } from './components/queue/QueuePanel';
 import { NewPlaylistModal } from './components/playlist/NewPlaylistModal';
 import { LyricsModal } from './components/lyrics/LyricsModal';
 import { SpotifyImportModal } from './components/importer/SpotifyImportModal';
+import { TuneWrappedModal } from './components/wrapped/TuneWrappedModal';
+import { AutoTaggerModal } from './components/tagger/AutoTaggerModal';
 import { useLibraryStore } from './store/libraryStore';
 import { usePlayerStore } from './store/playerStore';
 import { extractDominantColor } from './utils/colorExtractor';
+import { recordSongPlay } from './utils/statsTracker';
+import { Song } from '@/types/music';
 
 export const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLyricsOpen, setIsLyricsOpen] = useState(false);
   const [isSpotifyModalOpen, setIsSpotifyModalOpen] = useState(false);
+  const [isWrappedOpen, setIsWrappedOpen] = useState(false);
+  const [taggerSong, setTaggerSong] = useState<Song | null>(null);
   const [accentColor, setAccentColor] = useState('#1db954');
   const [ambientGradient, setAmbientGradient] = useState(
     'radial-gradient(ellipse at top, rgba(29, 185, 84, 0.12) 0%, transparent 70%)'
@@ -23,13 +29,15 @@ export const App: React.FC = () => {
     useLibraryStore();
   const { currentSong, togglePlay, nextTrack, prevTrack, seek, currentTime } = usePlayerStore();
 
-  // Dynamic Album Art Palette Extraction
+  // Dynamic Album Art Palette Extraction & Stats Tracking
   useEffect(() => {
     if (!currentSong) {
       setAccentColor('#1db954');
       setAmbientGradient('radial-gradient(ellipse at top, rgba(29, 185, 84, 0.12) 0%, transparent 70%)');
       return;
     }
+
+    recordSongPlay(currentSong);
 
     extractDominantColor(currentSong.coverArt).then((palette) => {
       setAccentColor(palette.primaryHex);
@@ -132,6 +140,7 @@ export const App: React.FC = () => {
         <Sidebar
           onOpenNewPlaylistModal={() => setIsModalOpen(true)}
           onOpenSpotifyModal={() => setIsSpotifyModalOpen(true)}
+          onOpenWrapped={() => setIsWrappedOpen(true)}
           onSelectFolder={handleSelectFolder}
         />
 
@@ -140,6 +149,7 @@ export const App: React.FC = () => {
           <LibraryView
             onScanFolder={() => handleScan()}
             onSelectFolderDialog={handleSelectFolder}
+            onAutoTag={(song) => setTaggerSong(song)}
           />
         </main>
 
@@ -169,6 +179,20 @@ export const App: React.FC = () => {
         isOpen={isLyricsOpen}
         onClose={() => setIsLyricsOpen(false)}
         accentColor={accentColor}
+      />
+
+      {/* Tune Wrapped Modal */}
+      <TuneWrappedModal
+        isOpen={isWrappedOpen}
+        onClose={() => setIsWrappedOpen(false)}
+        allSongs={songs}
+      />
+
+      {/* AI Metadata Auto-Tagger Modal */}
+      <AutoTaggerModal
+        isOpen={Boolean(taggerSong)}
+        onClose={() => setTaggerSong(null)}
+        song={taggerSong}
       />
     </div>
   );

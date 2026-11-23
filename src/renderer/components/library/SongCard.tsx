@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Pause, Heart, PlusCircle, Trash2 } from 'lucide-react';
+import { Play, Pause, Heart, PlusCircle, Trash2, Wand2 } from 'lucide-react';
 import { Song } from '@/types/music';
 import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
@@ -10,12 +10,14 @@ interface SongCardProps {
   song: Song;
   playlistContext?: Song[];
   onDelete?: (song: Song) => void;
+  onAutoTag?: (song: Song) => void;
 }
 
 export const SongCard: React.FC<SongCardProps> = ({
   song,
   playlistContext,
-  onDelete
+  onDelete,
+  onAutoTag
 }) => {
   const { currentSong, isPlaying, playSong, togglePlay, addToQueue } = usePlayerStore();
   const { isSongLiked, toggleLikeSong } = usePlaylistStore();
@@ -95,6 +97,19 @@ export const SongCard: React.FC<SongCardProps> = ({
           >
             <PlusCircle size={15} />
           </button>
+
+          {onAutoTag && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onAutoTag(song);
+              }}
+              className="p-1 text-purple-400 hover:text-purple-300"
+              title="Auto-tag with AI"
+            >
+              <Wand2 size={15} />
+            </button>
+          )}
 
           {onDelete && (
             <button

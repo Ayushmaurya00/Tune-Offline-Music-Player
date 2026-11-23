@@ -78,3 +78,4 @@ export function clearDiscordPresence() {
     rpc.clearActivity().catch(() => {});
   }
 }
+

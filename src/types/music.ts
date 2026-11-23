@@ -62,6 +62,15 @@ export interface DiscordPresenceData {
   isPlaying: boolean;
 }
 
+export interface TagSuggestion {
+  title: string;
+  artist: string;
+  album: string;
+  genre: string;
+  year: number | null;
+  coverArt: string | null;
+}
+
 export interface TuneAPI {
   getDownloadsPath: () => Promise<string>;
   scanFolder: (folderPath: string) => Promise<Song[]>;
@@ -72,6 +81,7 @@ export interface TuneAPI {
   selectFolderDialog: () => Promise<string | null>;
   fetchSpotifyPlaylist: (url: string) => Promise<SpotifyPlaylistResult>;
   updateDiscordPresence: (data: DiscordPresenceData) => Promise<void>;
+  suggestMetadata: (query: string) => Promise<TagSuggestion[]>;
   onFileAdded: (callback: (song: Song) => void) => () => void;
   onFileRemoved: (callback: (filePath: string) => void) => () => void;
 }

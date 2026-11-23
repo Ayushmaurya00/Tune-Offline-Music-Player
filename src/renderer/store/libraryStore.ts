@@ -14,6 +14,7 @@ interface LibraryStore {
   // Actions
   setSongs: (songs: Song[]) => void;
   addSong: (song: Song) => void;
+  updateSong: (songId: string, updatedFields: Partial<Song>) => void;
   removeSong: (filePath: string) => void;
   setWatchedFolder: (folderPath: string) => void;
   setIsLoading: (val: boolean) => void;
@@ -41,6 +42,12 @@ export const useLibraryStore = create<LibraryStore>((set, get) => ({
       if (exists) return state;
       return { songs: [song, ...state.songs] };
     });
+  },
+
+  updateSong: (songId: string, updatedFields: Partial<Song>) => {
+    set((state) => ({
+      songs: state.songs.map((s) => (s.id === songId ? { ...s, ...updatedFields } : s))
+    }));
   },
 
   removeSong: (filePath: string) => {

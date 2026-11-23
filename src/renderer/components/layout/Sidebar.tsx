@@ -1,17 +1,19 @@
 import React from 'react';
-import { Home, FolderDown, Heart, Plus, FolderOpen, Music2, Trash2 } from 'lucide-react';
+import { Home, FolderDown, Heart, Plus, FolderOpen, Music2, Trash2, Sparkles } from 'lucide-react';
 import { useLibraryStore } from '../../store/libraryStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 
 interface SidebarProps {
   onOpenNewPlaylistModal: () => void;
   onOpenSpotifyModal: () => void;
+  onOpenWrapped: () => void;
   onSelectFolder: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   onOpenNewPlaylistModal,
   onOpenSpotifyModal,
+  onOpenWrapped,
   onSelectFolder
 }) => {
   const { activeView, selectedPlaylistId, setActiveView, watchedFolderPath, songs } = useLibraryStore();
@@ -55,6 +57,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           <Heart size={18} className="text-tune-accent" />
           <span>Liked Songs</span>
+        </button>
+
+        <button
+          onClick={onOpenWrapped}
+          className="w-full flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-sm font-medium text-purple-300 hover:text-white hover:bg-purple-950/30 transition group"
+        >
+          <Sparkles size={18} className="text-purple-400 group-hover:rotate-12 transition-transform" />
+          <span>Tune Wrapped</span>
+          <span className="ml-auto text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300">New</span>
         </button>
       </div>
 
