@@ -101,7 +101,13 @@ export const App: React.FC = () => {
   );
 
   const applyScanResult = useCallback(
-    (folderPath: string, scannedSongs: Song[], durationMs: number) => {
+    (
+      folderPath: string,
+      scannedSongs: Song[],
+      durationMs: number,
+      rejectedCount = 0,
+      rejectedNames: string[] = []
+    ) => {
       setWatchedFolder(folderPath);
       const prevCount = songs.length;
       setSongs(scannedSongs);
@@ -118,7 +124,9 @@ export const App: React.FC = () => {
         totalSongs: scannedSongs.length,
         newSongsCount,
         durationMs,
-        formatCounts
+        formatCounts,
+        rejectedCount,
+        rejectedNames
       });
     },
     [songs.length, setWatchedFolder, setSongs]
@@ -130,7 +138,13 @@ export const App: React.FC = () => {
     try {
       const picked = await pickFolder();
       if (!picked) return;
-      applyScanResult(picked.folderPath, picked.songs, performance.now() - startTime);
+      applyScanResult(
+        picked.folderPath,
+        picked.songs,
+        performance.now() - startTime,
+        picked.rejectedCount,
+        picked.rejectedNames
+      );
       if (window.tuneAPI) {
         await window.tuneAPI.startWatching(picked.folderPath);
       }
@@ -147,9 +161,14 @@ export const App: React.FC = () => {
     try {
       const picked = await pickAudioFiles();
       if (!picked) return;
-      // Append to existing songs or replace if empty
       const merged = [...songs.filter((s) => !picked.songs.some((p) => p.id === s.id)), ...picked.songs];
-      applyScanResult(picked.folderPath, merged, performance.now() - startTime);
+      applyScanResult(
+        picked.folderPath,
+        merged,
+        performance.now() - startTime,
+        picked.rejectedCount,
+        picked.rejectedNames
+      );
     } catch (err) {
       console.error('File selection error:', err);
     } finally {
@@ -160,7 +179,7 @@ export const App: React.FC = () => {
   const handleLoadDemoTracks = () => {
     const startTime = performance.now();
     const demoSongs = generateDemoTracks();
-    applyScanResult('Tune Offline Demo Library', demoSongs, performance.now() - startTime);
+    applyScanResult('Tune Offline Demo Library', demoSongs, performance.now() - startTime, 0, []);
     if (demoSongs.length > 0) {
       playSong(demoSongs[0], demoSongs);
     }
@@ -169,9 +188,14 @@ export const App: React.FC = () => {
   const handleFilesDropped = (files: File[]) => {
     const startTime = performance.now();
     const result = convertFileListToSongs(files);
-    if (result.songs.length === 0) return;
     const merged = [...songs.filter((s) => !result.songs.some((p) => p.id === s.id)), ...result.songs];
-    applyScanResult(result.folderPath, merged, performance.now() - startTime);
+    applyScanResult(
+      result.folderPath,
+      merged,
+      performance.now() - startTime,
+      result.rejectedCount,
+      result.rejectedNames
+    );
   };
 
   // Keyboard Shortcuts Listener

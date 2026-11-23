@@ -7,6 +7,8 @@ export interface ScanResultData {
   newSongsCount: number;
   durationMs: number;
   formatCounts: Record<string, number>;
+  rejectedCount?: number;
+  rejectedNames?: string[];
 }
 
 interface ScanResultModalProps {
@@ -110,6 +112,25 @@ export const ScanResultModal: React.FC<ScanResultModalProps> = ({
             </span>
           </div>
         </div>
+
+        {/* Rejected Non-Audio Warning Banner */}
+        {result.rejectedCount !== undefined && result.rejectedCount > 0 && (
+          <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/25 flex items-start gap-2.5">
+            <AlertCircle size={16} className="text-red-400 mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-tune-textSecondary flex-1">
+              <span className="font-bold text-white">
+                Rejected {result.rejectedCount} non-audio file{result.rejectedCount > 1 ? 's' : ''}:
+              </span>{' '}
+              <span className="text-red-300 font-mono">
+                {result.rejectedNames?.slice(0, 3).join(', ')}
+                {(result.rejectedNames?.length || 0) > 3 ? '...' : ''}
+              </span>
+              <p className="text-[11px] text-tune-textMuted mt-1">
+                Tune strictly plays audio formats (.mp3, .wav, .flac, .m4a, .ogg, .aac, .opus). Non-audio files (such as PDF, documents, or images) are safely rejected and not imported.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Formats Breakdown or Empty Advice */}
         {formats.length > 0 ? (

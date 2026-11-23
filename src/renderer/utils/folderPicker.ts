@@ -6,6 +6,8 @@ const AUDIO_EXTENSIONS = ['.mp3', '.m4a', '.wav', '.flac', '.ogg', '.aac', '.opu
 export interface PickFolderResult {
   folderPath: string;
   songs: Song[];
+  rejectedCount?: number;
+  rejectedNames?: string[];
 }
 
 export async function pickFolder(): Promise<PickFolderResult | null> {
@@ -13,7 +15,7 @@ export async function pickFolder(): Promise<PickFolderResult | null> {
     const folderPath = await window.tuneAPI.selectFolderDialog();
     if (!folderPath) return null;
     const songs = await window.tuneAPI.scanFolder(folderPath);
-    return { folderPath, songs };
+    return { folderPath, songs, rejectedCount: 0, rejectedNames: [] };
   }
 
   // Web / Mobile HTML5 Folder Picker
@@ -26,13 +28,18 @@ export async function pickAudioFiles(): Promise<PickFolderResult | null> {
     if (!filePaths || filePaths.length === 0) return null;
 
     const songs: Song[] = [];
+    const rejectedNames: string[] = [];
     for (const filePath of filePaths) {
       const song = await window.tuneAPI.parseAudioFile(filePath);
-      if (song) songs.push(song);
+      if (song) {
+        songs.push(song);
+      } else {
+        rejectedNames.push(filePath.split(/[\\/]/).pop() || filePath);
+      }
     }
 
     const parentDir = filePaths[0].replace(/\\/g, '/').split('/').slice(0, -1).join('/') || 'Selected Files';
-    return { folderPath: parentDir, songs };
+    return { folderPath: parentDir, songs, rejectedCount: rejectedNames.length, rejectedNames };
   }
 
   // Web / Mobile HTML5 File Picker
@@ -67,12 +74,16 @@ function pickWebFiles(isFolder: boolean): Promise<PickFolderResult | null> {
 export function convertFileListToSongs(files: File[]): PickFolderResult {
   const folderName = files[0].webkitRelativePath?.split('/')[0] || 'Selected Music';
   const songs: Song[] = [];
+  const rejectedNames: string[] = [];
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     const lower = file.name.toLowerCase();
     const isAudio = AUDIO_EXTENSIONS.some((ext) => lower.endsWith(ext));
-    if (!isAudio) continue;
+    if (!isAudio) {
+      rejectedNames.push(file.name);
+      continue;
+    }
 
     const cleanTitle = file.name.replace(/\.[^/.]+$/, '').replace(/^[0-9]+[\s._-]+/, '');
     const url = URL.createObjectURL(file);
@@ -94,5 +105,10 @@ export function convertFileListToSongs(files: File[]): PickFolderResult {
     });
   }
 
-  return { folderPath: folderName, songs };
+  return {
+    folderPath: folderName,
+    songs,
+    rejectedCount: rejectedNames.length,
+    rejectedNames
+  };
 }

@@ -82,3 +82,4 @@ export const FileDropOverlay: React.FC<FileDropOverlayProps> = ({
     </div>
   );
 };
+
