@@ -4,14 +4,36 @@ import { PlayerBar } from './components/player/PlayerBar';
 import { LibraryView } from './components/library/LibraryView';
 import { QueuePanel } from './components/queue/QueuePanel';
 import { NewPlaylistModal } from './components/playlist/NewPlaylistModal';
+import { LyricsModal } from './components/lyrics/LyricsModal';
 import { useLibraryStore } from './store/libraryStore';
 import { usePlayerStore } from './store/playerStore';
+import { extractDominantColor } from './utils/colorExtractor';
 
 export const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLyricsOpen, setIsLyricsOpen] = useState(false);
+  const [accentColor, setAccentColor] = useState('#1db954');
+  const [ambientGradient, setAmbientGradient] = useState(
+    'radial-gradient(ellipse at top, rgba(29, 185, 84, 0.12) 0%, transparent 70%)'
+  );
+
   const { setSongs, addSong, removeSong, setWatchedFolder, setIsLoading, watchedFolderPath } =
     useLibraryStore();
-  const { togglePlay, nextTrack, prevTrack, seek, currentTime } = usePlayerStore();
+  const { currentSong, togglePlay, nextTrack, prevTrack, seek, currentTime } = usePlayerStore();
+
+  // Dynamic Album Art Palette Extraction
+  useEffect(() => {
+    if (!currentSong) {
+      setAccentColor('#1db954');
+      setAmbientGradient('radial-gradient(ellipse at top, rgba(29, 185, 84, 0.12) 0%, transparent 70%)');
+      return;
+    }
+
+    extractDominantColor(currentSong.coverArt).then((palette) => {
+      setAccentColor(palette.primaryHex);
+      setAmbientGradient(palette.ambientGradient);
+    });
+  }, [currentSong]);
 
   const handleScan = useCallback(
     async (targetPath?: string) => {
@@ -25,7 +47,6 @@ export const App: React.FC = () => {
         const scannedSongs = await window.tuneAPI.scanFolder(folder);
         setSongs(scannedSongs);
 
-        // Start live watching
         await window.tuneAPI.startWatching(folder);
       } catch (err) {
         console.error('Scan error:', err);
@@ -44,10 +65,9 @@ export const App: React.FC = () => {
     }
   };
 
-  // Keyboard Shortcuts Listener (Space for play/pause, Arrows for seek/skip)
+  // Keyboard Shortcuts Listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing in an input
       if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
         return;
       }
@@ -67,6 +87,8 @@ export const App: React.FC = () => {
       } else if (e.code === 'ArrowLeft' && e.shiftKey) {
         e.preventDefault();
         prevTrack();
+      } else if (e.code === 'KeyL') {
+        setIsLyricsOpen((prev) => !prev);
       }
     };
 
@@ -95,9 +117,15 @@ export const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-tune-bg text-white overflow-hidden select-none">
+    <div className="relative flex flex-col h-screen w-screen bg-tune-bg text-white overflow-hidden select-none">
+      {/* Dynamic Ambient Background Glow */}
+      <div
+        className="absolute inset-0 pointer-events-none transition-all duration-1000 ease-out z-0"
+        style={{ background: ambientGradient }}
+      />
+
       {/* Top Application Body */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="relative z-10 flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <Sidebar
           onOpenNewPlaylistModal={() => setIsModalOpen(true)}
@@ -105,7 +133,7 @@ export const App: React.FC = () => {
         />
 
         {/* Central Library & Views */}
-        <main className="flex-1 flex flex-col bg-tune-bg overflow-hidden">
+        <main className="flex-1 flex flex-col bg-transparent overflow-hidden">
           <LibraryView
             onScanFolder={() => handleScan()}
             onSelectFolderDialog={handleSelectFolder}
@@ -116,14 +144,24 @@ export const App: React.FC = () => {
         <QueuePanel />
       </div>
 
-      {/* Bottom Fixed Player Bar */}
-      <PlayerBar />
+      {/* Bottom Fixed Player Bar with Waveform & Lyrics */}
+      <PlayerBar
+        accentColor={accentColor}
+        onOpenLyrics={() => setIsLyricsOpen(true)}
+        isLyricsOpen={isLyricsOpen}
+      />
 
       {/* Create Playlist Modal */}
       <NewPlaylistModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+
+      {/* Synced Karaoke Lyrics Modal */}
+      <LyricsModal
+        isOpen={isLyricsOpen}
+        onClose={() => setIsLyricsOpen(false)}
+        accentColor={accentColor}
+      />
     </div>
   );
 };
 
 export default App;
-

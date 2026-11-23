@@ -1,20 +1,30 @@
 import React from 'react';
-import { ListMusic, Heart } from 'lucide-react';
+import { ListMusic, Heart, Mic2 } from 'lucide-react';
 import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { PlaybackControls } from './PlaybackControls';
-import { SeekBar } from './SeekBar';
+import { WaveformSeekBar } from './WaveformSeekBar';
 import { VolumeControl } from './VolumeControl';
 import { AlbumArt } from '../shared/AlbumArt';
 
-export const PlayerBar: React.FC = () => {
+interface PlayerBarProps {
+  accentColor?: string;
+  onOpenLyrics: () => void;
+  isLyricsOpen: boolean;
+}
+
+export const PlayerBar: React.FC<PlayerBarProps> = ({
+  accentColor = '#1db954',
+  onOpenLyrics,
+  isLyricsOpen
+}) => {
   const { currentSong, isQueueOpen, toggleQueue } = usePlayerStore();
   const { isSongLiked, toggleLikeSong } = usePlaylistStore();
 
   const isLiked = currentSong ? isSongLiked(currentSong.id) : false;
 
   return (
-    <footer className="h-24 bg-tune-surface border-t border-tune-border px-4 flex items-center justify-between select-none z-30">
+    <footer className="h-24 bg-tune-surface/95 backdrop-blur-md border-t border-tune-border px-4 flex items-center justify-between select-none z-30 shadow-2xl">
       {/* Left: Now Playing Info */}
       <div className="flex items-center gap-3 w-1/4 min-w-[200px]">
         {currentSong ? (
@@ -22,7 +32,7 @@ export const PlayerBar: React.FC = () => {
             <AlbumArt
               coverArt={currentSong.coverArt}
               title={currentSong.title}
-              className="w-14 h-14 rounded-md flex-shrink-0"
+              className="w-14 h-14 rounded-md flex-shrink-0 shadow-md"
               iconSize={22}
             />
             <div className="flex flex-col min-w-0 pr-2">
@@ -36,9 +46,8 @@ export const PlayerBar: React.FC = () => {
 
             <button
               onClick={() => toggleLikeSong(currentSong)}
-              className={`p-1.5 transition rounded-full hover:scale-110 flex-shrink-0 ${
-                isLiked ? 'text-tune-accent fill-tune-accent' : 'text-tune-textSecondary hover:text-white'
-              }`}
+              className="p-1.5 transition rounded-full hover:scale-110 flex-shrink-0"
+              style={{ color: isLiked ? accentColor : '#b3b3b3' }}
               title={isLiked ? 'Remove from Liked Songs' : 'Save to Liked Songs'}
             >
               <Heart size={18} fill={isLiked ? 'currentColor' : 'none'} />
@@ -54,19 +63,34 @@ export const PlayerBar: React.FC = () => {
         )}
       </div>
 
-      {/* Center: Playback & Seek */}
+      {/* Center: Playback Controls & Waveform Seek Bar */}
       <div className="flex flex-col items-center gap-1.5 flex-1 max-w-xl px-4">
         <PlaybackControls />
-        <SeekBar />
+        <WaveformSeekBar accentColor={accentColor} />
       </div>
 
-      {/* Right: Tools & Volume */}
-      <div className="flex items-center justify-end gap-4 w-1/4 min-w-[200px]">
+      {/* Right: Lyrics, Queue & Volume */}
+      <div className="flex items-center justify-end gap-3 w-1/4 min-w-[200px]">
+        {/* Synced Lyrics Button */}
+        <button
+          onClick={onOpenLyrics}
+          disabled={!currentSong}
+          className={`p-2 rounded-lg transition hover:bg-tune-card disabled:opacity-30 ${
+            isLyricsOpen ? 'bg-tune-elevated' : 'text-tune-textSecondary hover:text-white'
+          }`}
+          style={isLyricsOpen ? { color: accentColor } : {}}
+          title="Synced Karaoke Lyrics"
+        >
+          <Mic2 size={19} />
+        </button>
+
+        {/* Play Queue Toggle */}
         <button
           onClick={toggleQueue}
           className={`p-2 rounded-lg transition hover:bg-tune-card ${
-            isQueueOpen ? 'text-tune-accent bg-tune-elevated' : 'text-tune-textSecondary hover:text-white'
+            isQueueOpen ? 'bg-tune-elevated' : 'text-tune-textSecondary hover:text-white'
           }`}
+          style={isQueueOpen ? { color: accentColor } : {}}
           title="Play Queue"
         >
           <ListMusic size={20} />
@@ -77,4 +101,3 @@ export const PlayerBar: React.FC = () => {
     </footer>
   );
 };
-
