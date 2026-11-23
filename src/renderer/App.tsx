@@ -10,6 +10,7 @@ import { TuneWrappedModal } from './components/wrapped/TuneWrappedModal';
 import { AutoTaggerModal } from './components/tagger/AutoTaggerModal';
 import { EqualizerModal } from './components/player/EqualizerModal';
 import { SleepTimerModal } from './components/player/SleepTimerModal';
+import { MiniPlayerView } from './components/player/MiniPlayerView';
 import { useLibraryStore } from './store/libraryStore';
 import { usePlayerStore } from './store/playerStore';
 import { extractDominantColor } from './utils/colorExtractor';
@@ -23,6 +24,7 @@ export const App: React.FC = () => {
   const [isWrappedOpen, setIsWrappedOpen] = useState(false);
   const [isEqOpen, setIsEqOpen] = useState(false);
   const [isSleepTimerOpen, setIsSleepTimerOpen] = useState(false);
+  const [isMiniPlayer, setIsMiniPlayer] = useState(false);
   const [taggerSong, setTaggerSong] = useState<Song | null>(null);
   const [accentColor, setAccentColor] = useState('#1db954');
   const [ambientGradient, setAmbientGradient] = useState(
@@ -110,7 +112,14 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [togglePlay, nextTrack, prevTrack, seek, currentTime]);
 
-  // Initial Scan on Mount & File Watcher Listeners
+  const handleToggleMiniPlayer = async () => {
+    if (window.tuneAPI) {
+      const active = await window.tuneAPI.toggleMiniPlayer();
+      setIsMiniPlayer(active);
+    }
+  };
+
+  // Initial Scan on Mount & File Watcher / OS Event Listeners
   useEffect(() => {
     handleScan();
 
@@ -123,12 +132,33 @@ export const App: React.FC = () => {
         removeSong(removedPath);
       });
 
+      const unsubMedia = window.tuneAPI.onMediaKey((action) => {
+        if (action === 'play-pause') togglePlay();
+        else if (action === 'next') nextTrack();
+        else if (action === 'prev') prevTrack();
+      });
+
+      const unsubMini = window.tuneAPI.onMiniPlayerChanged((mini) => {
+        setIsMiniPlayer(mini);
+      });
+
       return () => {
         unsubAdd();
         unsubRemove();
+        unsubMedia();
+        unsubMini();
       };
     }
-  }, []);
+  }, [togglePlay, nextTrack, prevTrack]);
+
+  if (isMiniPlayer) {
+    return (
+      <MiniPlayerView
+        onExpand={handleToggleMiniPlayer}
+        accentColor={accentColor}
+      />
+    );
+  }
 
   return (
     <div className="relative flex flex-col h-screen w-screen bg-tune-bg text-white overflow-hidden select-none">
@@ -169,6 +199,7 @@ export const App: React.FC = () => {
         onOpenEq={() => setIsEqOpen(true)}
         isEqOpen={isEqOpen}
         onOpenSleepTimer={() => setIsSleepTimerOpen(true)}
+        onToggleMiniPlayer={handleToggleMiniPlayer}
       />
 
       {/* Create Playlist Modal */}

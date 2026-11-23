@@ -71,6 +71,8 @@ export interface TagSuggestion {
   coverArt: string | null;
 }
 
+export type MediaKeyAction = 'play-pause' | 'next' | 'prev';
+
 export interface TuneAPI {
   getDownloadsPath: () => Promise<string>;
   scanFolder: (folderPath: string) => Promise<Song[]>;
@@ -82,6 +84,10 @@ export interface TuneAPI {
   fetchSpotifyPlaylist: (url: string) => Promise<SpotifyPlaylistResult>;
   updateDiscordPresence: (data: DiscordPresenceData) => Promise<void>;
   suggestMetadata: (query: string) => Promise<TagSuggestion[]>;
+  toggleMiniPlayer: (enable?: boolean) => Promise<boolean>;
+  isMiniPlayer: () => Promise<boolean>;
+  onMediaKey: (callback: (action: MediaKeyAction) => void) => () => void;
+  onMiniPlayerChanged: (callback: (isMini: boolean) => void) => () => void;
   onFileAdded: (callback: (song: Song) => void) => () => void;
   onFileRemoved: (callback: (filePath: string) => void) => () => void;
 }

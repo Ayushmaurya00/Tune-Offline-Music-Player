@@ -72,3 +72,4 @@ export function buildFolderTree(songs: Song[], rootPath: string): FolderNode {
   calculateTotals(rootNode);
   return rootNode;
 }
+

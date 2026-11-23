@@ -248,3 +248,4 @@ export const FolderView: React.FC<FolderViewProps> = ({
     </div>
   );
 };
+

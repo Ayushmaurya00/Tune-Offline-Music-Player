@@ -74,3 +74,4 @@ export const SpeedSelector: React.FC<SpeedSelectorProps> = ({ accentColor = '#1d
     </div>
   );
 };
+

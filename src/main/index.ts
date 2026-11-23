@@ -7,6 +7,9 @@ import { deleteFileToTrash, showFileInFolder, selectFolder } from './services/fi
 import { fetchSpotifyPlaylistTracks } from './services/spotifyService';
 import { initDiscordRPC, setDiscordPresence, clearDiscordPresence } from './services/discordService';
 import { fetchSuggestedMetadata } from './services/autoTagger';
+import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './services/shortcuts';
+import { setupSystemTray, destroySystemTray } from './services/tray';
+import { setMiniPlayerMode, isMiniPlayer } from './services/miniPlayer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -71,6 +74,14 @@ function createWindow() {
   } else {
     win.loadFile(path.join(process.env.DIST || '', 'index.html'));
   }
+
+  registerGlobalShortcuts(() => win);
+  setupSystemTray(
+    () => win,
+    () => {
+      if (win) setMiniPlayerMode(win);
+    }
+  );
 }
 
 // IPC Handlers
@@ -116,7 +127,18 @@ ipcMain.handle('tune:suggest-metadata', async (_, query: string) => {
   return await fetchSuggestedMetadata(query);
 });
 
+ipcMain.handle('tune:toggle-mini-player', (_, enable?: boolean) => {
+  if (!win) return false;
+  return setMiniPlayerMode(win, enable);
+});
+
+ipcMain.handle('tune:is-mini-player', () => {
+  return isMiniPlayer();
+});
+
 app.on('window-all-closed', () => {
+  unregisterGlobalShortcuts();
+  destroySystemTray();
   clearDiscordPresence();
   stopFolderWatcher();
   if (process.platform !== 'darwin') {

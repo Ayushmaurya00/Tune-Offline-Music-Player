@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ListMusic, Heart, Mic2, Sliders, Moon } from 'lucide-react';
+import { ListMusic, Heart, Mic2, Sliders, Moon, Minimize2 } from 'lucide-react';
 import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { PlaybackControls } from './PlaybackControls';
@@ -16,6 +16,7 @@ interface PlayerBarProps {
   onOpenEq: () => void;
   isEqOpen: boolean;
   onOpenSleepTimer: () => void;
+  onToggleMiniPlayer: () => void;
 }
 
 export const PlayerBar: React.FC<PlayerBarProps> = ({
@@ -24,7 +25,8 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   isLyricsOpen,
   onOpenEq,
   isEqOpen,
-  onOpenSleepTimer
+  onOpenSleepTimer,
+  onToggleMiniPlayer
 }) => {
   const { currentSong, isQueueOpen, toggleQueue } = usePlayerStore();
   const { isSongLiked, toggleLikeSong } = usePlaylistStore();
@@ -106,6 +108,15 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
                 : `${Math.ceil(timerState.remainingSeconds / 60)}m`}
             </span>
           )}
+        </button>
+
+        {/* Mini Player Mode Button */}
+        <button
+          onClick={onToggleMiniPlayer}
+          className="p-2 rounded-lg transition hover:bg-tune-card text-tune-textSecondary hover:text-white"
+          title="Switch to Mini Player (Floating Always-on-Top)"
+        >
+          <Minimize2 size={17} />
         </button>
 
         {/* Equalizer Button */}

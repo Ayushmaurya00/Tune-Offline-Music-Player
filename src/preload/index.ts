@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { Song, TuneAPI } from '../types/music';
+import { Song, TuneAPI, MediaKeyAction } from '../types/music';
 
 const api: TuneAPI = {
   getDownloadsPath: () => ipcRenderer.invoke('tune:get-downloads-path'),
@@ -12,6 +12,18 @@ const api: TuneAPI = {
   fetchSpotifyPlaylist: (url: string) => ipcRenderer.invoke('tune:fetch-spotify-playlist', url),
   updateDiscordPresence: (data: unknown) => ipcRenderer.invoke('tune:update-discord-presence', data),
   suggestMetadata: (query: string) => ipcRenderer.invoke('tune:suggest-metadata', query),
+  toggleMiniPlayer: (enable?: boolean) => ipcRenderer.invoke('tune:toggle-mini-player', enable),
+  isMiniPlayer: () => ipcRenderer.invoke('tune:is-mini-player'),
+  onMediaKey: (callback: (action: MediaKeyAction) => void) => {
+    const handler = (_: unknown, action: MediaKeyAction) => callback(action);
+    ipcRenderer.on('tune:media-key', handler);
+    return () => ipcRenderer.removeListener('tune:media-key', handler);
+  },
+  onMiniPlayerChanged: (callback: (isMini: boolean) => void) => {
+    const handler = (_: unknown, isMini: boolean) => callback(isMini);
+    ipcRenderer.on('tune:mini-player-changed', handler);
+    return () => ipcRenderer.removeListener('tune:mini-player-changed', handler);
+  },
   onFileAdded: (callback: (song: Song) => void) => {
     const handler = (_: unknown, song: Song) => callback(song);
     ipcRenderer.on('tune:file-added', handler);
