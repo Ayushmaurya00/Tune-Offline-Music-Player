@@ -20,10 +20,10 @@ export const MobileNav: React.FC<MobileNavProps> = ({
       <button
         onClick={() => setActiveView('library')}
         className={`flex flex-col items-center gap-1 py-1 px-3 rounded-lg text-[10px] font-medium transition ${
-          activeView === 'library' ? 'text-tune-accent font-bold' : 'text-tune-textSecondary'
+          activeView === 'library' ? 'text-white font-bold' : 'text-tune-textSecondary'
         }`}
       >
-        <Home size={19} />
+        <Home size={19} className="text-white" />
         <span>Library</span>
       </button>
 
@@ -31,10 +31,10 @@ export const MobileNav: React.FC<MobileNavProps> = ({
         <button
           onClick={() => setActiveView('playlists')}
           className={`flex flex-col items-center gap-1 py-1 px-2 rounded-lg text-[10px] font-medium transition ${
-            isPlaylistsActive ? 'text-tune-accent font-bold' : 'text-tune-textSecondary'
+            isPlaylistsActive ? 'text-white font-bold' : 'text-tune-textSecondary'
           }`}
         >
-          <ListMusic size={19} />
+          <ListMusic size={19} className="text-white" />
           <span>Playlists</span>
         </button>
         <button
@@ -42,30 +42,30 @@ export const MobileNav: React.FC<MobileNavProps> = ({
             e.stopPropagation();
             onOpenNewPlaylistModal();
           }}
-          className="p-1 -ml-1 text-tune-textMuted hover:text-tune-accent transition"
+          className="p-1 -ml-1 text-white hover:text-tune-accent transition"
           title="Create New Playlist"
         >
-          <Plus size={14} />
+          <Plus size={14} className="text-white" />
         </button>
       </div>
 
       <button
         onClick={() => setActiveView('folders')}
         className={`flex flex-col items-center gap-1 py-1 px-3 rounded-lg text-[10px] font-medium transition ${
-          activeView === 'folders' ? 'text-tune-accent font-bold' : 'text-tune-textSecondary'
+          activeView === 'folders' ? 'text-white font-bold' : 'text-tune-textSecondary'
         }`}
       >
-        <FolderTree size={19} />
+        <FolderTree size={19} className="text-white" />
         <span>Folders</span>
       </button>
 
       <button
         onClick={() => setActiveView('liked')}
         className={`flex flex-col items-center gap-1 py-1 px-3 rounded-lg text-[10px] font-medium transition ${
-          activeView === 'liked' ? 'text-tune-accent font-bold' : 'text-tune-textSecondary'
+          activeView === 'liked' ? 'text-white font-bold' : 'text-tune-textSecondary'
         }`}
       >
-        <Heart size={19} fill={activeView === 'liked' ? 'currentColor' : 'none'} />
+        <Heart size={19} className="text-white" fill={activeView === 'liked' ? 'white' : 'none'} />
         <span>Liked</span>
       </button>
 
@@ -73,7 +73,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
         onClick={onOpenSpotifyModal}
         className="flex flex-col items-center gap-1 py-1 px-3 rounded-lg text-[10px] font-medium text-tune-textSecondary hover:text-white transition"
       >
-        <FolderDown size={19} />
+        <FolderDown size={19} className="text-white" />
         <span>Import</span>
       </button>
     </nav>

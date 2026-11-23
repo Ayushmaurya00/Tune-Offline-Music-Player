@@ -145,8 +145,8 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
       <div className="flex-1 overflow-y-auto p-6">
         {sortedSongs.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-tune-elevated flex items-center justify-center text-tune-accent mb-4 border border-tune-border">
-              <FolderDown size={32} />
+            <div className="w-16 h-16 rounded-2xl bg-tune-elevated flex items-center justify-center text-white mb-4 border border-tune-border">
+              <FolderDown size={32} className="text-white" />
             </div>
             <h3 className="text-base font-semibold text-white">No audio files found</h3>
             <p className="text-xs text-tune-textMuted max-w-sm mt-1.5 leading-relaxed">

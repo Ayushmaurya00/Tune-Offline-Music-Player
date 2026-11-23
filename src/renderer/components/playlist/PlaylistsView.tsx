@@ -52,7 +52,7 @@ export const PlaylistsView: React.FC<PlaylistsViewProps> = ({
       <div className="p-4 sm:p-6 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-tune-border/40">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-            <ListMusic className="text-tune-accent" size={24} />
+            <ListMusic className="text-white" size={24} />
             <span>Your Playlists</span>
           </h1>
           <p className="text-xs text-tune-textSecondary mt-0.5">
@@ -73,8 +73,8 @@ export const PlaylistsView: React.FC<PlaylistsViewProps> = ({
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         {playlists.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-tune-elevated flex items-center justify-center text-tune-accent mb-4 border border-tune-border">
-              <Music size={32} />
+            <div className="w-16 h-16 rounded-2xl bg-tune-elevated flex items-center justify-center text-white mb-4 border border-tune-border">
+              <Music size={32} className="text-white" />
             </div>
             <h3 className="text-base font-semibold text-white">No playlists yet</h3>
             <p className="text-xs text-tune-textMuted max-w-sm mt-1.5 leading-relaxed">
@@ -99,8 +99,8 @@ export const PlaylistsView: React.FC<PlaylistsViewProps> = ({
                   className="group relative p-4 rounded-2xl bg-tune-elevated/40 hover:bg-tune-card/80 border border-tune-border/50 hover:border-tune-accent/50 transition cursor-pointer flex flex-col justify-between"
                 >
                   <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-tune-card to-neutral-800 border border-tune-border flex items-center justify-center text-tune-accent flex-shrink-0">
-                      <Music size={22} />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-tune-card to-neutral-800 border border-tune-border flex items-center justify-center text-white flex-shrink-0">
+                      <Music size={22} className="text-white" />
                     </div>
 
                     <div className="flex items-center gap-1">

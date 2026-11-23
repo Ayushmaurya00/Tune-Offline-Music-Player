@@ -54,8 +54,12 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
   return (
     <div className="flex-1 flex flex-col overflow-y-auto">
       <div className="p-4 sm:p-8 bg-gradient-to-b from-neutral-800/80 to-transparent flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6 text-center sm:text-left border-b border-tune-border/40">
-        <div className="w-32 h-32 sm:w-44 sm:h-44 rounded-xl bg-gradient-to-br from-tune-card to-neutral-800 border border-tune-border shadow-2xl flex items-center justify-center flex-shrink-0 text-tune-accent">
-          {isLikedView ? <Heart size={48} className="sm:w-16 sm:h-16" fill="currentColor" /> : <Music size={48} className="sm:w-16 sm:h-16" />}
+        <div className="w-32 h-32 sm:w-44 sm:h-44 rounded-xl bg-gradient-to-br from-tune-card to-neutral-800 border border-tune-border shadow-2xl flex items-center justify-center flex-shrink-0 text-white">
+          {isLikedView ? (
+            <Heart size={48} className="sm:w-16 sm:h-16 text-white" fill="white" />
+          ) : (
+            <Music size={48} className="sm:w-16 sm:h-16 text-white" />
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5 sm:gap-2 min-w-0">

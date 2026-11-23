@@ -66,9 +66,9 @@ const TreeItem: React.FC<TreeItemProps> = ({ node, selectedPath, onSelect, depth
         )}
 
         {isExpanded ? (
-          <FolderOpen size={15} className={isSelected ? 'text-tune-accent' : 'text-tune-textMuted'} />
+          <FolderOpen size={15} className="text-white" />
         ) : (
-          <Folder size={15} className={isSelected ? 'text-tune-accent' : 'text-tune-textMuted'} />
+          <Folder size={15} className="text-white" />
         )}
 
         <span className="truncate flex-1">{node.name}</span>
@@ -146,7 +146,7 @@ export const FolderView: React.FC<FolderViewProps> = ({
       <div className="w-72 bg-tune-surface/50 border-r border-tune-border flex flex-col h-full overflow-hidden select-none">
         <div className="p-4 border-b border-tune-border flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <FolderTree size={18} className="text-tune-accent" />
+            <FolderTree size={18} className="text-white" />
             <span className="text-xs font-bold text-white uppercase tracking-wider">
               Folder Browser
             </span>
@@ -189,8 +189,8 @@ export const FolderView: React.FC<FolderViewProps> = ({
         {/* Folder Header */}
         <div className="p-6 pb-4 border-b border-tune-border/60 bg-tune-elevated/20 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-tune-elevated text-tune-accent flex items-center justify-center border border-tune-border shadow-md">
-              <FolderOpen size={28} />
+            <div className="w-14 h-14 rounded-2xl bg-tune-elevated text-white flex items-center justify-center border border-tune-border shadow-md">
+              <FolderOpen size={28} className="text-white" />
             </div>
 
             <div className="flex flex-col min-w-0">

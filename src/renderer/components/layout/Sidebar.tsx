@@ -55,7 +55,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               : 'text-tune-textSecondary hover:text-white hover:bg-tune-elevated/50'
           }`}
         >
-          <Heart size={18} className="text-tune-accent" />
+          <Heart size={18} className="text-white" />
           <span>Liked Songs</span>
         </button>
 
@@ -67,7 +67,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               : 'text-tune-textSecondary hover:text-white hover:bg-tune-elevated/50'
           }`}
         >
-          <FolderTree size={18} className="text-amber-400" />
+          <FolderTree size={18} className="text-white" />
           <span>Folder Mode</span>
         </button>
 
@@ -79,7 +79,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               : 'text-tune-textSecondary hover:text-white hover:bg-tune-elevated/50'
           }`}
         >
-          <Music2 size={18} className="text-tune-accent" />
+          <Music2 size={18} className="text-white" />
           <span>Playlists</span>
           <span className="ml-auto text-xs text-tune-textMuted font-mono">{playlists.length}</span>
         </button>
@@ -89,7 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="mt-4 px-4 py-3 mx-3 bg-tune-elevated/60 border border-tune-border rounded-xl">
         <div className="flex items-center justify-between text-xs font-semibold text-tune-textMuted uppercase tracking-wider mb-1.5">
           <span className="flex items-center gap-1.5">
-            <FolderDown size={14} className="text-tune-accent" />
+            <FolderDown size={14} className="text-white" />
             Watched Folder
           </span>
           <div className="flex items-center gap-2">
@@ -160,7 +160,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }`}
               >
                 <div className="flex items-center gap-2.5 truncate">
-                  <Music2 size={16} className={isSelected ? 'text-tune-accent' : 'text-tune-textMuted'} />
+                  <Music2 size={16} className="text-white" />
                   <span className="truncate">{playlist.name}</span>
                 </div>
 
@@ -186,7 +186,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={onSelectFolder}
           className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-tune-elevated hover:bg-tune-card text-xs font-medium text-tune-textSecondary hover:text-white border border-tune-border transition"
         >
-          <FolderOpen size={15} />
+          <FolderOpen size={15} className="text-white" />
           <span>Scan Custom Folder</span>
         </button>
 

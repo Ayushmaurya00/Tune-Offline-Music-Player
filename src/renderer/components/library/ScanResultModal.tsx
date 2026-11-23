@@ -67,7 +67,7 @@ export const ScanResultModal: React.FC<ScanResultModalProps> = ({
 
         {/* Folder Path Box */}
         <div className="p-3 rounded-xl bg-tune-elevated/70 border border-tune-border flex items-center gap-2.5 overflow-hidden">
-          <Folder size={18} className="text-tune-accent flex-shrink-0" />
+          <Folder size={18} className="text-white flex-shrink-0" />
           <div className="flex flex-col min-w-0">
             <span className="text-[10px] uppercase font-bold text-tune-textMuted tracking-wider">
               Scanned Directory
@@ -81,7 +81,7 @@ export const ScanResultModal: React.FC<ScanResultModalProps> = ({
         {/* Stats Grid */}
         <div className="grid grid-cols-3 gap-2.5">
           <div className="p-3 rounded-xl bg-tune-elevated border border-tune-border flex flex-col items-center justify-center text-center">
-            <Music size={16} className="text-tune-accent mb-1" />
+            <Music size={16} className="text-white mb-1" />
             <span className="text-xl font-bold font-mono text-white">
               {result.totalSongs}
             </span>

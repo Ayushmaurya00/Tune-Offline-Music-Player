@@ -32,7 +32,7 @@ export const NewPlaylistModal: React.FC<NewPlaylistModalProps> = ({ isOpen, onCl
       <div className="w-full max-w-md bg-tune-surface border border-tune-border rounded-2xl p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
         <div className="flex items-center justify-between pb-4 border-b border-tune-border">
           <div className="flex items-center gap-2 text-white font-bold">
-            <Music size={18} className="text-tune-accent" />
+            <Music size={18} className="text-white" />
             <span>Create New Playlist</span>
           </div>
           <button
