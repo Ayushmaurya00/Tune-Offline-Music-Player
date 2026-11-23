@@ -7,7 +7,8 @@ import {
   Play,
   ListPlus,
   FolderTree,
-  Music
+  Music,
+  RefreshCw
 } from 'lucide-react';
 import { Song } from '@/types/music';
 import { buildFolderTree, FolderNode } from '../../utils/folderTree';
@@ -21,6 +22,9 @@ interface FolderViewProps {
   onAutoTag?: (song: Song) => void;
   onDelete?: (song: Song) => void;
   onShowInFolder?: (song: Song) => void;
+  onChangeFolder?: () => void;
+  onRefresh?: () => void;
+  isLoading?: boolean;
 }
 
 interface TreeItemProps {
@@ -95,7 +99,10 @@ export const FolderView: React.FC<FolderViewProps> = ({
   rootPath,
   onAutoTag,
   onDelete,
-  onShowInFolder
+  onShowInFolder,
+  onChangeFolder,
+  onRefresh,
+  isLoading = false
 }) => {
   const tree = useMemo(() => buildFolderTree(songs, rootPath), [songs, rootPath]);
   const [selectedNode, setSelectedNode] = useState<FolderNode>(tree);
@@ -136,11 +143,22 @@ export const FolderView: React.FC<FolderViewProps> = ({
     <div className="flex-1 flex h-full overflow-hidden">
       {/* Left Tree Explorer Sidebar */}
       <div className="w-72 bg-tune-surface/50 border-r border-tune-border flex flex-col h-full overflow-hidden select-none">
-        <div className="p-4 border-b border-tune-border flex items-center gap-2">
-          <FolderTree size={18} className="text-tune-accent" />
-          <span className="text-xs font-bold text-white uppercase tracking-wider">
-            Folder Browser
-          </span>
+        <div className="p-4 border-b border-tune-border flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <FolderTree size={18} className="text-tune-accent" />
+            <span className="text-xs font-bold text-white uppercase tracking-wider">
+              Folder Browser
+            </span>
+          </div>
+          {onChangeFolder && (
+            <button
+              onClick={onChangeFolder}
+              className="text-[11px] text-tune-accent hover:underline lowercase font-normal"
+              title="Change root music folder"
+            >
+              change
+            </button>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
@@ -188,6 +206,17 @@ export const FolderView: React.FC<FolderViewProps> = ({
           </div>
 
           <div className="flex items-center gap-2.5">
+            {onRefresh && (
+              <button
+                onClick={onRefresh}
+                disabled={isLoading}
+                className="p-2.5 rounded-full bg-tune-elevated hover:bg-tune-card text-tune-textSecondary hover:text-white border border-tune-border transition"
+                title="Rescan directory"
+              >
+                <RefreshCw size={15} className={isLoading ? 'animate-spin' : ''} />
+              </button>
+            )}
+
             <button
               onClick={handlePlayFolder}
               disabled={activeSongs.length === 0}

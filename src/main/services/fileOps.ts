@@ -18,10 +18,16 @@ export async function showFileInFolder(filePath: string): Promise<void> {
   }
 }
 
-export async function selectFolder(win: BrowserWindow): Promise<string | null> {
-  const result = await dialog.showOpenDialog(win, {
+export async function selectFolder(win?: BrowserWindow | null): Promise<string | null> {
+  const options: Electron.OpenDialogOptions = {
+    title: 'Select Music Folder',
     properties: ['openDirectory']
-  });
+  };
+
+  const result =
+    win && !win.isDestroyed()
+      ? await dialog.showOpenDialog(win, options)
+      : await dialog.showOpenDialog(options);
 
   if (result.canceled || result.filePaths.length === 0) {
     return null;

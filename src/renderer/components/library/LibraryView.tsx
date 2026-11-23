@@ -10,7 +10,7 @@ import { PlaylistDetailView } from '../playlist/PlaylistDetailView';
 import { FolderView } from '../folders/FolderView';
 
 interface LibraryViewProps {
-  onScanFolder: (path?: string) => Promise<void>;
+  onScanFolder: (path?: string, showPopup?: boolean) => Promise<void>;
   onSelectFolderDialog: () => Promise<void>;
   onAutoTag?: (song: Song) => void;
 }
@@ -69,6 +69,9 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         onAutoTag={onAutoTag}
         onDelete={handleDeleteSong}
         onShowInFolder={handleShowInFolder}
+        onChangeFolder={onSelectFolderDialog}
+        onRefresh={() => onScanFolder(undefined, true)}
+        isLoading={isLoading}
       />
     );
   }
@@ -91,7 +94,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         </div>
 
         <button
-          onClick={() => onScanFolder()}
+          onClick={() => onScanFolder(undefined, true)}
           disabled={isLoading}
           className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-tune-elevated hover:bg-tune-card text-xs font-medium text-tune-textSecondary hover:text-white border border-tune-border transition shadow-sm"
         >

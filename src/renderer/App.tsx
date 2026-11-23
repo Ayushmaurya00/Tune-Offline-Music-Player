@@ -12,6 +12,8 @@ import { AutoTaggerModal } from './components/tagger/AutoTaggerModal';
 import { EqualizerModal } from './components/player/EqualizerModal';
 import { SleepTimerModal } from './components/player/SleepTimerModal';
 import { MiniPlayerView } from './components/player/MiniPlayerView';
+import { ScanResultModal, ScanResultData } from './components/library/ScanResultModal';
+import { pickFolderOrFiles } from './utils/folderPicker';
 import { useLibraryStore } from './store/libraryStore';
 import { usePlayerStore } from './store/playerStore';
 import { extractDominantColor } from './utils/colorExtractor';
@@ -26,6 +28,7 @@ export const App: React.FC = () => {
   const [isEqOpen, setIsEqOpen] = useState(false);
   const [isSleepTimerOpen, setIsSleepTimerOpen] = useState(false);
   const [isMiniPlayer, setIsMiniPlayer] = useState(false);
+  const [scanResult, setScanResult] = useState<ScanResultData | null>(null);
   const [taggerSong, setTaggerSong] = useState<Song | null>(null);
   const [accentColor, setAccentColor] = useState('#1db954');
   const [ambientGradient, setAmbientGradient] = useState(
@@ -34,7 +37,7 @@ export const App: React.FC = () => {
 
   const { songs, setSongs, addSong, removeSong, setWatchedFolder, setIsLoading, watchedFolderPath } =
     useLibraryStore();
-  const { currentSong, togglePlay, nextTrack, prevTrack, seek, currentTime } = usePlayerStore();
+  const { currentSong, togglePlay, nextTrack, prevTrack, seek, currentTime, playSong } = usePlayerStore();
 
   // Dynamic Album Art Palette Extraction & Stats Tracking
   useEffect(() => {
@@ -53,32 +56,85 @@ export const App: React.FC = () => {
   }, [currentSong]);
 
   const handleScan = useCallback(
-    async (targetPath?: string) => {
+    async (targetPath?: string, showPopup = false) => {
       if (!window.tuneAPI) return;
 
       setIsLoading(true);
+      const startTime = performance.now();
       try {
         const folder = targetPath || watchedFolderPath || (await window.tuneAPI.getDownloadsPath());
         setWatchedFolder(folder);
 
         const scannedSongs = await window.tuneAPI.scanFolder(folder);
+        const prevCount = songs.length;
         setSongs(scannedSongs);
 
         await window.tuneAPI.startWatching(folder);
+
+        const durationMs = performance.now() - startTime;
+        const newSongsCount = Math.max(0, scannedSongs.length - prevCount);
+
+        const formatCounts: Record<string, number> = {};
+        for (const s of scannedSongs) {
+          const fmt = (s.format || s.fileName.split('.').pop() || 'mp3').toLowerCase();
+          formatCounts[fmt] = (formatCounts[fmt] || 0) + 1;
+        }
+
+        if (showPopup) {
+          setScanResult({
+            folderPath: folder,
+            totalSongs: scannedSongs.length,
+            newSongsCount,
+            durationMs,
+            formatCounts
+          });
+        }
       } catch (err) {
         console.error('Scan error:', err);
       } finally {
         setIsLoading(false);
       }
     },
-    [watchedFolderPath, setIsLoading, setWatchedFolder, setSongs]
+    [watchedFolderPath, setIsLoading, setWatchedFolder, setSongs, songs.length]
   );
 
   const handleSelectFolder = async () => {
-    if (!window.tuneAPI) return;
-    const selected = await window.tuneAPI.selectFolderDialog();
-    if (selected) {
-      await handleScan(selected);
+    setIsLoading(true);
+    const startTime = performance.now();
+    try {
+      const picked = await pickFolderOrFiles();
+      if (!picked) return;
+
+      const { folderPath, songs: scannedSongs } = picked;
+      setWatchedFolder(folderPath);
+
+      const prevCount = songs.length;
+      setSongs(scannedSongs);
+
+      if (window.tuneAPI) {
+        await window.tuneAPI.startWatching(folderPath);
+      }
+
+      const durationMs = performance.now() - startTime;
+      const newSongsCount = Math.max(0, scannedSongs.length - prevCount);
+
+      const formatCounts: Record<string, number> = {};
+      for (const s of scannedSongs) {
+        const fmt = (s.format || s.fileName.split('.').pop() || 'mp3').toLowerCase();
+        formatCounts[fmt] = (formatCounts[fmt] || 0) + 1;
+      }
+
+      setScanResult({
+        folderPath,
+        totalSongs: scannedSongs.length,
+        newSongsCount,
+        durationMs,
+        formatCounts
+      });
+    } catch (err) {
+      console.error('Folder selection error:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -182,7 +238,7 @@ export const App: React.FC = () => {
         {/* Central Library & Views */}
         <main className="flex-1 flex flex-col bg-transparent overflow-hidden">
           <LibraryView
-            onScanFolder={() => handleScan()}
+            onScanFolder={(path, popup) => handleScan(path, popup)}
             onSelectFolderDialog={handleSelectFolder}
             onAutoTag={(song) => setTaggerSong(song)}
           />
@@ -252,6 +308,19 @@ export const App: React.FC = () => {
         isOpen={isSleepTimerOpen}
         onClose={() => setIsSleepTimerOpen(false)}
         accentColor={accentColor}
+      />
+
+      {/* Custom Scan Result Popup */}
+      <ScanResultModal
+        isOpen={Boolean(scanResult)}
+        onClose={() => setScanResult(null)}
+        result={scanResult}
+        accentColor={accentColor}
+        onPlayAll={() => {
+          if (songs.length > 0) {
+            playSong(songs[0], songs);
+          }
+        }}
       />
     </div>
   );
