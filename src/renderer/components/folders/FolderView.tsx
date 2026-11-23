@@ -264,7 +264,7 @@ export const FolderView: React.FC<FolderViewProps> = ({
             </div>
           ) : (
             <div className="space-y-1">
-              <div className="grid grid-cols-[36px_minmax(200px,2fr)_minmax(120px,1.5fr)_minmax(100px,1fr)_80px_100px] px-4 py-2 text-[11px] font-semibold text-tune-textMuted uppercase border-b border-tune-border/40 select-none">
+              <div className="hidden md:grid grid-cols-[36px_minmax(200px,2fr)_minmax(120px,1.5fr)_minmax(100px,1fr)_80px_100px] px-4 py-2 text-[11px] font-semibold text-tune-textMuted uppercase border-b border-tune-border/40 select-none">
                 <span>#</span>
                 <span>Title</span>
                 <span>Album</span>

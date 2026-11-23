@@ -53,21 +53,21 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
 
   return (
     <div className="flex-1 flex flex-col overflow-y-auto">
-      <div className="p-8 bg-gradient-to-b from-neutral-800/80 to-transparent flex items-end gap-6 border-b border-tune-border/40">
-        <div className="w-44 h-44 rounded-xl bg-gradient-to-br from-tune-card to-neutral-800 border border-tune-border shadow-2xl flex items-center justify-center flex-shrink-0 text-tune-accent">
-          {isLikedView ? <Heart size={64} fill="currentColor" /> : <Music size={64} />}
+      <div className="p-4 sm:p-8 bg-gradient-to-b from-neutral-800/80 to-transparent flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6 text-center sm:text-left border-b border-tune-border/40">
+        <div className="w-32 h-32 sm:w-44 sm:h-44 rounded-xl bg-gradient-to-br from-tune-card to-neutral-800 border border-tune-border shadow-2xl flex items-center justify-center flex-shrink-0 text-tune-accent">
+          {isLikedView ? <Heart size={48} className="sm:w-16 sm:h-16" fill="currentColor" /> : <Music size={48} className="sm:w-16 sm:h-16" />}
         </div>
 
-        <div className="flex flex-col gap-2 min-w-0">
+        <div className="flex flex-col gap-1.5 sm:gap-2 min-w-0">
           <span className="text-xs uppercase font-bold tracking-widest text-tune-textMuted">
             {isLikedView ? 'Auto Playlist' : 'Playlist'}
           </span>
-          <h1 className="text-4xl font-extrabold text-white tracking-tight truncate">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight truncate">
             {title}
           </h1>
           {description && <p className="text-xs text-tune-textSecondary">{description}</p>}
 
-          <div className="flex items-center gap-2 text-xs text-tune-textMuted font-mono mt-1">
+          <div className="flex items-center justify-center sm:justify-start gap-2 text-xs text-tune-textMuted font-mono mt-1">
             <span>{songs.length} songs</span>
             <span>•</span>
             <span>{formatDuration(totalDuration)} total</span>
@@ -75,7 +75,7 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
         </div>
       </div>
 
-      <div className="px-8 py-4 flex items-center gap-4">
+      <div className="px-4 sm:px-8 py-4 flex items-center gap-4">
         <button
           onClick={handlePlayAll}
           disabled={songs.length === 0}
@@ -95,14 +95,14 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
         </button>
       </div>
 
-      <div className="px-8 pb-12 flex-1">
+      <div className="px-4 sm:px-8 pb-12 flex-1">
         {songs.length === 0 ? (
           <div className="py-16 text-center text-tune-textMuted text-xs">
             No songs in this playlist yet. Browse your library and add some!
           </div>
         ) : (
           <div className="space-y-1">
-            <div className="grid grid-cols-[36px_minmax(200px,2fr)_minmax(120px,1.5fr)_minmax(100px,1fr)_80px_100px] px-4 py-2 text-[11px] font-semibold text-tune-textMuted uppercase border-b border-tune-border/40 select-none">
+            <div className="hidden md:grid grid-cols-[36px_minmax(200px,2fr)_minmax(120px,1.5fr)_minmax(100px,1fr)_80px_100px] px-4 py-2 text-[11px] font-semibold text-tune-textMuted uppercase border-b border-tune-border/40 select-none">
               <span>#</span>
               <span>Title</span>
               <span>Album</span>

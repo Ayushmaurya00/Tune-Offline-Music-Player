@@ -57,7 +57,7 @@ export const QueuePanel: React.FC = () => {
   if (!isQueueOpen) return null;
 
   return (
-    <aside className="w-80 bg-tune-surface border-l border-tune-border flex flex-col h-full select-none z-20">
+    <aside className="fixed inset-y-0 right-0 w-full sm:w-80 bg-tune-surface border-l border-tune-border flex flex-col h-full select-none z-50 md:relative md:z-20 shadow-2xl">
       {/* Queue Header */}
       <div className="p-4 border-b border-tune-border flex items-center justify-between">
         <div className="flex items-center gap-2">

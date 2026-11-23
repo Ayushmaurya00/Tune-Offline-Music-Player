@@ -9,6 +9,7 @@ class AudioController {
   private onEndCallback?: () => void;
   private timerId: number | null = null;
   private playbackRate: number = 1.0;
+  private pendingPlayTimeout: ReturnType<typeof setTimeout> | null = null;
 
   public playSong(
     song: Song,
@@ -16,16 +17,21 @@ class AudioController {
     onEnd: () => void,
     onTimeUpdate: (currentTime: number) => void
   ) {
+    if (this.pendingPlayTimeout) {
+      clearTimeout(this.pendingPlayTimeout);
+      this.pendingPlayTimeout = null;
+    }
+
     this.onEndCallback = onEnd;
     this.onTimeUpdateCallback = onTimeUpdate;
 
     const mediaUrl = resolveMediaUrl(song.filePath);
 
-    const { crossfadeDuration } = eqService.getSettings();
+    const { crossfadeDuration, songChangeDelayMs } = eqService.getSettings();
     const shouldCrossfade = crossfadeDuration > 0 && this.howl && this.howl.playing();
     const fadeMs = Math.min(5000, crossfadeDuration * 1000);
 
-    // Fade out previous track smoothly if crossfade is enabled
+    // Fade out / stop previous track smoothly
     if (this.howl) {
       const oldHowl = this.howl;
       this.stopTimer();
@@ -42,52 +48,77 @@ class AudioController {
           oldHowl.unload();
         }
       } else {
-        oldHowl.stop();
-        oldHowl.unload();
+        try {
+          oldHowl.fade(oldHowl.volume(), 0, 40);
+          setTimeout(() => {
+            oldHowl.stop();
+            oldHowl.unload();
+          }, 50);
+        } catch {
+          oldHowl.stop();
+          oldHowl.unload();
+        }
       }
+      this.howl = null;
     }
 
-    const initialVolume = shouldCrossfade ? 0 : volume;
+    const startPlayback = () => {
+      const initialVolume = shouldCrossfade ? 0 : volume;
 
-    this.howl = new Howl({
-      src: [mediaUrl],
-      html5: true,
-      volume: initialVolume,
-      rate: this.playbackRate,
-      onend: () => {
-        this.stopTimer();
-        if (this.onEndCallback) this.onEndCallback();
-      },
-      onplay: () => {
-        this.startTimer();
-        eqService.init();
+      this.howl = new Howl({
+        src: [mediaUrl],
+        html5: true,
+        volume: initialVolume,
+        rate: this.playbackRate,
+        onend: () => {
+          this.stopTimer();
+          if (this.onEndCallback) this.onEndCallback();
+        },
+        onplay: () => {
+          this.startTimer();
+          eqService.init();
 
-        // Fade in new track
-        if (shouldCrossfade && this.howl) {
-          this.howl.fade(0, volume, fadeMs);
+          // Fade in new track
+          if (shouldCrossfade && this.howl) {
+            this.howl.fade(0, volume, fadeMs);
+          }
+        },
+        onpause: () => {
+          this.stopTimer();
+        },
+        onstop: () => {
+          this.stopTimer();
+        },
+        onloaderror: (_id, err) => {
+          console.error('Audio load error:', err, 'on URL:', mediaUrl);
+        },
+        onplayerror: (_id, err) => {
+          console.error('Audio play error:', err);
+          this.howl?.once('unlock', () => {
+            this.howl?.play();
+          });
         }
-      },
-      onpause: () => {
-        this.stopTimer();
-      },
-      onstop: () => {
-        this.stopTimer();
-      },
-      onloaderror: (_id, err) => {
-        console.error('Audio load error:', err, 'on URL:', mediaUrl);
-      },
-      onplayerror: (_id, err) => {
-        console.error('Audio play error:', err);
-        this.howl?.once('unlock', () => {
-          this.howl?.play();
-        });
-      }
-    });
+      });
 
-    this.howl.play();
+      this.howl.play();
+    };
+
+    const delayMs = songChangeDelayMs ?? 250;
+    if (delayMs > 0) {
+      this.pendingPlayTimeout = setTimeout(() => {
+        this.pendingPlayTimeout = null;
+        startPlayback();
+      }, delayMs);
+    } else {
+      startPlayback();
+    }
   }
 
   public pause() {
+    if (this.pendingPlayTimeout) {
+      clearTimeout(this.pendingPlayTimeout);
+      this.pendingPlayTimeout = null;
+    }
     this.howl?.pause();
     this.stopTimer();
   }
@@ -98,6 +129,10 @@ class AudioController {
   }
 
   public stop() {
+    if (this.pendingPlayTimeout) {
+      clearTimeout(this.pendingPlayTimeout);
+      this.pendingPlayTimeout = null;
+    }
     this.stopTimer();
     if (this.howl) {
       this.howl.stop();

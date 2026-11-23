@@ -66,7 +66,7 @@ export const SongCard: React.FC<SongCardProps> = ({
             toggleLikeSong(song);
           }}
           className={`absolute top-2 left-2 p-1.5 rounded-full bg-black/40 backdrop-blur-sm transition ${
-            isLiked ? 'text-tune-accent opacity-100' : 'text-white opacity-0 group-hover:opacity-100 hover:scale-110'
+            isLiked ? 'text-tune-accent opacity-100' : 'text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:scale-110'
           }`}
           title={isLiked ? 'Liked' : 'Like'}
         >
@@ -86,7 +86,7 @@ export const SongCard: React.FC<SongCardProps> = ({
       <div className="flex items-center justify-between mt-2 pt-2 border-t border-tune-border/40 text-[11px] text-tune-textMuted">
         <span className="font-mono">{formatDuration(song.duration)}</span>
 
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+        <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition">
           <button
             onClick={(e) => {
               e.stopPropagation();

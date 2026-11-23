@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Pause, Heart, PlusCircle, Trash2, Folder, Wand2 } from 'lucide-react';
+import { Play, Pause, Heart, PlusCircle, Trash2, Folder, Wand2, MoreVertical } from 'lucide-react';
 import { Song } from '@/types/music';
 import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
@@ -50,7 +50,7 @@ export const SongRow: React.FC<SongRowProps> = ({
       <div
         onClick={handleRowClick}
         onContextMenu={handleContextMenu}
-        className={`group grid grid-cols-[36px_minmax(200px,2fr)_minmax(120px,1.5fr)_minmax(100px,1fr)_80px_100px] items-center px-4 py-2.5 rounded-lg text-xs cursor-pointer select-none transition ${
+        className={`group grid grid-cols-[28px_1fr_auto] md:grid-cols-[36px_minmax(200px,2fr)_minmax(120px,1.5fr)_minmax(100px,1fr)_80px_100px] items-center px-3 md:px-4 py-2.5 rounded-lg text-xs cursor-pointer select-none transition ${
           isCurrent ? 'bg-tune-elevated text-tune-accent font-medium' : 'hover:bg-tune-card/60 text-tune-textSecondary'
         }`}
       >
@@ -75,7 +75,7 @@ export const SongRow: React.FC<SongRowProps> = ({
           </button>
         </div>
 
-      <div className="flex items-center gap-3 min-w-0 pr-3">
+      <div className="flex items-center gap-2.5 md:gap-3 min-w-0 pr-2 md:pr-3">
         <AlbumArt
           coverArt={song.coverArt}
           title={song.title}
@@ -90,19 +90,21 @@ export const SongRow: React.FC<SongRowProps> = ({
         </div>
       </div>
 
-      <div className="truncate text-tune-textMuted pr-3">{song.album}</div>
+      <div className="hidden md:block truncate text-tune-textMuted pr-3">{song.album}</div>
 
-      <div className="truncate text-tune-textMuted font-mono text-[11px]">
+      <div className="hidden md:block truncate text-tune-textMuted font-mono text-[11px]">
         {formatDate(song.fileModified || song.dateAdded)}
       </div>
 
-      <div className="text-tune-textMuted font-mono">{formatDuration(song.duration)}</div>
+      <div className="hidden md:block text-tune-textMuted font-mono">{formatDuration(song.duration)}</div>
 
-      <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center justify-end gap-1 md:gap-2" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={() => toggleLikeSong(song)}
-          className={`p-1 transition rounded-full hover:scale-110 ${
-            isLiked ? 'text-tune-accent' : 'text-tune-textMuted hover:text-white opacity-0 group-hover:opacity-100'
+          className={`p-1.5 transition rounded-full hover:scale-110 ${
+            isLiked
+              ? 'text-tune-accent opacity-100'
+              : 'text-tune-textMuted hover:text-white md:opacity-0 md:group-hover:opacity-100'
           }`}
           title={isLiked ? 'Liked' : 'Like'}
         >
@@ -111,7 +113,7 @@ export const SongRow: React.FC<SongRowProps> = ({
 
         <button
           onClick={() => addToQueue(song)}
-          className="p-1 text-tune-textMuted hover:text-white opacity-0 group-hover:opacity-100 transition"
+          className="hidden md:flex p-1 text-tune-textMuted hover:text-white opacity-0 group-hover:opacity-100 transition"
           title="Add to queue"
         >
           <PlusCircle size={15} />
@@ -120,7 +122,7 @@ export const SongRow: React.FC<SongRowProps> = ({
         {onShowInFolder && (
           <button
             onClick={() => onShowInFolder(song)}
-            className="p-1 text-tune-textMuted hover:text-white opacity-0 group-hover:opacity-100 transition"
+            className="hidden md:flex p-1 text-tune-textMuted hover:text-white opacity-0 group-hover:opacity-100 transition"
             title="Show in folder"
           >
             <Folder size={15} />
@@ -130,7 +132,7 @@ export const SongRow: React.FC<SongRowProps> = ({
         {onAutoTag && (
           <button
             onClick={() => onAutoTag(song)}
-            className="p-1 text-purple-400 hover:text-purple-300 opacity-0 group-hover:opacity-100 transition"
+            className="hidden md:flex p-1 text-purple-400 hover:text-purple-300 opacity-0 group-hover:opacity-100 transition"
             title="Auto-tag with AI"
           >
             <Wand2 size={15} />
@@ -140,12 +142,25 @@ export const SongRow: React.FC<SongRowProps> = ({
         {onDelete && (
           <button
             onClick={() => onDelete(song)}
-            className="p-1 text-tune-textMuted hover:text-red-400 opacity-0 group-hover:opacity-100 transition"
+            className="hidden md:flex p-1 text-tune-textMuted hover:text-red-400 opacity-0 group-hover:opacity-100 transition"
             title="Delete file"
           >
             <Trash2 size={15} />
           </button>
         )}
+
+        {/* 3-dots Menu Button for Mobile & Desktop quick trigger */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+            setContextMenu({ x: rect.left - 160, y: rect.bottom + 4 });
+          }}
+          className="p-1.5 text-tune-textMuted hover:text-white transition rounded-full"
+          title="More options"
+        >
+          <MoreVertical size={16} />
+        </button>
       </div>
     </div>
 

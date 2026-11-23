@@ -86,9 +86,9 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       {/* Header Bar */}
-      <div className="p-6 pb-2 flex items-center justify-between">
+      <div className="p-4 sm:p-6 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex flex-col">
-          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
             <span>Offline Library</span>
             {isLoading && <RefreshCw size={18} className="animate-spin text-tune-accent" />}
           </h1>
@@ -175,7 +175,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
           </div>
         ) : (
           <div className="space-y-1">
-            <div className="grid grid-cols-[36px_minmax(200px,2fr)_minmax(120px,1.5fr)_minmax(100px,1fr)_80px_100px] px-4 py-2 text-[11px] font-semibold text-tune-textMuted uppercase border-b border-tune-border/40 select-none">
+            <div className="hidden md:grid grid-cols-[36px_minmax(200px,2fr)_minmax(120px,1.5fr)_minmax(100px,1fr)_80px_100px] px-4 py-2 text-[11px] font-semibold text-tune-textMuted uppercase border-b border-tune-border/40 select-none">
               <span>#</span>
               <span>Title</span>
               <span>Album</span>

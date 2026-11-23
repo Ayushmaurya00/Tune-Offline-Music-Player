@@ -37,6 +37,11 @@ export const EqualizerModal: React.FC<EqualizerModalProps> = ({
     setSettings(eqService.getSettings());
   };
 
+  const handleDelayChange = (ms: number) => {
+    eqService.setSongChangeDelay(ms);
+    setSettings(eqService.getSettings());
+  };
+
   const formatFreq = (freq: number) => {
     if (freq >= 1000) return `${freq / 1000}k`;
     return `${freq}`;
@@ -187,6 +192,33 @@ export const EqualizerModal: React.FC<EqualizerModalProps> = ({
               />
               <span className="text-xs font-mono font-bold text-tune-accent w-10 text-right">
                 {settings.crossfadeDuration}s
+              </span>
+            </div>
+          </div>
+
+          {/* Song Switch Delay Slider */}
+          <div className="p-4 rounded-2xl bg-tune-elevated/40 border border-tune-border flex items-center justify-between gap-6">
+            <div>
+              <span className="text-xs font-bold text-white block">
+                Song Switch Delay
+              </span>
+              <span className="text-[11px] text-tune-textSecondary">
+                Adds a gentle pause between tracks to prevent abrupt audio pops
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3 w-48">
+              <input
+                type="range"
+                min={0}
+                max={1000}
+                step={50}
+                value={settings.songChangeDelayMs}
+                onChange={(e) => handleDelayChange(parseInt(e.target.value, 10))}
+                className="w-full accent-tune-accent cursor-pointer"
+              />
+              <span className="text-xs font-mono font-bold text-tune-accent w-14 text-right">
+                {settings.songChangeDelayMs === 0 ? 'Off' : `${settings.songChangeDelayMs}ms`}
               </span>
             </div>
           </div>

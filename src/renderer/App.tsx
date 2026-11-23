@@ -342,7 +342,7 @@ export const App: React.FC = () => {
       />
 
       {/* Sleek Windows 10/11 Titlebar Overlay Drag Area */}
-      <div className="h-8 w-full app-drag-region flex items-center justify-between px-3 z-30 select-none bg-tune-bg/90 backdrop-blur-sm border-b border-tune-border/40 flex-shrink-0">
+      <div className="hidden md:flex h-8 w-full app-drag-region items-center justify-between px-3 z-30 select-none bg-tune-bg/90 backdrop-blur-sm border-b border-tune-border/40 flex-shrink-0">
         <div className="flex items-center gap-2 app-no-drag">
           <span className="w-2 h-2 rounded-full bg-tune-accent animate-pulse" />
           <span className="text-[11px] font-bold text-white tracking-widest uppercase">Tune</span>

@@ -26,6 +26,7 @@ class EqualizerService {
   private currentGains: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   private activePreset = 'Flat';
   private crossfadeDuration = 3; // default 3 seconds
+  private songChangeDelayMs = 250; // default 250ms transition delay on song change
 
   constructor() {
     this.loadSettings();
@@ -112,12 +113,18 @@ class EqualizerService {
       isEnabled: this.isEnabled,
       activePreset: this.activePreset,
       currentGains: [...this.currentGains],
-      crossfadeDuration: this.crossfadeDuration
+      crossfadeDuration: this.crossfadeDuration,
+      songChangeDelayMs: this.songChangeDelayMs
     };
   }
 
   public setCrossfadeDuration(sec: number) {
     this.crossfadeDuration = Math.max(0, Math.min(12, sec));
+    this.saveSettings();
+  }
+
+  public setSongChangeDelay(ms: number) {
+    this.songChangeDelayMs = Math.max(0, Math.min(2000, ms));
     this.saveSettings();
   }
 
@@ -129,7 +136,8 @@ class EqualizerService {
           isEnabled: this.isEnabled,
           activePreset: this.activePreset,
           currentGains: this.currentGains,
-          crossfadeDuration: this.crossfadeDuration
+          crossfadeDuration: this.crossfadeDuration,
+          songChangeDelayMs: this.songChangeDelayMs
         })
       );
     } catch {
@@ -149,6 +157,9 @@ class EqualizerService {
         }
         if (typeof parsed.crossfadeDuration === 'number') {
           this.crossfadeDuration = parsed.crossfadeDuration;
+        }
+        if (typeof parsed.songChangeDelayMs === 'number') {
+          this.songChangeDelayMs = parsed.songChangeDelayMs;
         }
       }
     } catch {
