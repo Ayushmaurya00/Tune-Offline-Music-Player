@@ -8,6 +8,7 @@ import { VolumeControl } from './VolumeControl';
 import { AlbumArt } from '../shared/AlbumArt';
 import { SpeedSelector } from './SpeedSelector';
 import { sleepTimerService, SleepTimerState } from '../../audio/sleepTimerService';
+import { MobileFullPlayer } from './MobileFullPlayer';
 
 interface PlayerBarProps {
   accentColor?: string;
@@ -40,6 +41,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   } = usePlayerStore();
   const { isSongLiked, toggleLikeSong } = usePlaylistStore();
   const [timerState, setTimerState] = useState<SleepTimerState>(sleepTimerService.getState());
+  const [isMobileFullPlayerOpen, setIsMobileFullPlayerOpen] = useState(false);
 
   useEffect(() => {
     return sleepTimerService.subscribe((state) => {
@@ -63,7 +65,14 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
       </div>
 
       {/* Left: Now Playing Info */}
-      <div className="flex items-center gap-3 w-auto md:w-1/4 min-w-0 md:min-w-[200px] flex-1 md:flex-initial">
+      <div
+        onClick={() => {
+          if (currentSong && window.innerWidth < 768) {
+            setIsMobileFullPlayerOpen(true);
+          }
+        }}
+        className="flex items-center gap-3 w-auto md:w-1/4 min-w-0 md:min-w-[200px] flex-1 md:flex-initial cursor-pointer md:cursor-default"
+      >
         {currentSong ? (
           <>
             <AlbumArt
@@ -73,16 +82,19 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
               iconSize={22}
             />
             <div className="flex flex-col min-w-0 pr-2">
-              <span className="text-sm font-medium text-white truncate hover:underline cursor-pointer">
+              <span className="text-sm font-medium text-white truncate hover:underline">
                 {currentSong.title}
               </span>
-              <span className="text-xs text-tune-textSecondary truncate hover:underline cursor-pointer">
+              <span className="text-xs text-tune-textSecondary truncate hover:underline">
                 {currentSong.artist}
               </span>
             </div>
 
             <button
-              onClick={() => toggleLikeSong(currentSong)}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleLikeSong(currentSong);
+              }}
               className="p-1.5 transition rounded-full hover:scale-110 flex-shrink-0"
               style={{ color: isLiked ? accentColor : '#b3b3b3' }}
               title={isLiked ? 'Remove from Liked Songs' : 'Save to Liked Songs'}
@@ -100,22 +112,53 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         )}
       </div>
 
-      {/* Mobile Play / Skip Controls */}
-      <div className="flex md:hidden items-center gap-2">
+      {/* Mobile Play, Skip, Lyrics & EQ Quick Controls */}
+      <div className="flex md:hidden items-center gap-1 flex-shrink-0">
         <button
-          onClick={togglePlay}
-          className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 active:scale-95 transition shadow"
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenLyrics();
+          }}
+          disabled={!currentSong}
+          className="p-1.5 text-tune-textSecondary hover:text-white transition disabled:opacity-30"
+          style={isLyricsOpen ? { color: accentColor } : {}}
+          title="Synced Karaoke Lyrics"
+        >
+          <Mic2 size={18} />
+        </button>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenEq();
+          }}
+          className="p-1.5 text-tune-textSecondary hover:text-white transition"
+          style={isEqOpen ? { color: accentColor } : {}}
+          title="10-Band Equalizer"
+        >
+          <Sliders size={18} />
+        </button>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            togglePlay();
+          }}
+          className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 active:scale-95 transition shadow ml-0.5"
           title={isPlaying ? 'Pause' : 'Play'}
         >
           {isPlaying ? <Pause size={17} fill="currentColor" /> : <Play size={17} fill="currentColor" className="ml-0.5" />}
         </button>
 
         <button
-          onClick={nextTrack}
-          className="p-2 text-tune-textSecondary hover:text-white transition"
-          title="Next"
+          onClick={(e) => {
+            e.stopPropagation();
+            nextTrack();
+          }}
+          className="p-1.5 text-tune-textSecondary hover:text-white transition"
+          title="Next Track"
         >
-          <SkipForward size={20} />
+          <SkipForward size={19} />
         </button>
       </div>
 
@@ -197,6 +240,18 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
 
         <VolumeControl />
       </div>
+
+      {/* Full-Screen Mobile Player Modal */}
+      <MobileFullPlayer
+        isOpen={isMobileFullPlayerOpen}
+        onClose={() => setIsMobileFullPlayerOpen(false)}
+        accentColor={accentColor}
+        onOpenLyrics={onOpenLyrics}
+        onOpenEq={onOpenEq}
+        onOpenSleepTimer={onOpenSleepTimer}
+        isLyricsOpen={isLyricsOpen}
+        isEqOpen={isEqOpen}
+      />
     </footer>
   );
 };
