@@ -82,6 +82,7 @@ export const MobileFullPlayer: React.FC<MobileFullPlayerProps> = ({
         <AlbumArt
           coverArt={currentSong.coverArt}
           title={currentSong.title}
+          artist={currentSong.artist}
           className="w-64 h-64 sm:w-80 sm:h-80 rounded-2xl shadow-2xl shadow-black/80 flex-shrink-0"
           iconSize={80}
         />

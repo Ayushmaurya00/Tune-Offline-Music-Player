@@ -88,6 +88,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
           <AlbumArt
             coverArt={currentSong?.coverArt}
             title={currentSong?.title || 'Tune'}
+            artist={currentSong?.artist}
             className="w-12 h-12 rounded-lg flex-shrink-0 shadow-md"
             iconSize={20}
           />
@@ -228,3 +229,4 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
     </div>
   );
 };
+

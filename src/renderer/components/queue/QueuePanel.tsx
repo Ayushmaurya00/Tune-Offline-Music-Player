@@ -98,6 +98,7 @@ export const QueuePanel: React.FC = () => {
               <AlbumArt
                 coverArt={currentSong.coverArt}
                 title={currentSong.title}
+                artist={currentSong.artist}
                 className="w-10 h-10 rounded flex-shrink-0"
                 iconSize={16}
               />

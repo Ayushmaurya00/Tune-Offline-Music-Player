@@ -21,6 +21,7 @@ import { usePlayerStore } from './store/playerStore';
 import { extractDominantColor } from './utils/colorExtractor';
 import { recordSongPlay } from './utils/statsTracker';
 import { mediaSessionService } from './services/mediaSession';
+import { coverArtService } from './services/coverArtService';
 import { Song } from '@/types/music';
 
 export const App: React.FC = () => {
@@ -39,12 +40,12 @@ export const App: React.FC = () => {
     'radial-gradient(ellipse at top, rgba(29, 185, 84, 0.12) 0%, transparent 70%)'
   );
 
-  const { songs, setSongs, addSong, removeSong, setWatchedFolder, setIsLoading, watchedFolderPath } =
+  const { songs, setSongs, addSong, updateSong, removeSong, setWatchedFolder, setIsLoading, watchedFolderPath } =
     useLibraryStore();
   const { currentSong, togglePlay, nextTrack, prevTrack, seek, currentTime, playSong, toggleMute, toggleQueue } =
     usePlayerStore();
 
-  // Dynamic Album Art Palette Extraction & Stats Tracking
+  // Dynamic Album Art Palette Extraction, Online Poster Resolution & Stats Tracking
   useEffect(() => {
     if (!currentSong) {
       setAccentColor('#1db954');
@@ -54,10 +55,31 @@ export const App: React.FC = () => {
 
     recordSongPlay(currentSong);
 
-    extractDominantColor(currentSong.coverArt).then((palette) => {
-      setAccentColor(palette.primaryHex);
-      setAmbientGradient(palette.ambientGradient);
-    });
+    if (currentSong.coverArt) {
+      extractDominantColor(currentSong.coverArt).then((palette) => {
+        setAccentColor(palette.primaryHex);
+        setAmbientGradient(palette.ambientGradient);
+      });
+    } else {
+      // Auto-fetch high-resolution album poster from iTunes Music Catalog
+      coverArtService.getCoverArt(currentSong.title, currentSong.artist).then((artUrl) => {
+        if (artUrl) {
+          updateSong(currentSong.id, { coverArt: artUrl });
+          usePlayerStore.setState((state) => {
+            if (state.currentSong?.id === currentSong.id) {
+              const updated = { ...state.currentSong, coverArt: artUrl };
+              mediaSessionService.updateMetadata(updated, state.isPlaying);
+              return { currentSong: updated };
+            }
+            return state;
+          });
+          extractDominantColor(artUrl).then((palette) => {
+            setAccentColor(palette.primaryHex);
+            setAmbientGradient(palette.ambientGradient);
+          });
+        }
+      });
+    }
   }, [currentSong]);
 
   const handleScan = useCallback(

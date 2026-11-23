@@ -48,6 +48,7 @@ export const QueueItemRow: React.FC<QueueItemRowProps> = ({ item, onRemove, onPl
         <AlbumArt
           coverArt={item.song.coverArt}
           title={item.song.title}
+          artist={item.song.artist}
           className="w-9 h-9 rounded flex-shrink-0"
           iconSize={14}
         />

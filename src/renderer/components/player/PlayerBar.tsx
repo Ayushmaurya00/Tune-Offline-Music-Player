@@ -84,6 +84,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
             <AlbumArt
               coverArt={currentSong.coverArt}
               title={currentSong.title}
+              artist={currentSong.artist}
               className="w-14 h-14 rounded-md flex-shrink-0 shadow-md"
               iconSize={22}
             />

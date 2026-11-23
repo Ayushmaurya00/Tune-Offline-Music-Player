@@ -44,6 +44,7 @@ export const SongCard: React.FC<SongCardProps> = ({
         <AlbumArt
           coverArt={song.coverArt}
           title={song.title}
+          artist={song.artist}
           className="w-full h-full object-cover"
           iconSize={40}
         />

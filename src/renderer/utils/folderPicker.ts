@@ -1,4 +1,6 @@
 import { Song } from '@/types/music';
+import { coverArtService } from '../services/coverArtService';
+import { parseFileID3 } from './id3Extractor';
 import { isElectron } from '../services/platform';
 
 const AUDIO_EXTENSIONS = ['.mp3', '.m4a', '.wav', '.flac', '.ogg', '.aac', '.opus'];
@@ -94,15 +96,15 @@ export function convertFileListToSongs(files: File[]): PickFolderResult {
       continue;
     }
 
-    const cleanTitle = file.name.replace(/\.[^/.]+$/, '').replace(/^[0-9]+[\s._-]+/, '');
+    const { cleanTitle, cleanArtist } = coverArtService.cleanTrackQuery(file.name);
     const url = URL.createObjectURL(file);
 
-    songs.push({
+    const songItem: Song = {
       id: `file-${file.name}-${file.size}-${file.lastModified}`,
       filePath: url,
       fileName: file.name,
-      title: cleanTitle,
-      artist: 'Local Artist',
+      title: cleanTitle || file.name.replace(/\.[^/.]+$/, ''),
+      artist: cleanArtist || 'Offline Artist',
       album: folderName,
       duration: 180,
       format: file.name.split('.').pop() || 'mp3',
@@ -111,7 +113,16 @@ export function convertFileListToSongs(files: File[]): PickFolderResult {
       fileModified: file.lastModified,
       playCount: 0,
       coverArt: null
+    };
+
+    // Asynchronously extract embedded ID3 picture if available
+    parseFileID3(file).then((id3) => {
+      if (id3.coverArt) {
+        songItem.coverArt = id3.coverArt;
+      }
     });
+
+    songs.push(songItem);
   }
 
   return {

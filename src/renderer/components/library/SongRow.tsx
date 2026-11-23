@@ -77,6 +77,7 @@ export const SongRow: React.FC<SongRowProps> = ({
         <AlbumArt
           coverArt={song.coverArt}
           title={song.title}
+          artist={song.artist}
           className="w-10 h-10 rounded flex-shrink-0"
           iconSize={16}
         />
