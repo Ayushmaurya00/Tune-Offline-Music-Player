@@ -154,3 +154,4 @@ export const MiniPlayerView: React.FC<MiniPlayerViewProps> = ({
     </div>
   );
 };
+

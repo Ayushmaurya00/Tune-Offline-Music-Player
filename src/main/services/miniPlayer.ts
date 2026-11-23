@@ -42,3 +42,4 @@ export function setMiniPlayerMode(win: BrowserWindow, enable?: boolean): boolean
   win.webContents.send('tune:mini-player-changed', isMiniPlayerActive);
   return isMiniPlayerActive;
 }
+

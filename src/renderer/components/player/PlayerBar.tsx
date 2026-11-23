@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ListMusic, Heart, Mic2, Sliders, Moon, Minimize2 } from 'lucide-react';
+import { ListMusic, Heart, Mic2, Sliders, Moon, Minimize2, Play, Pause, SkipForward } from 'lucide-react';
 import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { PlaybackControls } from './PlaybackControls';
@@ -28,7 +28,16 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   onOpenSleepTimer,
   onToggleMiniPlayer
 }) => {
-  const { currentSong, isQueueOpen, toggleQueue } = usePlayerStore();
+  const {
+    currentSong,
+    isQueueOpen,
+    toggleQueue,
+    isPlaying,
+    togglePlay,
+    nextTrack,
+    currentTime,
+    duration
+  } = usePlayerStore();
   const { isSongLiked, toggleLikeSong } = usePlaylistStore();
   const [timerState, setTimerState] = useState<SleepTimerState>(sleepTimerService.getState());
 
@@ -41,9 +50,20 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   const isLiked = currentSong ? isSongLiked(currentSong.id) : false;
 
   return (
-    <footer className="h-24 bg-tune-surface/95 backdrop-blur-md border-t border-tune-border px-4 flex items-center justify-between select-none z-30 shadow-2xl">
+    <footer className="relative h-20 md:h-24 bg-tune-surface/95 backdrop-blur-md border-t border-tune-border px-4 flex items-center justify-between select-none z-30 shadow-2xl">
+      {/* Thin top progress line for mobile */}
+      <div className="md:hidden absolute top-0 left-0 right-0 h-0.5 bg-tune-border">
+        <div
+          className="h-full transition-all duration-200"
+          style={{
+            width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
+            backgroundColor: accentColor
+          }}
+        />
+      </div>
+
       {/* Left: Now Playing Info */}
-      <div className="flex items-center gap-3 w-1/4 min-w-[200px]">
+      <div className="flex items-center gap-3 w-auto md:w-1/4 min-w-0 md:min-w-[200px] flex-1 md:flex-initial">
         {currentSong ? (
           <>
             <AlbumArt
@@ -80,14 +100,33 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         )}
       </div>
 
-      {/* Center: Playback Controls & Waveform Seek Bar */}
-      <div className="flex flex-col items-center gap-1.5 flex-1 max-w-xl px-4">
+      {/* Mobile Play / Skip Controls */}
+      <div className="flex md:hidden items-center gap-2">
+        <button
+          onClick={togglePlay}
+          className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 active:scale-95 transition shadow"
+          title={isPlaying ? 'Pause' : 'Play'}
+        >
+          {isPlaying ? <Pause size={17} fill="currentColor" /> : <Play size={17} fill="currentColor" className="ml-0.5" />}
+        </button>
+
+        <button
+          onClick={nextTrack}
+          className="p-2 text-tune-textSecondary hover:text-white transition"
+          title="Next"
+        >
+          <SkipForward size={20} />
+        </button>
+      </div>
+
+      {/* Center: Playback Controls & Waveform Seek Bar (Desktop) */}
+      <div className="hidden md:flex flex-col items-center gap-1.5 flex-1 max-w-xl px-4">
         <PlaybackControls />
         <WaveformSeekBar accentColor={accentColor} />
       </div>
 
-      {/* Right: Controls, Lyrics, EQ, Queue & Volume */}
-      <div className="flex items-center justify-end gap-2 w-1/3 min-w-[280px]">
+      {/* Right: Controls, Lyrics, EQ, Queue & Volume (Desktop) */}
+      <div className="hidden md:flex items-center justify-end gap-2 w-1/3 min-w-[280px]">
         {/* Playback Speed Selector */}
         <SpeedSelector accentColor={accentColor} />
 

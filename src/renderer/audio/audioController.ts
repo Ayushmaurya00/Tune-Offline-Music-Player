@@ -1,6 +1,7 @@
 import { Howl } from 'howler';
 import { Song } from '@/types/music';
 import { eqService } from './eqService';
+import { resolveMediaUrl } from '../utils/mediaUrl';
 
 class AudioController {
   private howl: Howl | null = null;
@@ -18,8 +19,7 @@ class AudioController {
     this.onEndCallback = onEnd;
     this.onTimeUpdateCallback = onTimeUpdate;
 
-    const normalizedPath = song.filePath.replace(/\\/g, '/');
-    const mediaUrl = `tune-media://local/${encodeURI(normalizedPath)}`;
+    const mediaUrl = resolveMediaUrl(song.filePath);
 
     const { crossfadeDuration } = eqService.getSettings();
     const shouldCrossfade = crossfadeDuration > 0 && this.howl && this.howl.playing();

@@ -28,3 +28,4 @@ export function registerGlobalShortcuts(getMainWindow: () => BrowserWindow | nul
 export function unregisterGlobalShortcuts() {
   globalShortcut.unregisterAll();
 }
+

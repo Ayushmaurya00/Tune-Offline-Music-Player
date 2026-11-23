@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Sidebar } from './components/layout/Sidebar';
+import { MobileNav } from './components/layout/MobileNav';
 import { PlayerBar } from './components/player/PlayerBar';
 import { LibraryView } from './components/library/LibraryView';
 import { QueuePanel } from './components/queue/QueuePanel';
@@ -200,6 +201,12 @@ export const App: React.FC = () => {
         isEqOpen={isEqOpen}
         onOpenSleepTimer={() => setIsSleepTimerOpen(true)}
         onToggleMiniPlayer={handleToggleMiniPlayer}
+      />
+
+      {/* Mobile Bottom Navigation Bar */}
+      <MobileNav
+        onOpenWrapped={() => setIsWrappedOpen(true)}
+        onOpenSpotifyModal={() => setIsSpotifyModalOpen(true)}
       />
 
       {/* Create Playlist Modal */}

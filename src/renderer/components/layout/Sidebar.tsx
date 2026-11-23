@@ -20,7 +20,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { playlists, deletePlaylist } = usePlaylistStore();
 
   return (
-    <aside className="w-64 bg-tune-surface flex flex-col h-full border-r border-tune-border select-none">
+    <aside className="hidden md:flex w-64 bg-tune-surface flex-col h-full border-r border-tune-border select-none flex-shrink-0">
       {/* App Branding */}
       <div className="p-5 flex items-center gap-2.5">
         <div className="w-8 h-8 rounded-lg bg-tune-accent flex items-center justify-center text-black font-black text-lg shadow-md shadow-tune-accent/20">
