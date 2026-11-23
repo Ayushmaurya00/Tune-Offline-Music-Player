@@ -42,6 +42,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
     nextTrack,
     currentTime,
     duration,
+    seek,
     repeatMode,
     toggleRepeat
   } = usePlayerStore();
@@ -59,15 +60,40 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
 
   return (
     <footer className="relative h-20 md:h-24 bg-tune-surface/95 backdrop-blur-md border-t border-tune-border px-4 flex items-center justify-between select-none z-30 shadow-2xl">
-      {/* Thin top progress line for mobile */}
-      <div className="md:hidden absolute top-0 left-0 right-0 h-0.5 bg-tune-border">
-        <div
-          className="h-full transition-all duration-200"
-          style={{
-            width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
-            backgroundColor: accentColor
-          }}
-        />
+      {/* Interactive top progress scrubber line for mobile */}
+      <div
+        className="md:hidden absolute -top-1.5 left-0 right-0 h-4 z-40 touch-none cursor-pointer flex items-center"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (duration <= 0) return;
+          const rect = e.currentTarget.getBoundingClientRect();
+          const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          seek(ratio * duration);
+        }}
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          try {
+            e.currentTarget.setPointerCapture(e.pointerId);
+          } catch {}
+        }}
+        onPointerMove={(e) => {
+          if (e.buttons === 1 && duration > 0) {
+            e.stopPropagation();
+            const rect = e.currentTarget.getBoundingClientRect();
+            const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            seek(ratio * duration);
+          }
+        }}
+      >
+        <div className="w-full h-1 bg-tune-border/80 overflow-hidden">
+          <div
+            className="h-full transition-all duration-150"
+            style={{
+              width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
+              backgroundColor: accentColor
+            }}
+          />
+        </div>
       </div>
 
       {/* Left: Now Playing Info */}

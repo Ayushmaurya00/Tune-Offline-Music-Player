@@ -26,14 +26,6 @@ export const MiniPlayerView: React.FC<MiniPlayerViewProps> = ({
 
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (duration <= 0) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const ratio = Math.max(0, Math.min(1, clickX / rect.width));
-    seek(ratio * duration);
-  };
-
   return (
     <div className="w-full h-full bg-tune-surface flex flex-col justify-between select-none overflow-hidden border border-tune-border/60 p-2.5">
       {/* Draggable Title Header */}
@@ -137,12 +129,31 @@ export const MiniPlayerView: React.FC<MiniPlayerViewProps> = ({
       {/* Progress Bar & Timestamps */}
       <div className="pt-1.5">
         <div
-          onClick={handleSeek}
-          className="relative w-full h-1 bg-tune-border rounded-full cursor-pointer group"
+          onPointerDown={(e) => {
+            try {
+              e.currentTarget.setPointerCapture(e.pointerId);
+            } catch {}
+            if (duration <= 0) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            seek(ratio * duration);
+          }}
+          onPointerMove={(e) => {
+            if (e.buttons === 1 && duration > 0) {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+              seek(ratio * duration);
+            }
+          }}
+          className="relative w-full h-2 flex items-center bg-tune-border rounded-full cursor-pointer group touch-none"
         >
           <div
-            className="h-full rounded-full transition-all"
+            className="h-1 rounded-full transition-all group-hover:h-1.5"
             style={{ width: `${progressPercent}%`, backgroundColor: accentColor }}
+          />
+          <div
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white rounded-full shadow pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+            style={{ left: `${progressPercent}%` }}
           />
         </div>
 
