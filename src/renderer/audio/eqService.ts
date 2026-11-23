@@ -158,3 +158,4 @@ class EqualizerService {
 }
 
 export const eqService = new EqualizerService();
+

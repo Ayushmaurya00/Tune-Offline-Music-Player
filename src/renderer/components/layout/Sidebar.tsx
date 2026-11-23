@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, FolderDown, Heart, Plus, FolderOpen, Music2, Trash2, Sparkles } from 'lucide-react';
+import { Home, FolderDown, Heart, Plus, FolderOpen, Music2, Trash2, Sparkles, FolderTree } from 'lucide-react';
 import { useLibraryStore } from '../../store/libraryStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 
@@ -57,6 +57,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           <Heart size={18} className="text-tune-accent" />
           <span>Liked Songs</span>
+        </button>
+
+        <button
+          onClick={() => setActiveView('folders')}
+          className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+            activeView === 'folders'
+              ? 'bg-tune-elevated text-white'
+              : 'text-tune-textSecondary hover:text-white hover:bg-tune-elevated/50'
+          }`}
+        >
+          <FolderTree size={18} className="text-amber-400" />
+          <span>Folder Mode</span>
         </button>
 
         <button

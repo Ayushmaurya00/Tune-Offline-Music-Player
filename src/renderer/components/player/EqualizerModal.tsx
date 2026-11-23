@@ -195,3 +195,4 @@ export const EqualizerModal: React.FC<EqualizerModalProps> = ({
     </div>
   );
 };
+

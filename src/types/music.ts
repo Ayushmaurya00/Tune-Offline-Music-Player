@@ -38,7 +38,7 @@ export interface Playlist {
 export type SortField = 'dateAdded' | 'fileModified' | 'title' | 'artist' | 'duration' | 'album';
 export type SortOrder = 'asc' | 'desc';
 
-export type ViewType = 'library' | 'playlist' | 'liked';
+export type ViewType = 'library' | 'playlist' | 'liked' | 'folders';
 
 export interface SpotifyTrack {
   title: string;

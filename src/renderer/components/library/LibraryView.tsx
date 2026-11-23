@@ -7,6 +7,7 @@ import { SortFilterBar } from './SortFilterBar';
 import { SongCard } from './SongCard';
 import { SongRow } from './SongRow';
 import { PlaylistDetailView } from '../playlist/PlaylistDetailView';
+import { FolderView } from '../folders/FolderView';
 
 interface LibraryViewProps {
   onScanFolder: (path?: string) => Promise<void>;
@@ -58,6 +59,18 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   if (activeView === 'playlist' && selectedPlaylistId) {
     const currentPlaylist = playlists.find((p) => p.id === selectedPlaylistId);
     return <PlaylistDetailView playlist={currentPlaylist} allSongs={songs} />;
+  }
+
+  if (activeView === 'folders') {
+    return (
+      <FolderView
+        songs={songs}
+        rootPath={watchedFolderPath || ''}
+        onAutoTag={onAutoTag}
+        onDelete={handleDeleteSong}
+        onShowInFolder={handleShowInFolder}
+      />
+    );
   }
 
   return (
