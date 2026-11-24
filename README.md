@@ -1,8 +1,8 @@
 # 🎵 Tune — Offline Music Player
 ### Modern, Privacy-First Offline Music Player for Windows & Android
 
-> 🌐 **Official Website & Download Portal:** [https://ayushmaurya00.github.io/Tune-Offline-Music-Player/](https://ayushmaurya00.github.io/Tune-Offline-Music-Player/)  
-> 📦 **Direct Downloads:** [GitHub Releases (.exe for Windows & .apk for Android)](https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases)
+> 📦 **Direct Downloads:** [GitHub Releases (.exe for Windows & .apk for Android)](https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases)  
+> 🌐 **Website & Download Portal:** Standalone self-hostable landing page source in [`website/`](./website/).
 
 ---
 
