@@ -21,12 +21,19 @@ const STORAGE_EQ_KEY = 'tune_eq_config_v1';
 
 class EqualizerService {
   private filters: BiquadFilterNode[] = [];
+  private bassBoostFilter: BiquadFilterNode | null = null;
+  private virtualizerFilter: BiquadFilterNode | null = null;
+  private compressorNode: DynamicsCompressorNode | null = null;
+
   private isInitialized = false;
   private isEnabled = true;
   private currentGains: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   private activePreset = 'Flat';
   private crossfadeDuration = 3; // default 3 seconds
   private songChangeDelayMs = 250; // default 250ms transition delay on song change
+  private bassBoost = 0; // 0 to 100%
+  private virtualizer = 0; // 0 to 100%
+  private volumeNormalization = true; // smart dynamics leveling
 
   constructor() {
     this.loadSettings();
@@ -54,7 +61,25 @@ class EqualizerService {
         return filter;
       });
 
-      // Chain filters in series: masterGain -> filter[0] -> filter[1] ... -> destination
+      // Bass boost filter (80 Hz lowshelf, up to +12 dB)
+      this.bassBoostFilter = ctx.createBiquadFilter();
+      this.bassBoostFilter.type = 'lowshelf';
+      this.bassBoostFilter.frequency.value = 80;
+      this.bassBoostFilter.gain.value = this.isEnabled ? (this.bassBoost / 100) * 12 : 0;
+
+      // 3D Spatial Virtualizer filter (3500 Hz presence shelf)
+      this.virtualizerFilter = ctx.createBiquadFilter();
+      this.virtualizerFilter.type = 'peaking';
+      this.virtualizerFilter.frequency.value = 3500;
+      this.virtualizerFilter.Q.value = 0.8;
+      this.virtualizerFilter.gain.value = this.isEnabled ? (this.virtualizer / 100) * 8 : 0;
+
+      // Smart Volume Normalization via Dynamics Compressor
+      this.compressorNode = ctx.createDynamicsCompressor();
+      this.applyCompressionSettings();
+
+      // Chain filters in series:
+      // masterGain -> filter[0..9] -> bassBoostFilter -> virtualizerFilter -> compressorNode -> destination
       const masterGain = Howler.masterGain;
       masterGain.disconnect();
 
@@ -63,12 +88,51 @@ class EqualizerService {
         prevNode.connect(filter);
         prevNode = filter;
       }
-      prevNode.connect(ctx.destination);
+      prevNode.connect(this.bassBoostFilter);
+      this.bassBoostFilter.connect(this.virtualizerFilter);
+      this.virtualizerFilter.connect(this.compressorNode);
+      this.compressorNode.connect(ctx.destination);
 
       this.isInitialized = true;
     } catch (err) {
       console.warn('Could not initialize EQ chain:', err);
     }
+  }
+
+  private applyCompressionSettings() {
+    if (!this.compressorNode) return;
+    if (this.volumeNormalization && this.isEnabled) {
+      this.compressorNode.threshold.value = -24;
+      this.compressorNode.knee.value = 30;
+      this.compressorNode.ratio.value = 12;
+      this.compressorNode.attack.value = 0.003;
+      this.compressorNode.release.value = 0.25;
+    } else {
+      this.compressorNode.threshold.value = 0;
+      this.compressorNode.ratio.value = 1;
+    }
+  }
+
+  public setBassBoost(val: number) {
+    this.bassBoost = Math.max(0, Math.min(100, Math.round(val)));
+    if (this.bassBoostFilter && this.isEnabled) {
+      this.bassBoostFilter.gain.value = (this.bassBoost / 100) * 12;
+    }
+    this.saveSettings();
+  }
+
+  public setVirtualizer(val: number) {
+    this.virtualizer = Math.max(0, Math.min(100, Math.round(val)));
+    if (this.virtualizerFilter && this.isEnabled) {
+      this.virtualizerFilter.gain.value = (this.virtualizer / 100) * 8;
+    }
+    this.saveSettings();
+  }
+
+  public setVolumeNormalization(enabled: boolean) {
+    this.volumeNormalization = enabled;
+    this.applyCompressionSettings();
+    this.saveSettings();
   }
 
   public setBandGain(index: number, db: number) {
@@ -104,6 +168,14 @@ class EqualizerService {
       filter.gain.value = this.isEnabled ? this.currentGains[idx] : 0;
     });
 
+    if (this.bassBoostFilter) {
+      this.bassBoostFilter.gain.value = this.isEnabled ? (this.bassBoost / 100) * 12 : 0;
+    }
+    if (this.virtualizerFilter) {
+      this.virtualizerFilter.gain.value = this.isEnabled ? (this.virtualizer / 100) * 8 : 0;
+    }
+    this.applyCompressionSettings();
+
     this.saveSettings();
     return this.isEnabled;
   }
@@ -114,7 +186,10 @@ class EqualizerService {
       activePreset: this.activePreset,
       currentGains: [...this.currentGains],
       crossfadeDuration: this.crossfadeDuration,
-      songChangeDelayMs: this.songChangeDelayMs
+      songChangeDelayMs: this.songChangeDelayMs,
+      bassBoost: this.bassBoost,
+      virtualizer: this.virtualizer,
+      volumeNormalization: this.volumeNormalization
     };
   }
 
@@ -137,7 +212,10 @@ class EqualizerService {
           activePreset: this.activePreset,
           currentGains: this.currentGains,
           crossfadeDuration: this.crossfadeDuration,
-          songChangeDelayMs: this.songChangeDelayMs
+          songChangeDelayMs: this.songChangeDelayMs,
+          bassBoost: this.bassBoost,
+          virtualizer: this.virtualizer,
+          volumeNormalization: this.volumeNormalization
         })
       );
     } catch {
@@ -160,6 +238,15 @@ class EqualizerService {
         }
         if (typeof parsed.songChangeDelayMs === 'number') {
           this.songChangeDelayMs = parsed.songChangeDelayMs;
+        }
+        if (typeof parsed.bassBoost === 'number') {
+          this.bassBoost = parsed.bassBoost;
+        }
+        if (typeof parsed.virtualizer === 'number') {
+          this.virtualizer = parsed.virtualizer;
+        }
+        if (typeof parsed.volumeNormalization === 'boolean') {
+          this.volumeNormalization = parsed.volumeNormalization;
         }
       }
     } catch {

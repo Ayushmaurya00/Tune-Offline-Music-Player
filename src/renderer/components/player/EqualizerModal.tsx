@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sliders, RotateCcw, Zap } from 'lucide-react';
+import { X, Sliders, RotateCcw, Zap, Waves, Sparkles, Volume2 } from 'lucide-react';
 import { eqService, EQ_FREQUENCIES, EQ_PRESETS } from '../../audio/eqService';
 import { backButtonService } from '../../services/backButtonService';
+import { triggerHaptic } from '../../utils/haptics';
 
 interface EqualizerModalProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export const EqualizerModal: React.FC<EqualizerModalProps> = ({
   const handleToggle = () => {
     eqService.toggleEnabled();
     setSettings(eqService.getSettings());
+    triggerHaptic('medium');
   };
 
   const handleBandChange = (index: number, val: number) => {
@@ -36,6 +38,25 @@ export const EqualizerModal: React.FC<EqualizerModalProps> = ({
   const handlePresetSelect = (presetName: string) => {
     eqService.applyPreset(presetName);
     setSettings(eqService.getSettings());
+    triggerHaptic('selection');
+  };
+
+  const handleBassBoostChange = (val: number) => {
+    eqService.setBassBoost(val);
+    setSettings(eqService.getSettings());
+    triggerHaptic('light');
+  };
+
+  const handleVirtualizerChange = (val: number) => {
+    eqService.setVirtualizer(val);
+    setSettings(eqService.getSettings());
+    triggerHaptic('light');
+  };
+
+  const handleToggleNormalization = () => {
+    eqService.setVolumeNormalization(!settings.volumeNormalization);
+    setSettings(eqService.getSettings());
+    triggerHaptic('medium');
   };
 
   const handleCrossfadeChange = (sec: number) => {
@@ -173,6 +194,89 @@ export const EqualizerModal: React.FC<EqualizerModalProps> = ({
                 );
               })}
             </div>
+          </div>
+
+          {/* Audio Superpowers: Bass Boost & 3D Virtualizer */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Bass Booster */}
+            <div className="p-4 rounded-2xl bg-tune-elevated/40 border border-tune-border flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Waves size={16} className="text-tune-accent" />
+                  <span className="text-xs font-bold text-white">Bass Booster</span>
+                </div>
+                <span className="text-xs font-mono font-bold text-tune-accent">
+                  {settings.bassBoost > 0 ? `+${settings.bassBoost}%` : 'Off'}
+                </span>
+              </div>
+              <p className="text-[11px] text-tune-textSecondary mb-3">
+                80Hz low-end punch & sub-bass acoustic boost
+              </p>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={settings.bassBoost}
+                disabled={!settings.isEnabled}
+                onChange={(e) => handleBassBoostChange(parseInt(e.target.value, 10))}
+                className="w-full accent-tune-accent cursor-pointer disabled:opacity-40"
+              />
+            </div>
+
+            {/* 3D Spatial Virtualizer */}
+            <div className="p-4 rounded-2xl bg-tune-elevated/40 border border-tune-border flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Sparkles size={16} className="text-tune-accent" />
+                  <span className="text-xs font-bold text-white">3D Virtualizer</span>
+                </div>
+                <span className="text-xs font-mono font-bold text-tune-accent">
+                  {settings.virtualizer > 0 ? `+${settings.virtualizer}%` : 'Off'}
+                </span>
+              </div>
+              <p className="text-[11px] text-tune-textSecondary mb-3">
+                Expands stereo field width & acoustic presence
+              </p>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={settings.virtualizer}
+                disabled={!settings.isEnabled}
+                onChange={(e) => handleVirtualizerChange(parseInt(e.target.value, 10))}
+                className="w-full accent-tune-accent cursor-pointer disabled:opacity-40"
+              />
+            </div>
+          </div>
+
+          {/* Smart Volume Normalization */}
+          <div className="p-4 rounded-2xl bg-tune-elevated/40 border border-tune-border flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-tune-elevated flex items-center justify-center text-tune-accent flex-shrink-0">
+                <Volume2 size={16} />
+              </div>
+              <div>
+                <span className="text-xs font-bold text-white block">
+                  Smart Volume Normalization
+                </span>
+                <span className="text-[11px] text-tune-textSecondary">
+                  Auto-balances quiet and loud tracks for consistent, comfortable listening
+                </span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              disabled={!settings.isEnabled}
+              onClick={handleToggleNormalization}
+              className={`w-12 h-6 flex items-center rounded-full p-1 transition duration-200 cursor-pointer disabled:opacity-40 flex-shrink-0 ${
+                settings.volumeNormalization && settings.isEnabled ? 'bg-tune-accent justify-end' : 'bg-tune-border justify-start'
+              }`}
+            >
+              <div className="w-4 h-4 rounded-full bg-white shadow-md transform transition-transform" />
+            </button>
           </div>
 
           {/* Crossfade Duration Slider */}
