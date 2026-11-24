@@ -58,14 +58,23 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
 
   const isLiked = currentSong ? isSongLiked(currentSong.id) : false;
 
+  const handleBarClick = (e: React.MouseEvent) => {
+    // Only handle taps on the mobile player bar (< md screen width)
+    if (window.innerWidth >= 768) return;
+    const target = e.target as HTMLElement;
+    // Don't open full player if user clicked a button, input, slider, or link
+    if (target.closest('button, input, a, [role="button"], [role="slider"]')) {
+      return;
+    }
+    if (currentSong) {
+      setIsMobileFullPlayerOpen(true);
+    }
+  };
+
   return (
     <footer
-      onClick={() => {
-        if (currentSong) {
-          setIsMobileFullPlayerOpen(true);
-        }
-      }}
-      className="relative h-20 md:h-24 bg-tune-surface/95 backdrop-blur-md border-t border-tune-border px-4 flex items-center justify-between select-none z-30 shadow-2xl cursor-pointer"
+      onClick={handleBarClick}
+      className="relative h-20 md:h-24 bg-tune-surface/95 backdrop-blur-md border-t border-tune-border px-4 flex items-center justify-between select-none z-30 shadow-2xl cursor-pointer md:cursor-default"
     >
       {/* Interactive top progress scrubber line for mobile */}
       <div

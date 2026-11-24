@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   ChevronDown,
   Heart,
@@ -151,13 +152,17 @@ export const MobileFullPlayer: React.FC<MobileFullPlayerProps> = ({
     setTouchStartY(null);
   };
 
-  return (
-    <div className="fixed inset-0 z-50 bg-[#0a0a0a]/98 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 select-none animate-in slide-in-from-bottom duration-300 overflow-y-auto">
-      <div className="w-full max-w-md md:max-w-lg mx-auto flex flex-col justify-between h-full min-h-[580px]">
+  return createPortal(
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="fixed inset-0 z-50 bg-[#0a0a0a]/98 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 select-none animate-in slide-in-from-bottom duration-300 overflow-y-auto"
+    >
+      <div className="w-full max-w-md md:max-w-lg mx-auto flex flex-col justify-between h-full min-h-[520px]">
         {/* Top Header */}
         <div className="flex items-center justify-between pt-2">
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               triggerHaptic('light');
               onClose();
             }}
@@ -205,7 +210,7 @@ export const MobileFullPlayer: React.FC<MobileFullPlayerProps> = ({
             coverArt={currentSong.coverArt}
             title={currentSong.title}
             artist={currentSong.artist}
-            className="w-64 h-64 sm:w-80 sm:h-80 rounded-2xl shadow-2xl shadow-black/80 flex-shrink-0 select-none pointer-events-none"
+            className="w-64 h-64 sm:w-80 sm:h-80 max-h-[38vh] max-w-[38vh] aspect-square rounded-2xl shadow-2xl shadow-black/80 flex-shrink-0 select-none pointer-events-none"
             iconSize={80}
           />
         </div>
@@ -332,6 +337,7 @@ export const MobileFullPlayer: React.FC<MobileFullPlayerProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
