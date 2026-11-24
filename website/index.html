@@ -3,540 +3,425 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tune — High-Performance Offline Music Player</title>
-  <meta name="description" content="A studio-grade, privacy-first offline music player for Windows and Android. 10-band cascaded biquad equalizer, synchronized LRC karaoke lyrics, ID3 tag editor, and bit-perfect local playback. Zero subscriptions. Zero tracking." />
-  <meta name="keywords" content="Tune, offline music player, Windows audio player, Android FLAC player, 10-band equalizer, bit-perfect, LRC lyrics, open source music player" />
-
-  <!-- OpenGraph / Twitter -->
+  <title>Tune — Offline Audio Workstation for Windows & Android</title>
+  <meta name="description" content="A studio-grade offline music player for Windows and Android. 10-band biquad equalizer, synchronized LRC lyrics, local ID3 tagger, and zero telemetry." />
+  
+  <!-- OpenGraph Metadata -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Tune — High-Performance Offline Music Player" />
-  <meta property="og:description" content="Local audio playback without compromise. 10-band studio EQ, synchronized LRC lyrics, and zero telemetry for Windows & Android." />
+  <meta property="og:title" content="Tune — Offline Audio Workstation" />
+  <meta property="og:description" content="Bit-perfect local playback, 10-band studio EQ, and synchronized LRC karaoke lyrics. Zero accounts. Zero telemetry." />
   <meta property="og:image" content="icon-512.png" />
-  <meta name="theme-color" content="#070709" />
+  <meta name="theme-color" content="#121319" />
 
-  <!-- Real App Icons -->
+  <!-- Icons -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="alternate icon" type="image/png" href="favicon.png" />
   <link rel="apple-touch-icon" href="icon-192.png" />
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            tune: {
-              accent: '#10b981',
-              accentHover: '#059669',
-              spotifyGreen: '#1db954',
-              bg: '#070709',
-              surface: '#0e0e13',
-              card: '#13131a',
-              elevated: '#1a1a24',
-              border: '#232330',
-              borderHover: '#343446',
-              textPrimary: '#f4f4f5',
-              textSecondary: '#a1a1aa',
-              textMuted: '#71717a'
-            }
-          },
-          fontFamily: {
-            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-            mono: ['JetBrains Mono', 'SF Mono', 'Menlo', 'Consolas', 'monospace']
-          }
-        }
-      }
-    }
-  </script>
+  <!-- External Design Tokens -->
+  <link rel="stylesheet" href="tokens.css" />
+
+  <!-- Typography: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+    /* Reset & Base Token Enforcement (frontend.md §1 & §4) */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-      background-color: #070709;
-      color: #f4f4f5;
-      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-canvas);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-body);
       overflow-x: hidden;
-      selection-background-color: #10b981;
+      -webkit-font-smoothing: antialiased;
     }
 
     ::selection {
-      background: #10b981;
-      color: #000000;
+      background: var(--accent);
+      color: var(--accent-fg);
     }
 
-    /* Subtle Technical Grid Background */
-    .bg-tech-grid {
-      background-size: 40px 40px;
+    /* Architectural Hairline Grid Texture */
+    .hairline-grid {
+      background-size: 32px 32px;
       background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        linear-gradient(to right, color-mix(in oklch, var(--border) 40%, transparent) 1px, transparent 1px),
+        linear-gradient(to bottom, color-mix(in oklch, var(--border) 40%, transparent) 1px, transparent 1px);
     }
 
-    /* Ambient Hero Radial Glow */
-    .hero-glow {
-      background: radial-gradient(circle at 50% -10%, rgba(16, 185, 129, 0.16) 0%, rgba(7, 7, 9, 0) 70%);
+    /* Surface Styles (frontend.md §3: No large soft drop shadows on cards) */
+    .surface-panel {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
     }
 
-    /* Sleek card hover border highlight */
-    .craft-card {
-      background: #111117;
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .craft-card:hover {
-      border-color: rgba(16, 185, 129, 0.4);
-      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(16, 185, 129, 0.15);
+    .surface-panel:hover {
+      border-color: var(--border-strong);
     }
 
-    /* Frequency EQ Bar Animations */
-    @keyframes vu-bounce-1 { 0%, 100% { height: 18%; } 50% { height: 85%; } }
-    @keyframes vu-bounce-2 { 0%, 100% { height: 60%; } 50% { height: 25%; } }
-    @keyframes vu-bounce-3 { 0%, 100% { height: 35%; } 50% { height: 95%; } }
-    @keyframes vu-bounce-4 { 0%, 100% { height: 80%; } 50% { height: 40%; } }
-    @keyframes vu-bounce-5 { 0%, 100% { height: 45%; } 50% { height: 75%; } }
+    .surface-subtle {
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border);
+    }
 
-    .vu-bar-1 { animation: vu-bounce-1 1.2s ease-in-out infinite; }
-    .vu-bar-2 { animation: vu-bounce-2 0.85s ease-in-out infinite; }
-    .vu-bar-3 { animation: vu-bounce-3 1.4s ease-in-out infinite; }
-    .vu-bar-4 { animation: vu-bounce-4 0.95s ease-in-out infinite; }
-    .vu-bar-5 { animation: vu-bounce-5 1.1s ease-in-out infinite; }
+    /* Typography Utilities */
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      text-wrap: balance;
+      letter-spacing: var(--tracking-heading);
+    }
+
+    p {
+      text-wrap: pretty;
+      max-width: 65ch; /* frontend.md §4: 45-75ch measure */
+    }
+
+    .num-tabular {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Button Physics (frontend.md §7: Scale to 0.97 on press) */
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+      border-radius: var(--radius-sm);
+      user-select: none;
+    }
+
+    .btn-action:active {
+      transform: scale(0.97);
+    }
+
+    .btn-action:focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      color: var(--accent-fg);
+      border: 1px solid transparent;
+      padding: var(--space-3) var(--space-5);
+      font-size: var(--text-sm);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-subtle);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: var(--space-3) var(--space-5);
+      font-size: var(--text-sm);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--bg-muted);
+      border-color: var(--border-strong);
+    }
+
+    /* Audio Equalizer Live VU Meter Animation */
+    @keyframes vu-peak {
+      0%, 100% { height: 18%; }
+      50% { height: 86%; }
+    }
+    .vu-bar {
+      width: 3px;
+      background-color: var(--accent);
+      border-radius: var(--radius-xs);
+      animation: vu-peak 1.2s ease-in-out infinite;
+    }
   </style>
 </head>
-<body class="bg-tech-grid text-tune-textPrimary antialiased">
+<body class="hairline-grid">
 
-  <!-- Minimal Precision Navigation -->
-  <header class="fixed top-0 left-0 right-0 z-50 bg-[#070709]/80 backdrop-blur-md border-b border-white/[0.06]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+  <!-- Header: 48px Hairline Bar (frontend.md §6 & §8) -->
+  <header style="position: sticky; top: 0; z-index: 50; height: 52px; background: color-mix(in oklch, var(--bg-canvas) 85%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);">
+    <div style="max-width: 1200px; margin: 0 auto; height: 100%; padding: 0 var(--space-4); display: flex; align-items: center; justify-content: space-between;">
       
-      <!-- Real Tune Logo & Wordmark -->
-      <a href="#" class="flex items-center gap-3 group">
-        <img 
-          src="logo.png" 
-          alt="Tune Logo" 
-          class="w-8 h-8 rounded-lg shadow-sm flex-shrink-0 object-contain transition-transform group-hover:scale-105"
-        />
-        <div class="flex flex-col">
-          <div class="flex items-baseline gap-0.5">
-            <span class="font-black text-lg tracking-tight lowercase text-white">tune</span>
-            <span class="w-1.5 h-1.5 rounded-full bg-tune-accent ml-0.5"></span>
-          </div>
-          <span class="text-[9px] text-tune-textMuted uppercase font-bold tracking-widest -mt-0.5">
-            YOUR MUSIC, OFFLINE
-          </span>
+      <!-- Brandmark with Actual Squircle Logo -->
+      <a href="#" style="display: flex; align-items: center; gap: var(--space-2); text-decoration: none; color: inherit;">
+        <img src="logo.png" alt="Tune logo" style="width: 28px; height: 28px; border-radius: var(--radius-xs); object-contain: contain;" />
+        <div style="display: flex; align-items: baseline; gap: 2px;">
+          <span style="font-weight: 800; font-size: var(--text-sm); letter-spacing: var(--tracking-heading); text-transform: lowercase;">tune</span>
+          <span style="width: 4px; height: 4px; border-radius: var(--radius-full); background: var(--accent); display: inline-block;"></span>
         </div>
+        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-left: var(--space-2); border-left: 1px solid var(--border); padding-left: var(--space-2);">v1.0</span>
       </a>
 
-      <!-- Desktop Links -->
-      <nav class="hidden md:flex items-center gap-7 text-xs font-medium text-tune-textSecondary">
-        <a href="#workstation" class="hover:text-white transition">Workstation</a>
-        <a href="#dsp-pipeline" class="hover:text-white transition">DSP Engine</a>
-        <a href="#features" class="hover:text-white transition">Architecture</a>
-        <a href="#compare" class="hover:text-white transition">Comparison</a>
-        <a href="#shortcuts" class="hover:text-white transition">Shortcuts</a>
-        <a href="#faq" class="hover:text-white transition">FAQ</a>
+      <!-- Minimal Navigation Links -->
+      <nav style="display: flex; align-items: center; gap: var(--space-6); font-size: var(--text-xs); font-weight: 500; color: var(--text-2);">
+        <a href="#workstation" style="color: inherit; text-decoration: none; transition: color var(--dur-fast);">Workstation</a>
+        <a href="#signal-chain" style="color: inherit; text-decoration: none; transition: color var(--dur-fast);">Signal chain</a>
+        <a href="#features" style="color: inherit; text-decoration: none; transition: color var(--dur-fast);">Architecture</a>
+        <a href="#ledger" style="color: inherit; text-decoration: none; transition: color var(--dur-fast);">Audit</a>
+        <a href="#downloads" style="color: inherit; text-decoration: none; transition: color var(--dur-fast);">Binaries</a>
       </nav>
 
-      <!-- Action Buttons -->
-      <div class="flex items-center gap-3">
-        <a 
-          href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player" 
-          target="_blank" 
-          class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-tune-textSecondary hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] transition"
-        >
-          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+      <!-- Action Button -->
+      <div style="display: flex; align-items: center; gap: var(--space-3);">
+        <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player" target="_blank" class="btn-action btn-secondary" style="padding: 6px var(--space-3); font-size: 12px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
           </svg>
           <span>GitHub</span>
         </a>
 
-        <a 
-          id="nav-cta"
-          href="#download" 
-          class="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-tune-accent hover:bg-tune-accentHover text-black text-xs font-bold transition shadow-sm hover:scale-[1.02] active:scale-95"
-        >
-          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-          </svg>
-          <span id="nav-cta-text">Download</span>
+        <a id="nav-cta" href="#downloads" class="btn-action btn-primary" style="padding: 6px var(--space-4); font-size: 12px;">
+          <span>Download</span>
         </a>
       </div>
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="relative pt-32 pb-16 sm:pt-40 sm:pb-24 hero-glow">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+  <!-- Hero: Product-Artifact Hero (§6 Pattern 1) -->
+  <section style="padding: var(--space-16) 0 var(--space-12) 0;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 var(--space-4);">
       
-      <!-- Tech Badge -->
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-tune-surface border border-white/[0.08] shadow-sm mb-6">
-        <span class="w-1.5 h-1.5 rounded-full bg-tune-accent animate-pulse"></span>
-        <span class="text-[11px] font-mono tracking-wide text-tune-textSecondary">
-          Tune v1.0 • Bit-Perfect Engine • Windows & Android
-        </span>
-      </div>
-
-      <!-- Main Heading (Grounded, direct, no generic AI buzzwords) -->
-      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.08]">
-        The music player built for people who own their sound.
-      </h1>
-
-      <!-- Technical Subtitle -->
-      <p class="mt-6 text-sm sm:text-lg text-tune-textSecondary max-w-2xl mx-auto leading-relaxed">
-        Bit-perfect local playback, a cascaded 10-band studio equalizer, synchronized LRC karaoke lyrics, and low-latency mobile swipe gestures. No accounts. No subscriptions. Zero telemetry.
-      </p>
-
-      <!-- Auto-Detecting Download Bar -->
-      <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5 max-w-lg mx-auto">
-        <!-- Primary OS-Detected Button -->
-        <a 
-          id="hero-primary-btn" 
-          href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" 
-          class="w-full sm:w-auto flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl bg-tune-accent hover:bg-tune-accentHover text-black font-bold text-sm transition shadow-lg shadow-tune-accent/20 hover:scale-[1.02] active:scale-95"
-        >
-          <svg id="hero-primary-icon" class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
-          </svg>
-          <div class="text-left">
-            <div id="hero-primary-title" class="leading-none text-xs uppercase tracking-wider font-extrabold">Download for Windows</div>
-            <div id="hero-primary-spec" class="text-[10px] font-mono opacity-80 mt-0.5">64-bit Installer (.exe)</div>
-          </div>
-        </a>
-
-        <!-- Secondary Platform Option -->
-        <a 
-          id="hero-secondary-btn" 
-          href="#download" 
-          class="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-tune-surface hover:bg-tune-card text-tune-textPrimary font-semibold text-xs border border-white/[0.08] hover:border-white/[0.18] transition active:scale-95"
-        >
-          <svg class="w-4 h-4 fill-current text-tune-accent" viewBox="0 0 24 24">
-            <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4116 13.8533 8.083 12 8.083c-1.8534 0-3.5903.3286-5.1367.8667L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>
-          </svg>
-          <span>Android APK</span>
-        </a>
-      </div>
-
-      <!-- Specs / Micro Metric Bar -->
-      <div class="mt-8 flex flex-wrap items-center justify-center gap-6 text-[11px] font-mono text-tune-textMuted">
-        <span class="flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-          FLAC · MP3 · WAV · M4A · OGG · OPUS
-        </span>
-        <span class="flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-          Cascaded 10-Band Biquad IIR
-        </span>
-        <span class="flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-          0 Network Outbound
-        </span>
-        <span class="flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-          Sub-3ms Seek Latency
-        </span>
-      </div>
-
-      <!-- Authentic Workstation Interface Mockup -->
-      <div id="workstation" class="mt-14 relative max-w-5xl mx-auto text-left">
-        <!-- Ambient Back Glow -->
-        <div class="absolute -inset-1 bg-gradient-to-r from-tune-accent/20 via-emerald-600/10 to-teal-500/20 rounded-2xl blur-xl opacity-60"></div>
-
-        <!-- Window Chassis -->
-        <div class="relative bg-tune-surface border border-white/[0.08] rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden">
+      <div style="display: grid; grid-template-columns: 1fr; gap: var(--space-12); align-items: start;">
+        
+        <!-- Left-Aligned Headline & Single Sentence (frontend.md §6: Left-aligned body, ≤ 10 words H1) -->
+        <div style="max-width: 720px;">
           
-          <!-- Window Header (Electron Titlebar) -->
-          <div class="h-10 bg-[#09090c] border-b border-white/[0.06] flex items-center justify-between px-4">
-            <!-- Window Traffic Lights -->
-            <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-[#ff5f56]/80 inline-block"></span>
-              <span class="w-3 h-3 rounded-full bg-[#ffbd2e]/80 inline-block"></span>
-              <span class="w-3 h-3 rounded-full bg-[#27c93f]/80 inline-block"></span>
-            </div>
+          <div style="font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin-bottom: var(--space-3); letter-spacing: var(--tracking-caps); text-transform: uppercase;">
+            Audio Engineering • Desktop & Mobile
+          </div>
+
+          <h1 style="font-size: var(--text-4xl); font-weight: 800; line-height: var(--leading-display); color: var(--text); margin-bottom: var(--space-5);">
+            Bit-perfect offline music for desktop and mobile.
+          </h1>
+
+          <p style="font-size: var(--text-lg); color: var(--text-2); margin-bottom: var(--space-8); line-height: var(--leading-body);">
+            Cascaded 10-band biquad equalization, timestamped LRC karaoke parsing, local tag management, and low-latency swipe physics. No accounts. No streaming subscriptions. Zero telemetry.
+          </p>
+
+          <!-- Primary OS-Detected CTA & Secondary Binary Option -->
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-bottom: var(--space-6);">
             
-            <!-- Window App Title with Actual Logo Mark -->
-            <div class="flex items-center gap-2">
-              <img src="logo.png" alt="Tune" class="w-3.5 h-3.5 object-contain" />
-              <span class="text-xs font-mono text-tune-textSecondary font-medium">tune — local audio workstation</span>
+            <a id="hero-primary-cta" href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" class="btn-action btn-primary" style="padding: var(--space-4) var(--space-6); font-size: var(--text-sm);">
+              <svg id="hero-cta-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+              </svg>
+              <span id="hero-cta-label">Download for Windows (64-bit .exe)</span>
+            </a>
+
+            <a href="#downloads" class="btn-action btn-secondary" style="padding: var(--space-4) var(--space-6); font-size: var(--text-sm);">
+              <span>All platform binaries</span>
+            </a>
+          </div>
+
+          <!-- Proof Metrics (frontend.md §3: Proof next to feature with unit and period) -->
+          <div style="display: flex; flex-wrap: wrap; gap: var(--space-6); font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: var(--space-4);">
+            <div><strong style="color: var(--text);">FLAC/ALAC</strong> bit-perfect</div>
+            <div><strong style="color: var(--text);">&lt; 3ms</strong> seek response</div>
+            <div><strong style="color: var(--text);">0</strong> network pings</div>
+            <div><strong style="color: var(--text);">~65 MB</strong> idle memory</div>
+          </div>
+        </div>
+
+        <!-- Real Product Artifact: Cropped Hardware Audio Workstation (§6 Pattern 1) -->
+        <div id="workstation" class="surface-panel" style="border-radius: var(--radius-md); overflow: hidden;">
+          
+          <!-- Workstation Header (Electron Titlebar) -->
+          <div style="height: 38px; background: var(--bg-canvas); border-bottom: 1px solid var(--border); padding: 0 var(--space-4); display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="width: 10px; height: 10px; border-radius: var(--radius-full); background: #ff5f56; display: inline-block;"></span>
+              <span style="width: 10px; height: 10px; border-radius: var(--radius-full); background: #ffbd2e; display: inline-block;"></span>
+              <span style="width: 10px; height: 10px; border-radius: var(--radius-full); background: #27c93f; display: inline-block;"></span>
             </div>
 
-            <!-- Watched Folder indicator -->
-            <div class="hidden sm:flex items-center gap-1.5 text-[10px] font-mono text-tune-textMuted bg-white/[0.03] px-2 py-0.5 rounded border border-white/[0.04]">
-              <span class="w-1.5 h-1.5 rounded-full bg-tune-accent"></span>
-              <span>Watched: D:/Music/Lossless</span>
+            <div style="display: flex; align-items: center; gap: var(--space-2); font-family: var(--font-mono); font-size: 11px; color: var(--text-2);">
+              <img src="logo.png" alt="Tune" style="width: 14px; height: 14px; object-fit: contain;" />
+              <span>tune — local audio workstation</span>
+            </div>
+
+            <div class="num-tabular" style="font-size: 11px; color: var(--text-muted);">
+              44.1 kHz / 24-bit PCM
             </div>
           </div>
 
-          <!-- Inside App UI Grid -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[460px] bg-[#09090c]">
+          <!-- Workstation Grid -->
+          <div style="display: grid; grid-template-columns: 240px 1fr; min-height: 400px;">
             
-            <!-- Sidebar (Replicating Tune's actual Sidebar.tsx) -->
-            <div class="hidden lg:flex lg:col-span-3 border-r border-white/[0.06] p-4 flex-col justify-between bg-tune-surface/30">
-              <div class="space-y-4">
-                <!-- Brand in Sidebar -->
-                <div class="flex items-center gap-2">
-                  <img src="logo.png" alt="Tune" class="w-6 h-6 rounded object-contain" />
-                  <span class="font-extrabold text-sm text-white tracking-tight lowercase">tune<span class="text-tune-accent">.</span></span>
+            <!-- Sidebar: Library & Storage Navigation -->
+            <div style="background: var(--bg-canvas); border-right: 1px solid var(--border); padding: var(--space-4); display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: var(--tracking-caps); margin-bottom: var(--space-2);">
+                  Library Index
                 </div>
 
-                <!-- Navigation List -->
-                <div class="space-y-1 text-xs font-medium">
-                  <div class="px-3 py-2 rounded-lg bg-tune-elevated text-white flex items-center justify-between border border-white/[0.05]">
-                    <span class="flex items-center gap-2.5">
-                      <svg class="w-4 h-4 text-tune-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                      Library
-                    </span>
-                    <span class="font-mono text-[10px] text-tune-textMuted">1,248</span>
+                <div style="display: flex; flex-direction: column; gap: 2px; font-size: var(--text-xs);">
+                  <div style="padding: 6px var(--space-3); border-radius: var(--radius-xs); background: var(--bg-subtle); color: var(--text); font-weight: 600; display: flex; justify-content: space-between;">
+                    <span>All Tracks</span>
+                    <span class="num-tabular" style="color: var(--text-muted);">1,248</span>
                   </div>
-
-                  <div class="px-3 py-2 text-tune-textSecondary hover:text-white flex items-center gap-2.5">
-                    <svg class="w-4 h-4 text-rose-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                    Liked Songs
+                  <div style="padding: 6px var(--space-3); color: var(--text-2); display: flex; justify-content: space-between;">
+                    <span>Liked Songs</span>
+                    <span class="num-tabular" style="color: var(--text-muted);">142</span>
                   </div>
-
-                  <div class="px-3 py-2 text-tune-textSecondary hover:text-white flex items-center gap-2.5">
-                    <svg class="w-4 h-4 text-tune-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-                    Folder Mode
+                  <div style="padding: 6px var(--space-3); color: var(--text-2); display: flex; justify-content: space-between;">
+                    <span>Folders Mode</span>
+                    <span class="num-tabular" style="color: var(--text-muted);">12</span>
                   </div>
                 </div>
 
-                <!-- Auto Smart Playlists -->
-                <div class="pt-3 border-t border-white/[0.06]">
-                  <span class="text-[9px] font-mono text-tune-textMuted uppercase tracking-wider block mb-2 font-bold">
-                    Smart Playlists
-                  </span>
-                  <div class="space-y-1 text-xs">
-                    <div class="px-2.5 py-1.5 rounded text-orange-400 bg-orange-500/10 border border-orange-500/20 flex items-center justify-between text-[11px]">
-                      <span>Most Played</span>
-                      <span class="font-mono text-[10px]">120</span>
-                    </div>
-                    <div class="px-2.5 py-1.5 text-yellow-400/90 flex items-center justify-between text-[11px]">
-                      <span>Recently Added</span>
-                      <span class="font-mono text-[10px]">45</span>
-                    </div>
-                    <div class="px-2.5 py-1.5 text-tune-textSecondary flex items-center justify-between text-[11px]">
-                      <span>Recently Played</span>
-                      <span class="font-mono text-[10px]">30</span>
-                    </div>
+                <div style="font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: var(--tracking-caps); margin-top: var(--space-5); margin-bottom: var(--space-2);">
+                  Smart Playlists
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 2px; font-size: var(--text-xs); color: var(--text-2);">
+                  <div style="padding: 5px var(--space-3); display: flex; justify-content: space-between;">
+                    <span>Most Played</span>
+                    <span class="num-tabular" style="color: var(--text-muted);">120</span>
+                  </div>
+                  <div style="padding: 5px var(--space-3); display: flex; justify-content: space-between;">
+                    <span>Recently Added</span>
+                    <span class="num-tabular" style="color: var(--text-muted);">45</span>
+                  </div>
+                  <div style="padding: 5px var(--space-3); display: flex; justify-content: space-between;">
+                    <span>Recently Played</span>
+                    <span class="num-tabular" style="color: var(--text-muted);">30</span>
                   </div>
                 </div>
               </div>
 
-              <!-- Spotify Importer Callout in Sidebar -->
-              <div class="p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.06] text-[11px]">
-                <div class="flex items-center gap-1.5 text-white font-medium mb-1">
-                  <span class="w-2 h-2 rounded-full bg-tune-spotifyGreen"></span>
-                  <span>Spotify Importer</span>
-                </div>
-                <div class="text-[10px] text-tune-textMuted">Matches local storage from Spotify playlist URL</div>
+              <!-- Storage Anchor -->
+              <div class="surface-subtle" style="padding: var(--space-3); border-radius: var(--radius-xs); font-family: var(--font-mono); font-size: 10px;">
+                <div style="color: var(--text-muted); margin-bottom: 2px;">WATCHED DIRECTORY</div>
+                <div style="color: var(--accent); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">D:/Audio/Studio-Masters</div>
               </div>
             </div>
 
-            <!-- Main Track Table & Live Equalizer Preview -->
-            <div class="lg:col-span-9 p-4 sm:p-5 flex flex-col justify-between">
+            <!-- Main Workstation Canvas -->
+            <div style="padding: var(--space-4); display: flex; flex-direction: column; justify-content: space-between; background: var(--bg-surface);">
               
-              <!-- Top Search and DSP Hardware Specs -->
-              <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/[0.06]">
-                <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-tune-card border border-white/[0.06] text-xs text-tune-textMuted w-full max-w-xs font-mono">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                  <span>Filter by title, artist, codec...</span>
+              <!-- Search & Active EQ Chip -->
+              <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: var(--space-3); border-bottom: 1px solid var(--border);">
+                <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">
+                  Filter: title, artist, codec, sample rate...
                 </div>
 
-                <div class="flex items-center gap-2 text-[10px] font-mono">
-                  <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    EQ: 10-Band Active
+                <div style="display: flex; align-items: center; gap: var(--space-2); font-family: var(--font-mono); font-size: 10px;">
+                  <span style="padding: 2px 6px; border-radius: var(--radius-xs); background: var(--bg-subtle); border: 1px solid var(--border); color: var(--accent);">
+                    EQ: 10-Band Biquad
                   </span>
-                  <span class="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                    Bass: +4.5dB
-                  </span>
-                  <span class="px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                    Spatial: 3500Hz
+                  <span style="padding: 2px 6px; border-radius: var(--radius-xs); background: var(--bg-subtle); border: 1px solid var(--border); color: var(--text-2);">
+                    Limiter: -24 dB
                   </span>
                 </div>
               </div>
 
-              <!-- Real Track Rows with Codec Badges -->
-              <div class="my-3 space-y-1.5">
+              <!-- Track Table (frontend.md §8: Text left, numbers right, tabular-nums) -->
+              <div style="margin: var(--space-3) 0;">
                 
-                <!-- Active Playing Track -->
-                <div class="grid grid-cols-12 items-center px-3 py-2.5 rounded-xl bg-tune-elevated/70 border border-tune-accent/30 text-xs">
-                  <div class="col-span-1 text-tune-accent font-bold">
-                    <svg class="w-3.5 h-3.5 fill-current animate-pulse" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                  </div>
-                  <div class="col-span-5">
-                    <div class="font-bold text-white flex items-center gap-2">
+                <!-- Playing Track -->
+                <div style="display: grid; grid-template-columns: 28px 1fr 180px 70px; align-items: center; padding: var(--space-2) var(--space-3); background: var(--bg-subtle); border-radius: var(--radius-xs); border-left: 2px solid var(--accent); margin-bottom: 4px; font-size: var(--text-xs);">
+                  <div style="color: var(--accent);">▶</div>
+                  <div>
+                    <div style="font-weight: 600; color: var(--text); display: flex; align-items: center; gap: var(--space-2);">
                       <span>Starboy</span>
-                      <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">FLAC 24-bit</span>
+                      <span class="num-tabular" style="font-size: 9px; padding: 1px 4px; border-radius: var(--radius-xs); background: var(--accent-subtle); color: var(--accent); border: 1px solid color-mix(in oklch, var(--accent) 30%, transparent);">FLAC 24-bit 96k</span>
                     </div>
-                    <div class="text-[10px] text-tune-textSecondary">The Weeknd, Daft Punk</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">The Weeknd, Daft Punk</div>
                   </div>
-                  <div class="col-span-4 text-tune-textMuted text-[11px] truncate">Starboy (Studio Master)</div>
-                  <div class="col-span-2 text-right font-mono text-[11px] text-tune-accent font-medium">3:50</div>
+                  <div style="color: var(--text-2); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Starboy (Studio Master)</div>
+                  <div class="num-tabular" style="text-align: right; color: var(--accent); font-weight: 500;">03:50</div>
                 </div>
 
                 <!-- Track 2 -->
-                <div class="grid grid-cols-12 items-center px-3 py-2 rounded-lg hover:bg-white/[0.02] text-xs text-tune-textSecondary transition">
-                  <div class="col-span-1 font-mono text-[11px] text-tune-textMuted">02</div>
-                  <div class="col-span-5">
-                    <div class="font-medium text-white flex items-center gap-2">
+                <div style="display: grid; grid-template-columns: 28px 1fr 180px 70px; align-items: center; padding: var(--space-2) var(--space-3); border-radius: var(--radius-xs); margin-bottom: 4px; font-size: var(--text-xs); color: var(--text-2);">
+                  <div class="num-tabular" style="color: var(--text-muted);">02</div>
+                  <div>
+                    <div style="font-weight: 500; color: var(--text); display: flex; align-items: center; gap: var(--space-2);">
                       <span>Midnight City</span>
-                      <span class="text-[9px] font-mono px-1 py-0.2 rounded bg-white/[0.05] text-tune-textMuted border border-white/[0.08]">MP3 320k</span>
+                      <span class="num-tabular" style="font-size: 9px; padding: 1px 4px; border-radius: var(--radius-xs); background: var(--bg-muted); color: var(--text-muted);">MP3 320k</span>
                     </div>
-                    <div class="text-[10px] text-tune-textMuted">M83</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">M83</div>
                   </div>
-                  <div class="col-span-4 text-tune-textMuted text-[11px] truncate">Hurry Up, We're Dreaming</div>
-                  <div class="col-span-2 text-right font-mono text-[11px] text-tune-textMuted">4:04</div>
+                  <div style="color: var(--text-muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Hurry Up, We're Dreaming</div>
+                  <div class="num-tabular" style="text-align: right; color: var(--text-muted);">04:04</div>
                 </div>
 
                 <!-- Track 3 -->
-                <div class="grid grid-cols-12 items-center px-3 py-2 rounded-lg hover:bg-white/[0.02] text-xs text-tune-textSecondary transition">
-                  <div class="col-span-1 font-mono text-[11px] text-tune-textMuted">03</div>
-                  <div class="col-span-5">
-                    <div class="font-medium text-white flex items-center gap-2">
+                <div style="display: grid; grid-template-columns: 28px 1fr 180px 70px; align-items: center; padding: var(--space-2) var(--space-3); border-radius: var(--radius-xs); margin-bottom: 4px; font-size: var(--text-xs); color: var(--text-2);">
+                  <div class="num-tabular" style="color: var(--text-muted);">03</div>
+                  <div>
+                    <div style="font-weight: 500; color: var(--text); display: flex; align-items: center; gap: var(--space-2);">
                       <span>Instant Crush</span>
-                      <span class="text-[9px] font-mono px-1 py-0.2 rounded bg-white/[0.05] text-tune-textMuted border border-white/[0.08]">ALAC Lossless</span>
+                      <span class="num-tabular" style="font-size: 9px; padding: 1px 4px; border-radius: var(--radius-xs); background: var(--bg-muted); color: var(--text-muted);">ALAC 16-bit</span>
                     </div>
-                    <div class="text-[10px] text-tune-textMuted">Daft Punk ft. Julian Casablancas</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Daft Punk ft. Julian Casablancas</div>
                   </div>
-                  <div class="col-span-4 text-tune-textMuted text-[11px] truncate">Random Access Memories</div>
-                  <div class="col-span-2 text-right font-mono text-[11px] text-tune-textMuted">5:37</div>
-                </div>
-
-                <!-- Track 4 -->
-                <div class="grid grid-cols-12 items-center px-3 py-2 rounded-lg hover:bg-white/[0.02] text-xs text-tune-textSecondary transition">
-                  <div class="col-span-1 font-mono text-[11px] text-tune-textMuted">04</div>
-                  <div class="col-span-5">
-                    <div class="font-medium text-white flex items-center gap-2">
-                      <span>Resonance</span>
-                      <span class="text-[9px] font-mono px-1 py-0.2 rounded bg-white/[0.05] text-tune-textMuted border border-white/[0.08]">WAV 1411k</span>
-                    </div>
-                    <div class="text-[10px] text-tune-textMuted">HOME</div>
-                  </div>
-                  <div class="col-span-4 text-tune-textMuted text-[11px] truncate">Odyssey</div>
-                  <div class="col-span-2 text-right font-mono text-[11px] text-tune-textMuted">3:32</div>
+                  <div style="color: var(--text-muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Random Access Memories</div>
+                  <div class="num-tabular" style="text-align: right; color: var(--text-muted);">05:37</div>
                 </div>
               </div>
 
-              <!-- Real Equalizer Slider Strip Preview -->
-              <div class="p-3 rounded-xl bg-tune-card/90 border border-white/[0.06] mb-3">
-                <div class="flex items-center justify-between text-[10px] font-mono text-tune-textMuted mb-2">
-                  <span class="text-white font-semibold flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-tune-accent"></span>
-                    10-Band IIR Peaking Filter Response (Q=1.414)
-                  </span>
-                  <div class="flex gap-2">
-                    <button class="px-1.5 py-0.5 rounded bg-white/[0.04] text-white hover:bg-tune-accent hover:text-black transition">Flat</button>
-                    <button class="px-1.5 py-0.5 rounded bg-tune-accent text-black font-bold">Bass Boost</button>
-                    <button class="px-1.5 py-0.5 rounded bg-white/[0.04] text-white hover:bg-tune-accent hover:text-black transition">Vocal</button>
-                    <button class="px-1.5 py-0.5 rounded bg-white/[0.04] text-white hover:bg-tune-accent hover:text-black transition">Rock</button>
+              <!-- Interactive 10-Band EQ Curve Visualizer Panel -->
+              <div class="surface-subtle" style="padding: var(--space-3); border-radius: var(--radius-xs); margin-bottom: var(--space-3);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2); font-family: var(--font-mono); font-size: 10px;">
+                  <span style="color: var(--text); font-weight: 600;">10-BAND BIQUAD EQUALIZER (Q = 1.414)</span>
+                  <div style="display: flex; gap: var(--space-1);">
+                    <button id="eq-preset-flat" class="btn-action" style="padding: 2px 8px; font-size: 10px; background: var(--bg-muted); color: var(--text);">Flat</button>
+                    <button id="eq-preset-bass" class="btn-action" style="padding: 2px 8px; font-size: 10px; background: var(--accent); color: var(--accent-fg);">Bass Boost</button>
+                    <button id="eq-preset-vocal" class="btn-action" style="padding: 2px 8px; font-size: 10px; background: var(--bg-muted); color: var(--text);">Vocal</button>
                   </div>
                 </div>
 
-                <!-- 10 Sliders Graphic -->
-                <div class="grid grid-cols-10 gap-1.5 items-end h-14 pt-1">
-                  <!-- 31Hz -->
-                  <div class="flex flex-col items-center gap-1 h-full justify-end">
-                    <div class="w-full bg-tune-accent/30 rounded-t h-[75%] relative">
-                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
-                    </div>
-                    <span class="text-[8px] font-mono text-tune-textMuted">31</span>
-                  </div>
-                  <!-- 62Hz -->
-                  <div class="flex flex-col items-center gap-1 h-full justify-end">
-                    <div class="w-full bg-tune-accent/30 rounded-t h-[85%] relative">
-                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
-                    </div>
-                    <span class="text-[8px] font-mono text-tune-textMuted">62</span>
-                  </div>
-                  <!-- 125Hz -->
-                  <div class="flex flex-col items-center gap-1 h-full justify-end">
-                    <div class="w-full bg-tune-accent/30 rounded-t h-[65%] relative">
-                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
-                    </div>
-                    <span class="text-[8px] font-mono text-tune-textMuted">125</span>
-                  </div>
-                  <!-- 250Hz -->
-                  <div class="flex flex-col items-center gap-1 h-full justify-end">
-                    <div class="w-full bg-tune-accent/30 rounded-t h-[50%] relative">
-                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
-                    </div>
-                    <span class="text-[8px] font-mono text-tune-textMuted">250</span>
-                  </div>
-                  <!-- 500Hz -->
-                  <div class="flex flex-col items-center gap-1 h-full justify-end">
-                    <div class="w-full bg-tune-accent/30 rounded-t h-[48%] relative">
-                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
-                    </div>
-                    <span class="text-[8px] font-mono text-tune-textMuted">500</span>
-                  </div>
-                  <!-- 1kHz -->
-                  <div class="flex flex-col items-center gap-1 h-full justify-end">
-                    <div class="w-full bg-tune-accent/30 rounded-t h-[52%] relative">
-                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
-                    </div>
-                    <span class="text-[8px] font-mono text-tune-textMuted">1k</span>
-                  </div>
-                  <!-- 2kHz -->
-                  <div class="flex flex-col items-center gap-1 h-full justify-end">
-                    <div class="w-full bg-tune-accent/30 rounded-t h-[60%] relative">
-                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
-                    </div>
-                    <span class="text-[8px] font-mono text-tune-textMuted">2k</span>
-                  </div>
-                  <!-- 4kHz -->
-                  <div class="flex flex-col items-center gap-1 h-full justify-end">
-                    <div class="w-full bg-tune-accent/30 rounded-t h-[70%] relative">
-                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
-                    </div>
-                    <span class="text-[8px] font-mono text-tune-textMuted">4k</span>
-                  </div>
-                  <!-- 8kHz -->
-                  <div class="flex flex-col items-center gap-1 h-full justify-end">
-                    <div class="w-full bg-tune-accent/30 rounded-t h-[65%] relative">
-                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
-                    </div>
-                    <span class="text-[8px] font-mono text-tune-textMuted">8k</span>
-                  </div>
-                  <!-- 16kHz -->
-                  <div class="flex flex-col items-center gap-1 h-full justify-end">
-                    <div class="w-full bg-tune-accent/30 rounded-t h-[58%] relative">
-                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
-                    </div>
-                    <span class="text-[8px] font-mono text-tune-textMuted">16k</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Player Dock Bar with Live Synced Karaoke Line -->
-              <div class="p-3 rounded-xl bg-tune-surface border border-white/[0.08] flex items-center justify-between gap-4">
+                <!-- Frequency Response Canvas -->
+                <canvas id="eq-canvas" width="600" height="70" style="width: 100%; height: 70px; background: var(--bg-canvas); border-radius: var(--radius-xs); display: block; border: 1px solid var(--border);"></canvas>
                 
-                <!-- Track Thumbnail & Controls -->
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center">
-                    <img src="logo.png" alt="Tune" class="w-6 h-6 object-contain" />
+                <!-- Frequency Band Labels -->
+                <div style="display: grid; grid-template-columns: repeat(10, 1fr); text-align: center; font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); margin-top: 4px;">
+                  <span>31Hz</span><span>62</span><span>125</span><span>250</span><span>500</span><span>1k</span><span>2k</span><span>4k</span><span>8k</span><span>16kHz</span>
+                </div>
+              </div>
+
+              <!-- Bottom Hardware Channel Strip Dock -->
+              <div style="background: var(--bg-canvas); border: 1px solid var(--border); border-radius: var(--radius-xs); padding: var(--space-3); display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);">
+                
+                <div style="display: flex; align-items: center; gap: var(--space-3);">
+                  <div style="width: 32px; height: 32px; border-radius: var(--radius-xs); background: var(--bg-subtle); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;">
+                    <img src="logo.png" alt="Tune" style="width: 20px; height: 20px; object-fit: contain;" />
                   </div>
                   <div>
-                    <div class="text-xs font-bold text-white leading-tight">Starboy</div>
-                    <div class="text-[10px] text-tune-textMuted">01:42 / 03:50</div>
+                    <div style="font-size: var(--text-xs); font-weight: 600; color: var(--text);">Starboy</div>
+                    <div class="num-tabular" style="font-size: 10px; color: var(--text-muted);">01:42 / 03:50</div>
                   </div>
                 </div>
 
-                <!-- Live Animated VU Meter Bars -->
-                <div class="flex items-end gap-1 h-5 px-3">
-                  <span class="w-1 bg-tune-accent rounded-full vu-bar-1"></span>
-                  <span class="w-1 bg-tune-accent rounded-full vu-bar-2"></span>
-                  <span class="w-1 bg-tune-accent rounded-full vu-bar-3"></span>
-                  <span class="w-1 bg-tune-accent rounded-full vu-bar-4"></span>
-                  <span class="w-1 bg-tune-accent rounded-full vu-bar-5"></span>
-                  <span class="w-1 bg-tune-accent rounded-full vu-bar-2"></span>
-                  <span class="w-1 bg-tune-accent rounded-full vu-bar-4"></span>
+                <!-- Live VU Meter Bars -->
+                <div style="display: flex; align-items: flex-end; gap: 3px; height: 20px; padding: 0 var(--space-3);">
+                  <span class="vu-bar" style="animation-delay: 0.1s;"></span>
+                  <span class="vu-bar" style="animation-delay: 0.3s;"></span>
+                  <span class="vu-bar" style="animation-delay: 0.05s;"></span>
+                  <span class="vu-bar" style="animation-delay: 0.4s;"></span>
+                  <span class="vu-bar" style="animation-delay: 0.2s;"></span>
+                  <span class="vu-bar" style="animation-delay: 0.15s;"></span>
                 </div>
 
-                <!-- Synced LRC Karaoke Realtime Display -->
-                <div class="hidden md:flex flex-col text-right">
-                  <span class="text-[9px] font-mono uppercase tracking-widest text-tune-accent font-bold">[01:42.50] LRC SYNCED</span>
-                  <span class="text-xs font-semibold text-white tracking-wide">"I'm tryna put you in the worst mood, ah"</span>
+                <!-- Synchronized LRC Karaoke Line -->
+                <div style="text-align: right;">
+                  <div class="num-tabular" style="font-size: 9px; color: var(--accent); font-weight: 700;">[01:42.50] LRC SYNCED</div>
+                  <div style="font-size: 11px; font-weight: 500; color: var(--text);">"I'm tryna put you in the worst mood, ah"</div>
                 </div>
               </div>
             </div>
@@ -546,505 +431,357 @@
     </div>
   </section>
 
-  <!-- Section 2: Audio Engineering & DSP Architecture -->
-  <section id="dsp-pipeline" class="py-20 sm:py-28 border-t border-white/[0.06] bg-[#09090d]">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- Section 2: Acoustic Signal Chain (§6 Pattern 3: Hairline Grid) -->
+  <section id="signal-chain" style="border-top: 1px solid var(--border); padding: var(--space-16) 0; background: var(--bg-canvas);">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 var(--space-4);">
       
-      <!-- Section Header -->
-      <div class="max-w-2xl mb-14 text-left">
-        <div class="text-xs font-mono uppercase tracking-widest text-tune-accent mb-2">Acoustic Signal Processing</div>
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-          Studio-grade signal chain. Direct to your hardware.
+      <div style="max-width: 600px; margin-bottom: var(--space-8);">
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: var(--tracking-caps); margin-bottom: var(--space-2);">
+          Deterministic DSP Pipeline
+        </div>
+        <h2 style="font-size: var(--text-3xl); font-weight: 800; color: var(--text); margin-bottom: var(--space-3);">
+          Zero-resampling audio signal path.
         </h2>
-        <p class="mt-3 text-sm text-tune-textSecondary leading-relaxed">
-          Audio isn't just decoded; it passes through a cascaded Web Audio DSP node graph calibrated for bit-perfection, transient preservation, and speaker acoustic correction.
+        <p style="font-size: var(--text-sm); color: var(--text-2);">
+          Decoded PCM frames traverse directly through native Web Audio nodes calibrated for phase coherence, acoustic ear protection, and spatial separation.
         </p>
       </div>
 
-      <!-- DSP Flow Diagram -->
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-12">
+      <!-- 5-Stage Hairline Grid (§6 Pattern 3) -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; background: var(--border); gap: 1px;">
         
-        <!-- Node 1 -->
-        <div class="p-4 rounded-xl bg-tune-card border border-white/[0.06] flex flex-col justify-between">
+        <!-- Stage 1 -->
+        <div style="background: var(--bg-surface); padding: var(--space-5); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-1">01. Source</div>
-            <h4 class="text-sm font-bold text-white mb-1">Audio Buffer</h4>
-            <p class="text-xs text-tune-textSecondary leading-normal">
-              IndexedDB Blob or Electron IPC stream with zero resampling.
+            <div class="num-tabular" style="font-size: 10px; color: var(--text-muted); margin-bottom: var(--space-1);">STAGE 01</div>
+            <h3 style="font-size: var(--text-base); font-weight: 700; color: var(--text); margin-bottom: var(--space-2);">PCM Buffer</h3>
+            <p style="font-size: var(--text-xs); color: var(--text-2); line-height: var(--leading-ui);">
+              Direct stream from IndexedDB local blobs or native OS file descriptors without conversion.
             </p>
           </div>
-          <div class="mt-4 pt-3 border-t border-white/[0.06] text-[10px] font-mono text-tune-accent">
-            PCM · 44.1k/96kHz
+          <div class="num-tabular" style="font-size: 11px; color: var(--accent); margin-top: var(--space-4); border-top: 1px solid var(--border); padding-top: var(--space-2);">
+            Bit-perfect 44.1k/96k
           </div>
         </div>
 
-        <!-- Node 2 -->
-        <div class="p-4 rounded-xl bg-tune-card border border-white/[0.06] flex flex-col justify-between">
+        <!-- Stage 2 -->
+        <div style="background: var(--bg-surface); padding: var(--space-5); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-1">02. Preamplifier</div>
-            <h4 class="text-sm font-bold text-white mb-1">Gain Control</h4>
-            <p class="text-xs text-tune-textSecondary leading-normal">
-              Linear gain scalar with smooth exponential ramp-to-value to eliminate clicks.
+            <div class="num-tabular" style="font-size: 10px; color: var(--text-muted); margin-bottom: var(--space-1);">STAGE 02</div>
+            <h3 style="font-size: var(--text-base); font-weight: 700; color: var(--text); margin-bottom: var(--space-2);">Gain Stage</h3>
+            <p style="font-size: var(--text-xs); color: var(--text-2); line-height: var(--leading-ui);">
+              Exponential ramp scalar eliminating audible clicks and DC offset pops during volume adjustments.
             </p>
           </div>
-          <div class="mt-4 pt-3 border-t border-white/[0.06] text-[10px] font-mono text-tune-accent">
-            0.0 to 1.0 (Log)
+          <div class="num-tabular" style="font-size: 11px; color: var(--accent); margin-top: var(--space-4); border-top: 1px solid var(--border); padding-top: var(--space-2);">
+            Smooth Ramp · 0-100%
           </div>
         </div>
 
-        <!-- Node 3 -->
-        <div class="p-4 rounded-xl bg-tune-card border border-tune-accent/30 flex flex-col justify-between relative shadow-lg shadow-tune-accent/5">
-          <div class="absolute -top-2.5 right-3 px-2 py-0.5 rounded bg-tune-accent text-black font-mono text-[9px] font-bold">CORE</div>
+        <!-- Stage 3 (Core) -->
+        <div style="background: var(--bg-subtle); padding: var(--space-5); display: flex; flex-direction: column; justify-content: space-between; border-left: 2px solid var(--accent);">
           <div>
-            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-1">03. EQ Bank</div>
-            <h4 class="text-sm font-bold text-white mb-1">10-Band Biquad</h4>
-            <p class="text-xs text-tune-textSecondary leading-normal">
-              Cascaded second-order IIR peaking and shelving filters from 31Hz to 16kHz.
+            <div class="num-tabular" style="font-size: 10px; color: var(--accent); font-weight: 700; margin-bottom: var(--space-1);">STAGE 03 • CORE</div>
+            <h3 style="font-size: var(--text-base); font-weight: 700; color: var(--text); margin-bottom: var(--space-2);">10-Band Biquad</h3>
+            <p style="font-size: var(--text-xs); color: var(--text-2); line-height: var(--leading-ui);">
+              Cascaded second-order IIR peaking and shelving filters from 31 Hz to 16 kHz with clamped Q = 1.414.
             </p>
           </div>
-          <div class="mt-4 pt-3 border-t border-white/[0.06] text-[10px] font-mono text-tune-accent">
-            ±12 dB · Q = 1.414
+          <div class="num-tabular" style="font-size: 11px; color: var(--accent); margin-top: var(--space-4); border-top: 1px solid var(--border); padding-top: var(--space-2);">
+            ±12 dB · Zero Ringing
           </div>
         </div>
 
-        <!-- Node 4 -->
-        <div class="p-4 rounded-xl bg-tune-card border border-white/[0.06] flex flex-col justify-between">
+        <!-- Stage 4 -->
+        <div style="background: var(--bg-surface); padding: var(--space-5); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-1">04. Spatializer</div>
-            <h4 class="text-sm font-bold text-white mb-1">Stereo Widener</h4>
-            <p class="text-xs text-tune-textSecondary leading-normal">
-              3500Hz acoustic presence boost and Haas stereo channel panning.
+            <div class="num-tabular" style="font-size: 10px; color: var(--text-muted); margin-bottom: var(--space-1);">STAGE 04</div>
+            <h3 style="font-size: var(--text-base); font-weight: 700; color: var(--text); margin-bottom: var(--space-2);">Spatial Panner</h3>
+            <p style="font-size: var(--text-xs); color: var(--text-2); line-height: var(--leading-ui);">
+              3,500 Hz presence equalization and Haas channel delay widening headphone stereo soundstage.
             </p>
           </div>
-          <div class="mt-4 pt-3 border-t border-white/[0.06] text-[10px] font-mono text-tune-accent">
-            Headphone 3D
+          <div class="num-tabular" style="font-size: 11px; color: var(--accent); margin-top: var(--space-4); border-top: 1px solid var(--border); padding-top: var(--space-2);">
+            Stereo Virtualizer
           </div>
         </div>
 
-        <!-- Node 5 -->
-        <div class="p-4 rounded-xl bg-tune-card border border-white/[0.06] flex flex-col justify-between">
+        <!-- Stage 5 -->
+        <div style="background: var(--bg-surface); padding: var(--space-5); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-1">05. Protection</div>
-            <h4 class="text-sm font-bold text-white mb-1">Dynamics Leveler</h4>
-            <p class="text-xs text-tune-textSecondary leading-normal">
-              Compression limiter preventing digital clipping during heavy bass boost.
+            <div class="num-tabular" style="font-size: 10px; color: var(--text-muted); margin-bottom: var(--space-1);">STAGE 05</div>
+            <h3 style="font-size: var(--text-base); font-weight: 700; color: var(--text); margin-bottom: var(--space-2);">Peak Limiter</h3>
+            <p style="font-size: var(--text-xs); color: var(--text-2); line-height: var(--leading-ui);">
+              Fast dynamics compression preventing digital clipping during extreme bass gain boosts.
             </p>
           </div>
-          <div class="mt-4 pt-3 border-t border-white/[0.06] text-[10px] font-mono text-tune-accent">
-            -24dB / 3ms Attack
+          <div class="num-tabular" style="font-size: 11px; color: var(--accent); margin-top: var(--space-4); border-top: 1px solid var(--border); padding-top: var(--space-2);">
+            -24 dB / 3ms Attack
           </div>
-        </div>
-      </div>
-
-      <!-- DSP Specification Details -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        <div class="craft-card p-6 rounded-2xl">
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
-          </div>
-          <h3 class="text-base font-bold text-white mb-1.5">Zero Lossless Compromise</h3>
-          <p class="text-xs text-tune-textSecondary leading-relaxed">
-            Direct hardware decoding via native Chromium audio streams. Whether you play 24-bit 192kHz FLAC, ALAC, or standard 320kbps MP3s, bits are handled without forced downsampling.
-          </p>
-        </div>
-
-        <div class="craft-card p-6 rounded-2xl">
-          <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center mb-4">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-          </div>
-          <h3 class="text-base font-bold text-white mb-1.5">Sub-3ms Seek Latency</h3>
-          <p class="text-xs text-tune-textSecondary leading-relaxed">
-            Local track indexing in memory coupled with IndexedDB blob caches eliminates buffering lag completely. Instant scrubber response even on multi-hour DJ sets.
-          </p>
-        </div>
-
-        <div class="craft-card p-6 rounded-2xl">
-          <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mb-4">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-          </div>
-          <h3 class="text-base font-bold text-white mb-1.5">100% Air-Gapped Capable</h3>
-          <p class="text-xs text-tune-textSecondary leading-relaxed">
-            Tune operates completely isolated from the internet. No background pings, no telemetry daemons, no usage heatmaps. Your listening history never leaves your device.
-          </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Section 3: Pillars & Architecture Details -->
-  <section id="features" class="py-20 sm:py-28 border-t border-white/[0.06]">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- Section 3: Architecture Deep-Dive (§6 Pattern 5: Weighted Bento) -->
+  <section id="features" style="border-top: 1px solid var(--border); padding: var(--space-16) 0;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 var(--space-4);">
       
-      <div class="max-w-2xl mb-14 text-left">
-        <div class="text-xs font-mono uppercase tracking-widest text-tune-accent mb-2">Software Architecture</div>
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-          Engineered for power users.
+      <div style="max-width: 600px; margin-bottom: var(--space-8);">
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: var(--tracking-caps); margin-bottom: var(--space-2);">
+          Subsystem Specifications
+        </div>
+        <h2 style="font-size: var(--text-3xl); font-weight: 800; color: var(--text); margin-bottom: var(--space-3);">
+          Built for offline reliability.
         </h2>
-        <p class="mt-3 text-sm text-tune-textSecondary leading-relaxed">
-          Built on Electron, React, TypeScript, and Capacitor for zero overhead on desktop and mobile.
+        <p style="font-size: var(--text-sm); color: var(--text-2);">
+          No external dependencies, cloud accounts, or mandatory internet connections. Every subsystem runs locally on your silicon.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Weighted Bento Grid: Unequal cells, no 6-equal tiles (§6 Pattern 5) -->
+      <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--space-4);">
         
-        <!-- Feature 1: Synced LRC Karaoke -->
-        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
+        <!-- Bento Cell 1: Large 7-col Weighted Cell (LRC Synced Karaoke Engine) -->
+        <div class="surface-panel" style="grid-column: span 7; border-radius: var(--radius-md); padding: var(--space-6); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-2">Lyric Synchronization</div>
-            <h3 class="text-base font-bold text-white mb-2">Sub-Second LRC Karaoke</h3>
-            <p class="text-xs text-tune-textSecondary leading-relaxed">
-              Auto-fetches timestamped lyrics via LRCLIB and renders real-time auto-scrolling karaoke. Supports manual .LRC file uploads, timestamp offsets (±50ms), and custom text pasting.
+            <div class="num-tabular" style="font-size: 10px; color: var(--text-muted); margin-bottom: var(--space-1);">LYRIC SYNCHRONIZATION</div>
+            <h3 style="font-size: var(--text-xl); font-weight: 700; color: var(--text); margin-bottom: var(--space-2);">
+              Sub-second timestamped LRC parsing
+            </h3>
+            <p style="font-size: var(--text-sm); color: var(--text-2); margin-bottom: var(--space-4);">
+              Line-by-line auto-scrolling synced karaoke engine. Supports standard <code class="num-tabular" style="background: var(--bg-canvas); padding: 1px 4px; border-radius: var(--radius-xs); border: 1px solid var(--border);">[mm:ss.xx]</code> files, offset calibration, custom manual text upload, and offline cache storage.
             </p>
           </div>
-          <div class="mt-6 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-tune-accent">
-            <span>[mm:ss.xx] Standard</span>
-            <span>Local & Network</span>
+
+          <div class="surface-subtle" style="padding: var(--space-4); border-radius: var(--radius-xs); font-family: var(--font-mono); font-size: 11px;">
+            <div style="color: var(--text-muted); margin-bottom: 4px;">[01:14.20] You're talking about the time we had</div>
+            <div style="color: var(--accent); font-weight: 600; padding: 2px 0;">[01:18.45] &gt;&gt; I'm tryna put you in the worst mood, ah</div>
+            <div style="color: var(--text-muted); margin-top: 4px;">[01:22.10] P1 cleaner than your church shoes, ah</div>
           </div>
         </div>
 
-        <!-- Feature 2: ID3 Tag Editor -->
-        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
+        <!-- Bento Cell 2: 5-col Cell (In-App ID3 Tag Editor) -->
+        <div class="surface-panel" style="grid-column: span 5; border-radius: var(--radius-md); padding: var(--space-6); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-2">Library Hygiene</div>
-            <h3 class="text-base font-bold text-white mb-2">In-App ID3 Tag Editor</h3>
-            <p class="text-xs text-tune-textSecondary leading-relaxed">
-              Edit Title, Artist, Album, Year, and Genre directly in the app. Automatic iTunes Search API integration identifies missing track metadata and downloads high-res album covers.
+            <div class="num-tabular" style="font-size: 10px; color: var(--text-muted); margin-bottom: var(--space-1);">METADATA SANITIZATION</div>
+            <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text); margin-bottom: var(--space-2);">
+              In-place ID3v2.4 editor
+            </h3>
+            <p style="font-size: var(--text-xs); color: var(--text-2); line-height: var(--leading-body);">
+              Edit title, artist, album, genre, and year in place. Built-in iTunes Search API integration auto-matches track metadata and fetches lossless embedded cover art.
             </p>
           </div>
-          <div class="mt-6 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-tune-accent">
-            <span>ID3v2.3 / ID3v2.4</span>
-            <span>iTunes Match</span>
+
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); border-top: 1px solid var(--border); padding-top: var(--space-3); margin-top: var(--space-4);">
+            ID3v2.3 / ID3v2.4 / Vorbis
           </div>
         </div>
 
-        <!-- Feature 3: Spotify Playlist Importer -->
-        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
+        <!-- Bento Cell 3: 5-col Cell (Mobile Physics & Inertial Gestures) -->
+        <div class="surface-panel" style="grid-column: span 5; border-radius: var(--radius-md); padding: var(--space-6); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-2">Data Portability</div>
-            <h3 class="text-base font-bold text-white mb-2">Spotify Playlist Importer</h3>
-            <p class="text-xs text-tune-textSecondary leading-relaxed">
-              Migrate away from streaming without losing your curation. Paste any public playlist link; Tune parses the tracklist and matches available audio files in your local folders.
+            <div class="num-tabular" style="font-size: 10px; color: var(--text-muted); margin-bottom: var(--space-1);">TOUCH PHYSICS</div>
+            <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text); margin-bottom: var(--space-2);">
+              Swipe gestures & haptics
+            </h3>
+            <p style="font-size: var(--text-xs); color: var(--text-2); line-height: var(--leading-body);">
+              Swipe album artwork left or right with resistance spring physics to change tracks. Integrated with Capacitor Haptics on Android for tactile confirmation on presses and likes.
             </p>
           </div>
-          <div class="mt-6 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-tune-accent">
-            <span>Zero API Keys</span>
-            <span>Fuzzy Matcher</span>
+
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); border-top: 1px solid var(--border); padding-top: var(--space-3); margin-top: var(--space-4);">
+            Capacitor Haptic Feedback
           </div>
         </div>
 
-        <!-- Feature 4: Mobile Gestures & Haptics -->
-        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
+        <!-- Bento Cell 4: 7-col Cell (Spotify Playlist Importer) -->
+        <div class="surface-panel" style="grid-column: span 7; border-radius: var(--radius-md); padding: var(--space-6); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-2">Mobile Physics</div>
-            <h3 class="text-base font-bold text-white mb-2">Inertial Swipe & Haptics</h3>
-            <p class="text-xs text-tune-textSecondary leading-relaxed">
-              Swipe album art left or right to skip tracks with resistance physics. Subtle vibration pulses via Capacitor Haptics deliver tactile confirmation on Android.
+            <div class="num-tabular" style="font-size: 10px; color: var(--text-muted); margin-bottom: var(--space-1);">STREAMING MIGRATION</div>
+            <h3 style="font-size: var(--text-xl); font-weight: 700; color: var(--text); margin-bottom: var(--space-2);">
+              Spotify playlist parser & local matcher
+            </h3>
+            <p style="font-size: var(--text-sm); color: var(--text-2); margin-bottom: var(--space-4);">
+              Paste any public Spotify playlist URL into Tune. The scraper extracts the tracklist and runs fuzzy-string matching against your offline storage folders to reconstruct playlists locally.
             </p>
           </div>
-          <div class="mt-6 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-tune-accent">
-            <span>Touch Physics</span>
-            <span>Android Haptics</span>
-          </div>
-        </div>
 
-        <!-- Feature 5: Smart Auto-Playlists -->
-        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
-          <div>
-            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-2">Automated Curation</div>
-            <h3 class="text-base font-bold text-white mb-2">Algorithmic Playlists</h3>
-            <p class="text-xs text-tune-textSecondary leading-relaxed">
-              Dynamically generated smart collections computed locally: <strong>Most Played</strong> (weighted by play counts), <strong>Recently Added</strong> (file mtime), and <strong>Recently Played</strong>.
-            </p>
-          </div>
-          <div class="mt-6 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-tune-accent">
-            <span>Local Indexing</span>
-            <span>Zero Manual Sorting</span>
-          </div>
-        </div>
-
-        <!-- Feature 6: Mini Player & Global Keys -->
-        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
-          <div>
-            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-2">Desktop Integration</div>
-            <h3 class="text-base font-bold text-white mb-2">Always-on-Top Mini Player</h3>
-            <p class="text-xs text-tune-textSecondary leading-relaxed">
-              Compact floating widget for multitasking. Includes Windows global media keys support (Play/Pause, Next, Previous) and Discord Rich Presence integration.
-            </p>
-          </div>
-          <div class="mt-6 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-tune-accent">
-            <span>Global Media Keys</span>
-            <span>Discord RPC</span>
+          <div style="display: flex; gap: var(--space-3); font-family: var(--font-mono); font-size: 11px; color: var(--text-2); border-top: 1px solid var(--border); padding-top: var(--space-3);">
+            <div>Zero Spotify credentials required</div>
+            <div>•</div>
+            <div>100% Client-side matching</div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Section 4: Honest Objective Comparison -->
-  <section id="compare" class="py-20 sm:py-28 border-t border-white/[0.06] bg-[#09090d]">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- Section 4: Architectural Ledger / Spec Sheet (§6 Pattern 4) -->
+  <section id="ledger" style="border-top: 1px solid var(--border); padding: var(--space-16) 0; background: var(--bg-canvas);">
+    <div style="max-width: 1000px; margin: 0 auto; padding: 0 var(--space-4);">
       
-      <div class="max-w-2xl mb-12 text-left">
-        <div class="text-xs font-mono uppercase tracking-widest text-tune-accent mb-2">Architectural Audit</div>
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-          How Tune compares.
+      <div style="max-width: 600px; margin-bottom: var(--space-8);">
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: var(--tracking-caps); margin-bottom: var(--space-2);">
+          Architectural Audit
+        </div>
+        <h2 style="font-size: var(--text-3xl); font-weight: 800; color: var(--text); margin-bottom: var(--space-3);">
+          Objective system comparison.
         </h2>
-        <p class="mt-3 text-sm text-tune-textSecondary leading-relaxed">
-          Comparing architecture, privacy, and audio fidelity against streaming services and default players.
+        <p style="font-size: var(--text-sm); color: var(--text-2);">
+          Direct comparison of resource footprints, privacy guarantees, and audio signal pipelines.
         </p>
       </div>
 
-      <div class="rounded-2xl border border-white/[0.08] overflow-hidden bg-tune-card">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs sm:text-sm">
-            <thead>
-              <tr class="border-b border-white/[0.08] bg-[#0e0e13]">
-                <th class="p-4 sm:p-5 font-mono text-[11px] uppercase tracking-wider text-tune-textMuted">Attribute</th>
-                <th class="p-4 sm:p-5 font-bold text-white bg-tune-accent/[0.08] border-x border-white/[0.06]">
-                  <div class="flex items-center gap-2">
-                    <img src="logo.png" alt="Tune" class="w-4 h-4 object-contain" />
-                    <span>Tune</span>
-                  </div>
-                </th>
-                <th class="p-4 sm:p-5 font-semibold text-tune-textMuted">Spotify</th>
-                <th class="p-4 sm:p-5 font-semibold text-tune-textMuted">Default Media Player</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-white/[0.06] font-mono text-xs">
-              <tr>
-                <td class="p-4 sm:p-5 font-sans font-medium text-white">Playback Model</td>
-                <td class="p-4 sm:p-5 text-tune-accent font-semibold bg-tune-accent/[0.08] border-x border-white/[0.06]">
-                  100% Local / Offline
-                </td>
-                <td class="p-4 sm:p-5 text-rose-400">Stream-First (DRM cached)</td>
-                <td class="p-4 sm:p-5 text-tune-textSecondary">Local File System</td>
-              </tr>
-              <tr>
-                <td class="p-4 sm:p-5 font-sans font-medium text-white">Pricing / Monetization</td>
-                <td class="p-4 sm:p-5 text-tune-accent font-semibold bg-tune-accent/[0.08] border-x border-white/[0.06]">
-                  Free / Open Source (MIT)
-                </td>
-                <td class="p-4 sm:p-5 text-rose-400">$11.99 / mo subscription</td>
-                <td class="p-4 sm:p-5 text-tune-textSecondary">Bundled with OS</td>
-              </tr>
-              <tr>
-                <td class="p-4 sm:p-5 font-sans font-medium text-white">Equalizer Pipeline</td>
-                <td class="p-4 sm:p-5 text-tune-accent font-semibold bg-tune-accent/[0.08] border-x border-white/[0.06]">
-                  10-Band Cascaded Biquad
-                </td>
-                <td class="p-4 sm:p-5 text-tune-textSecondary">Basic 6-Band</td>
-                <td class="p-4 sm:p-5 text-rose-400">None or Basic Presets</td>
-              </tr>
-              <tr>
-                <td class="p-4 sm:p-5 font-sans font-medium text-white">Lyrics Synchronization</td>
-                <td class="p-4 sm:p-5 text-tune-accent font-semibold bg-tune-accent/[0.08] border-x border-white/[0.06]">
-                  Auto + Custom .LRC File Support
-                </td>
-                <td class="p-4 sm:p-5 text-tune-textSecondary">Server-gated Musixmatch</td>
-                <td class="p-4 sm:p-5 text-rose-400">Not Supported</td>
-              </tr>
-              <tr>
-                <td class="p-4 sm:p-5 font-sans font-medium text-white">Privacy & Telemetry</td>
-                <td class="p-4 sm:p-5 text-tune-accent font-semibold bg-tune-accent/[0.08] border-x border-white/[0.06]">
-                  0 Telemetry Packets
-                </td>
-                <td class="p-4 sm:p-5 text-rose-400">Ad Identifiers & Listening Logs</td>
-                <td class="p-4 sm:p-5 text-tune-textSecondary">OS Diagnostics</td>
-              </tr>
-              <tr>
-                <td class="p-4 sm:p-5 font-sans font-medium text-white">RAM Consumption</td>
-                <td class="p-4 sm:p-5 text-tune-accent font-semibold bg-tune-accent/[0.08] border-x border-white/[0.06]">
-                  ~65 MB (Idle)
-                </td>
-                <td class="p-4 sm:p-5 text-rose-400">650 MB - 1.2 GB</td>
-                <td class="p-4 sm:p-5 text-tune-textSecondary">~120 MB</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <!-- Ledger / Spec Sheet Table (28% label column, tabular numbers) -->
+      <div class="surface-panel" style="border-radius: var(--radius-md); overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--text-xs);">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border); background: var(--bg-subtle);">
+              <th style="width: 28%; padding: var(--space-4); font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: var(--tracking-caps);">Metric</th>
+              <th style="padding: var(--space-4); color: var(--accent); font-weight: 700; background: var(--accent-subtle);">Tune (This App)</th>
+              <th style="padding: var(--space-4); color: var(--text-muted);">Spotify Desktop</th>
+              <th style="padding: var(--space-4); color: var(--text-muted);">OS Media Player</th>
+            </tr>
+          </thead>
+          <tbody style="divide-y: 1px solid var(--border);">
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: var(--space-4); font-weight: 600; color: var(--text);">Playback Architecture</td>
+              <td style="padding: var(--space-4); color: var(--accent); font-weight: 600; background: var(--accent-subtle);">100% Local / Offline</td>
+              <td style="padding: var(--space-4); color: var(--danger);">DRM Encrypted Stream</td>
+              <td style="padding: var(--space-4); color: var(--text-2);">Local Files</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: var(--space-4); font-weight: 600; color: var(--text);">Equalizer Precision</td>
+              <td style="padding: var(--space-4); color: var(--accent); font-weight: 600; background: var(--accent-subtle);">10-Band Biquad (Q=1.414)</td>
+              <td style="padding: var(--space-4); color: var(--text-2);">Basic 6-Band</td>
+              <td style="padding: var(--space-4); color: var(--danger);">None or Presets</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: var(--space-4); font-weight: 600; color: var(--text);">Synced Karaoke Lyrics</td>
+              <td style="padding: var(--space-4); color: var(--accent); font-weight: 600; background: var(--accent-subtle);">LRC Parser + Upload</td>
+              <td style="padding: var(--space-4); color: var(--text-2);">Online Gated</td>
+              <td style="padding: var(--space-4); color: var(--danger);">Not Supported</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: var(--space-4); font-weight: 600; color: var(--text);">Memory Consumption</td>
+              <td class="num-tabular" style="padding: var(--space-4); color: var(--accent); font-weight: 600; background: var(--accent-subtle);">~65 MB (Idle)</td>
+              <td class="num-tabular" style="padding: var(--space-4); color: var(--danger);">650 MB - 1.2 GB</td>
+              <td class="num-tabular" style="padding: var(--space-4); color: var(--text-2);">~120 MB</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: var(--space-4); font-weight: 600; color: var(--text);">Outbound Telemetry</td>
+              <td class="num-tabular" style="padding: var(--space-4); color: var(--accent); font-weight: 600; background: var(--accent-subtle);">0 packets</td>
+              <td style="padding: var(--space-4); color: var(--danger);">Tracking & Listening Logs</td>
+              <td style="padding: var(--space-4); color: var(--text-2);">OS Diagnostics</td>
+            </tr>
+            <tr>
+              <td style="padding: var(--space-4); font-weight: 600; color: var(--text);">License & Pricing</td>
+              <td style="padding: var(--space-4); color: var(--accent); font-weight: 600; background: var(--accent-subtle);">MIT Open Source (Free)</td>
+              <td style="padding: var(--space-4); color: var(--danger);">$11.99 / mo subscription</td>
+              <td style="padding: var(--space-4); color: var(--text-2);">OS Bundled</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </section>
 
-  <!-- Section 5: Keyboard Shortcuts HUD -->
-  <section id="shortcuts" class="py-16 sm:py-24 border-t border-white/[0.06]">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- Section 5: Platform Binaries & Downloads (§8: Verbs + Nouns) -->
+  <section id="downloads" style="border-top: 1px solid var(--border); padding: var(--space-16) 0;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 var(--space-4);">
       
-      <div class="text-center max-w-xl mx-auto mb-10">
-        <div class="text-xs font-mono uppercase tracking-widest text-tune-accent mb-2">Designed for Velocity</div>
-        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Desktop Keyboard Navigation</h2>
-        <p class="mt-2 text-xs sm:text-sm text-tune-textSecondary">
-          Control playback instantly without lifting your hands from the keyboard.
+      <div style="max-width: 600px; margin-bottom: var(--space-8);">
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: var(--tracking-caps); margin-bottom: var(--space-2);">
+          Self-Contained Binaries
+        </div>
+        <h2 style="font-size: var(--text-3xl); font-weight: 800; color: var(--text); margin-bottom: var(--space-3);">
+          Download Tune.
+        </h2>
+        <p style="font-size: var(--text-sm); color: var(--text-2);">
+          Select your target architecture below. Standard standalone installers with zero background updaters or telemetry services.
         </p>
       </div>
 
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
-          <span class="text-xs text-tune-textSecondary">Play / Pause</span>
-          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">Space</kbd>
-        </div>
-
-        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
-          <span class="text-xs text-tune-textSecondary">Seek -5 Seconds</span>
-          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">J</kbd>
-        </div>
-
-        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
-          <span class="text-xs text-tune-textSecondary">Seek +5 Seconds</span>
-          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">L</kbd>
-        </div>
-
-        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
-          <span class="text-xs text-tune-textSecondary">Toggle Mute</span>
-          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">M</kbd>
-        </div>
-
-        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
-          <span class="text-xs text-tune-textSecondary">Search Library</span>
-          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">F</kbd>
-        </div>
-
-        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
-          <span class="text-xs text-tune-textSecondary">Equalizer Panel</span>
-          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">E</kbd>
-        </div>
-
-        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
-          <span class="text-xs text-tune-textSecondary">Toggle Shuffle</span>
-          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">S</kbd>
-        </div>
-
-        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
-          <span class="text-xs text-tune-textSecondary">Keyboard Help</span>
-          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">?</kbd>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Section 6: Direct Platform Downloads -->
-  <section id="download" class="py-20 sm:py-28 border-t border-white/[0.06] bg-[#09090d]">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="text-center max-w-2xl mx-auto mb-14">
-        <div class="text-xs font-mono uppercase tracking-widest text-tune-accent mb-2">Self-Contained Binaries</div>
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Download Tune</h2>
-        <p class="mt-3 text-sm text-tune-textSecondary">
-          Free and open-source. Select your platform below.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-4);">
         
-        <!-- Windows Card -->
-        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
+        <!-- Windows Spec Card -->
+        <div class="surface-panel" style="border-radius: var(--radius-md); padding: var(--space-6); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mb-5">
-              <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
-              </svg>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3);">
+              <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text);">Windows</h3>
+              <span class="num-tabular" style="font-size: 10px; padding: 2px 6px; border-radius: var(--radius-xs); background: var(--bg-subtle); color: var(--text-muted); border: 1px solid var(--border);">x64</span>
             </div>
-            <h3 class="text-lg font-bold text-white mb-1">Windows</h3>
-            <p class="text-xs text-tune-textSecondary mb-4">
-              Native desktop build with Mini-Player, Windows Global Media Keys, and automatic folder watcher.
+            <p style="font-size: var(--text-xs); color: var(--text-2); margin-bottom: var(--space-4); line-height: var(--leading-body);">
+              Desktop binary with floating mini-player, Windows media keys daemon, and Discord Rich Presence integration.
             </p>
-            <div class="text-[11px] font-mono text-tune-textMuted space-y-1 mb-6">
-              <div>• Windows 10 & 11 (x64)</div>
-              <div>• Package: NSIS Setup / Portable</div>
-              <div>• SHA-256 Verified Release</div>
+            <div class="num-tabular" style="font-size: 11px; color: var(--text-muted); margin-bottom: var(--space-6); line-height: 1.6;">
+              <div>• Windows 10 & 11 (64-bit)</div>
+              <div>• Standard NSIS Setup & Portable ZIP</div>
+              <div>• Package size: ~85 MB</div>
             </div>
           </div>
 
-          <div class="space-y-2">
-            <a 
-              href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" 
-              class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-tune-accent hover:bg-tune-accentHover text-black text-xs font-bold transition shadow-sm active:scale-95"
-            >
-              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-              <span>Download (.EXE)</span>
+          <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+            <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" class="btn-action btn-primary" style="padding: var(--space-3) var(--space-4); font-size: var(--text-xs);">
+              <span>Download for Windows (.exe)</span>
             </a>
-            <a 
-              href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" 
-              class="w-full flex items-center justify-center py-1.5 text-[11px] font-mono text-tune-textMuted hover:text-white transition"
-            >
-              <span>View Portable (.zip) Releases ↗</span>
+            <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" class="num-tabular" style="text-align: center; font-size: 11px; color: var(--text-muted); text-decoration: none; padding: 4px 0;">
+              View portable release archive ↗
             </a>
           </div>
         </div>
 
-        <!-- Android Card -->
-        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
+        <!-- Android Spec Card -->
+        <div class="surface-panel" style="border-radius: var(--radius-md); padding: var(--space-6); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-5">
-              <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4116 13.8533 8.083 12 8.083c-1.8534 0-3.5903.3286-5.1367.8667L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>
-              </svg>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3);">
+              <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text);">Android</h3>
+              <span class="num-tabular" style="font-size: 10px; padding: 2px 6px; border-radius: var(--radius-xs); background: var(--bg-subtle); color: var(--text-muted); border: 1px solid var(--border);">ARM64</span>
             </div>
-            <h3 class="text-lg font-bold text-white mb-1">Android</h3>
-            <p class="text-xs text-tune-textSecondary mb-4">
-              Touchscreen optimized with album art inertial swipe physics, Capacitor haptic vibration, and lockscreen controls.
+            <p style="font-size: var(--text-xs); color: var(--text-2); margin-bottom: var(--space-4); line-height: var(--leading-body);">
+              Touch-optimized APK with album art inertial swipe physics, haptic feedback pulses, and lockscreen media notifications.
             </p>
-            <div class="text-[11px] font-mono text-tune-textMuted space-y-1 mb-6">
+            <div class="num-tabular" style="font-size: 11px; color: var(--text-muted); margin-bottom: var(--space-6); line-height: 1.6;">
               <div>• Android 8.0 (API 26) or newer</div>
-              <div>• Direct Sideload (.apk)</div>
-              <div>• Background Audio + Notification Bar</div>
+              <div>• Direct standalone sideload APK</div>
+              <div>• Package size: ~15 MB</div>
             </div>
           </div>
 
-          <div class="space-y-2">
-            <a 
-              href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" 
-              class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-tune-accent hover:bg-tune-accentHover text-black text-xs font-bold transition shadow-sm active:scale-95"
-            >
-              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-              <span>Download APK</span>
+          <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+            <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" class="btn-action btn-primary" style="padding: var(--space-3) var(--space-4); font-size: var(--text-xs);">
+              <span>Download APK for Android</span>
             </a>
-            <a 
-              href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases" 
-              class="w-full flex items-center justify-center py-1.5 text-[11px] font-mono text-tune-textMuted hover:text-white transition"
-            >
-              <span>View Release Notes ↗</span>
+            <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases" class="num-tabular" style="text-align: center; font-size: 11px; color: var(--text-muted); text-decoration: none; padding: 4px 0;">
+              View changelog & releases ↗
             </a>
           </div>
         </div>
 
-        <!-- Build from Source Card -->
-        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
+        <!-- Source Build Spec Card -->
+        <div class="surface-panel" style="border-radius: var(--radius-md); padding: var(--space-6); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mb-5">
-              <svg class="w-6 h-6 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-              </svg>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3);">
+              <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text);">Source Build</h3>
+              <span class="num-tabular" style="font-size: 10px; padding: 2px 6px; border-radius: var(--radius-xs); background: var(--bg-subtle); color: var(--text-muted); border: 1px solid var(--border);">Git</span>
             </div>
-            <h3 class="text-lg font-bold text-white mb-1">Build from Source</h3>
-            <p class="text-xs text-tune-textSecondary mb-4">
-              Compile Tune on your own machine. Requires Node.js 18+ and standard developer toolchains.
+            <p style="font-size: var(--text-xs); color: var(--text-2); margin-bottom: var(--space-4); line-height: var(--leading-body);">
+              Compile Tune on your own hardware using Node 18+ and Electron Builder toolchains.
             </p>
-            <div class="p-2.5 rounded-lg bg-black/60 border border-white/[0.06] text-[10px] font-mono text-tune-textSecondary space-y-1 mb-6">
-              <div class="text-tune-accent">$ git clone https://github.com/...</div>
+            <div class="surface-subtle num-tabular" style="padding: var(--space-3); border-radius: var(--radius-xs); font-size: 10px; color: var(--text-2); margin-bottom: var(--space-6); line-height: 1.6;">
+              <div style="color: var(--accent);">$ git clone https://github.com/...</div>
               <div>$ npm install</div>
               <div>$ npm run electron:build</div>
             </div>
           </div>
 
-          <div class="space-y-2">
-            <a 
-              href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player" 
-              target="_blank" 
-              class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-white text-xs font-bold transition border border-white/[0.08] active:scale-95"
-            >
-              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
-              </svg>
-              <span>GitHub Repository</span>
+          <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+            <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player" target="_blank" class="btn-action btn-secondary" style="padding: var(--space-3) var(--space-4); font-size: var(--text-xs);">
+              <span>Open GitHub repository</span>
             </a>
-            <a 
-              href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player#build-from-source" 
-              target="_blank" 
-              class="w-full flex items-center justify-center py-1.5 text-[11px] font-mono text-tune-textMuted hover:text-white transition"
-            >
-              <span>Compilation Guide ↗</span>
+            <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player#build-from-source" target="_blank" class="num-tabular" style="text-align: center; font-size: 11px; color: var(--text-muted); text-decoration: none; padding: 4px 0;">
+              Read compilation instructions ↗
             </a>
           </div>
         </div>
@@ -1052,95 +789,174 @@
     </div>
   </section>
 
-  <!-- Section 7: Technical FAQ -->
-  <section id="faq" class="py-20 sm:py-28 border-t border-white/[0.06]">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- Section 6: Technical FAQ (§8: Concise answers, no "Oops") -->
+  <section style="border-top: 1px solid var(--border); padding: var(--space-16) 0; background: var(--bg-canvas);">
+    <div style="max-width: 800px; margin: 0 auto; padding: 0 var(--space-4);">
       
-      <div class="text-left mb-12">
-        <div class="text-xs font-mono uppercase tracking-widest text-tune-accent mb-2">Technical Questions</div>
-        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">FAQ</h2>
+      <div style="margin-bottom: var(--space-8);">
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: var(--tracking-caps); margin-bottom: var(--space-2);">
+          System Details
+        </div>
+        <h2 style="font-size: var(--text-3xl); font-weight: 800; color: var(--text); margin-bottom: var(--space-3);">
+          Frequently asked questions.
+        </h2>
       </div>
 
-      <div class="space-y-3">
-        <div class="p-5 rounded-xl bg-tune-card border border-white/[0.06]">
-          <h4 class="text-sm font-bold text-white mb-1.5">Where is library and playback data stored?</h4>
-          <p class="text-xs text-tune-textSecondary leading-relaxed">
-            All database tables, playlist indices, and track configurations are persisted in local browser storage (IndexedDB) or local JSON application state within the user's OS AppData directory. Nothing is synchronized to any external server.
+      <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+        <div class="surface-panel" style="padding: var(--space-5); border-radius: var(--radius-md);">
+          <h4 style="font-size: var(--text-sm); font-weight: 700; color: var(--text); margin-bottom: var(--space-1);">Does Tune send telemetry or audio metrics?</h4>
+          <p style="font-size: var(--text-xs); color: var(--text-2); line-height: var(--leading-body);">
+            No. The application contains zero telemetry daemons, tracking pixels, or user behavior analytics. All database indexes, listening history, and playlist tables reside strictly on your local disk.
           </p>
         </div>
 
-        <div class="p-5 rounded-xl bg-tune-card border border-white/[0.06]">
-          <h4 class="text-sm font-bold text-white mb-1.5">Does the 10-band equalizer introduce phase distortion?</h4>
-          <p class="text-xs text-tune-textSecondary leading-relaxed">
-            No. The equalizer utilizes standard second-order biquadratic filter nodes provided natively by the Web Audio specification. With Q-factors clamped to 1.414, transitions between octave bands remain smooth without audible ringing or phase cancellation.
+        <div class="surface-panel" style="padding: var(--space-5); border-radius: var(--radius-md);">
+          <h4 style="font-size: var(--text-sm); font-weight: 700; color: var(--text); margin-bottom: var(--space-1);">Which audio codecs are decoded natively?</h4>
+          <p style="font-size: var(--text-xs); color: var(--text-2); line-height: var(--leading-body);">
+            Tune decodes FLAC (up to 24-bit 192kHz), ALAC, WAV, MP3 (CBR/VBR up to 320kbps), M4A, AAC, OGG, and OPUS audio formats without forced downsampling.
           </p>
         </div>
 
-        <div class="p-5 rounded-xl bg-tune-card border border-white/[0.06]">
-          <h4 class="text-sm font-bold text-white mb-1.5">How does Tune handle album cover fetching?</h4>
-          <p class="text-xs text-tune-textSecondary leading-relaxed">
-            Tune first extracts embedded APIC / ID3 picture frames directly from your audio files. If absent, you can trigger the Tag Editor's iTunes Lookup, which fetches artwork directly from Apple's public catalog without needing an account.
-          </p>
-        </div>
-
-        <div class="p-5 rounded-xl bg-tune-card border border-white/[0.06]">
-          <h4 class="text-sm font-bold text-white mb-1.5">Is Tune free of telemetry and analytics?</h4>
-          <p class="text-xs text-tune-textSecondary leading-relaxed">
-            Yes. There are zero analytics SDKs (no Google Analytics, no Sentry, no Mixpanel, no PostHog). The only network calls made by the application are direct fetches to lrclib.net (for lyrics) and itunes.apple.com (for tags), both of which can be completely avoided in offline mode.
+        <div class="surface-panel" style="padding: var(--space-5); border-radius: var(--radius-md);">
+          <h4 style="font-size: var(--text-sm); font-weight: 700; color: var(--text); margin-bottom: var(--space-1);">How does the Spotify playlist importer operate offline?</h4>
+          <p style="font-size: var(--text-xs); color: var(--text-2); line-height: var(--leading-body);">
+            It scrapes public track titles and artist names from the shared URL and executes a client-side fuzzy match against your local audio files. Missing files are flagged so you can populate your offline folder.
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Clean Footer with Real Logo -->
-  <footer class="py-12 border-t border-white/[0.06] bg-[#050507] text-xs text-tune-textMuted">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+  <!-- Footer: Minimalist Hairline Bar (§8) -->
+  <footer style="border-top: 1px solid var(--border); padding: var(--space-8) 0; background: var(--bg-canvas); font-size: var(--text-xs); color: var(--text-muted);">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 var(--space-4); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4);">
       
-      <!-- Logo + Copyright -->
-      <div class="flex items-center gap-3">
-        <img src="logo.png" alt="Tune" class="w-6 h-6 rounded object-contain" />
-        <div class="flex items-baseline gap-1">
-          <span class="font-extrabold text-white lowercase">tune<span class="text-tune-accent">.</span></span>
-          <span class="text-[10px] font-mono text-tune-textMuted ml-1">— Open Source (MIT)</span>
+      <div style="display: flex; align-items: center; gap: var(--space-3);">
+        <img src="logo.png" alt="Tune logo" style="width: 20px; height: 20px; object-fit: contain;" />
+        <div style="display: flex; align-items: baseline; gap: 4px;">
+          <strong style="color: var(--text); font-weight: 700;">tune</strong>
+          <span>— Open-source audio player (MIT License)</span>
         </div>
       </div>
 
-      <!-- Links -->
-      <div class="flex items-center gap-6 font-mono text-[11px]">
-        <a href="#workstation" class="hover:text-white transition">Workstation</a>
-        <a href="#dsp-pipeline" class="hover:text-white transition">DSP Pipeline</a>
-        <a href="#download" class="hover:text-white transition">Downloads</a>
-        <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player" target="_blank" class="hover:text-white transition">GitHub</a>
-        <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/issues" target="_blank" class="hover:text-white transition">Issues</a>
+      <div style="display: flex; gap: var(--space-6); font-family: var(--font-mono); font-size: 11px;">
+        <a href="#workstation" style="color: inherit; text-decoration: none;">Workstation</a>
+        <a href="#signal-chain" style="color: inherit; text-decoration: none;">Signal chain</a>
+        <a href="#downloads" style="color: inherit; text-decoration: none;">Binaries</a>
+        <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player" target="_blank" style="color: inherit; text-decoration: none;">GitHub</a>
+        <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/issues" target="_blank" style="color: inherit; text-decoration: none;">Issue tracker</a>
       </div>
     </div>
   </footer>
 
-  <!-- OS Auto-Detection Script -->
+  <!-- Interactive Equalizer Canvas & OS Detection Script -->
   <script>
     (function () {
+      // 1. Equalizer Curve Simulation on Canvas
+      const canvas = document.getElementById('eq-canvas');
+      if (canvas && canvas.getContext) {
+        const ctx = canvas.getContext('2d');
+        let currentGains = [4, 6, 3, 0, -1, 1, 3, 4, 3, 1]; // Bass boost initial
+        let targetGains = [4, 6, 3, 0, -1, 1, 3, 4, 3, 1];
+
+        const presets = {
+          flat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          bass: [5, 7, 4, 1, -1, 0, 1, 3, 2, 1],
+          vocal: [-2, -1, 0, 2, 4, 4, 2, 0, -1, -2]
+        };
+
+        function setPreset(name) {
+          targetGains = presets[name] || presets.flat;
+          document.querySelectorAll('#eq-preset-flat, #eq-preset-bass, #eq-preset-vocal').forEach(b => {
+            b.style.background = 'var(--bg-muted)';
+            b.style.color = 'var(--text)';
+          });
+          const activeBtn = document.getElementById('eq-preset-' + name);
+          if (activeBtn) {
+            activeBtn.style.background = 'var(--accent)';
+            activeBtn.style.color = 'var(--accent-fg)';
+          }
+        }
+
+        document.getElementById('eq-preset-flat')?.addEventListener('click', () => setPreset('flat'));
+        document.getElementById('eq-preset-bass')?.addEventListener('click', () => setPreset('bass'));
+        document.getElementById('eq-preset-vocal')?.addEventListener('click', () => setPreset('vocal'));
+
+        function drawCurve() {
+          const w = canvas.width;
+          const h = canvas.height;
+          ctx.clearRect(0, 0, w, h);
+
+          // Center reference line (0 dB)
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(0, h / 2);
+          ctx.lineTo(w, h / 2);
+          ctx.stroke();
+
+          // Interpolate gains smoothly
+          for (let i = 0; i < currentGains.length; i++) {
+            currentGains[i] += (targetGains[i] - currentGains[i]) * 0.1;
+          }
+
+          // Draw Biquad Frequency Curve
+          ctx.strokeStyle = '#10b981';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+
+          const step = w / (currentGains.length - 1);
+          for (let i = 0; i < currentGains.length; i++) {
+            const x = i * step;
+            // Map ±12dB to canvas height
+            const y = (h / 2) - (currentGains[i] / 12) * (h * 0.38);
+            if (i === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              const prevX = (i - 1) * step;
+              const prevY = (h / 2) - (currentGains[i - 1] / 12) * (h * 0.38);
+              const cx = (prevX + x) / 2;
+              ctx.bezierCurveTo(cx, prevY, cx, y, x, y);
+            }
+          }
+          ctx.stroke();
+
+          // Draw node dots
+          for (let i = 0; i < currentGains.length; i++) {
+            const x = i * step;
+            const y = (h / 2) - (currentGains[i] / 12) * (h * 0.38);
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          requestAnimationFrame(drawCurve);
+        }
+        drawCurve();
+      }
+
+      // 2. OS Auto-Detection (frontend.md §8: Verbs + Nouns in CTA)
       const userAgent = navigator.userAgent || navigator.vendor || window.opera;
       const isAndroid = /android/i.test(userAgent);
       const isWindows = /windows nt/i.test(userAgent);
 
-      const heroBtn = document.getElementById('hero-primary-btn');
-      const heroTitle = document.getElementById('hero-primary-title');
-      const heroSpec = document.getElementById('hero-primary-spec');
-      const heroIcon = document.getElementById('hero-primary-icon');
-      const navCtaText = document.getElementById('nav-cta-text');
+      const heroCta = document.getElementById('hero-primary-cta');
+      const heroLabel = document.getElementById('hero-cta-label');
+      const heroIcon = document.getElementById('hero-cta-icon');
+      const navCta = document.getElementById('nav-cta');
 
       if (isAndroid) {
-        heroTitle.textContent = 'Download for Android';
-        heroSpec.textContent = 'Android 8.0+ • APK Sideload';
-        heroBtn.href = 'https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest';
-        navCtaText.textContent = 'Download APK';
-        heroIcon.innerHTML = '<path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4116 13.8533 8.083 12 8.083c-1.8534 0-3.5903.3286-5.1367.8667L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>';
+        heroLabel.textContent = 'Download APK for Android (15 MB)';
+        heroCta.href = 'https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest';
+        if (navCta) navCta.textContent = 'Download APK';
+        if (heroIcon) {
+          heroIcon.innerHTML = '<path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4116 13.8533 8.083 12 8.083c-1.8534 0-3.5903.3286-5.1367.8667L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>';
+        }
       } else if (isWindows) {
-        heroTitle.textContent = 'Download for Windows';
-        heroSpec.textContent = '64-bit Installer (.exe)';
-        heroBtn.href = 'https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest';
-        navCtaText.textContent = 'Download for Windows';
+        heroLabel.textContent = 'Download for Windows (64-bit .exe)';
+        heroCta.href = 'https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest';
+        if (navCta) navCta.textContent = 'Download for Windows';
       }
     })();
   </script>

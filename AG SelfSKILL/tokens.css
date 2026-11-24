@@ -1,0 +1,117 @@
+/* tokens.css — per-project design tokens. EDIT THE THREE "SET PER PROJECT" LINES.
+   Lightness and chroma steps below were checked for WCAG 2.2 AA at 24 hues
+   (0–345°, 15° steps), light and dark: text ≥ 4.5:1 on canvas and on subtle,
+   accent-fg ≥ 4.5:1 on accent. Out-of-gamut accents are clipped by the browser;
+   contrast was checked on the clipped values. Re-check if you change any L value. */
+
+:root {
+  color-scheme: light;
+
+  /* ===== SET PER PROJECT (derive from the product's domain, see frontend.md §2) ===== */
+  --hue: 250;          /* neutral tint hue: tint grays toward the brand, 0–360 */
+  --accent-hue: 250;   /* brand hue; may equal --hue or sit near it */
+  --font-display: "REPLACE", Georgia, serif;          /* chosen in frontend.md §4 */
+  --font-body: "REPLACE", system-ui, sans-serif;
+  --font-mono: "REPLACE", ui-monospace, monospace;
+  /* ========================================================================== */
+
+  /* Color roles, light */
+  --bg-canvas:   oklch(0.985 0.004 var(--hue));
+  --bg-surface:  oklch(1 0 0);
+  --bg-subtle:   oklch(0.945 0.006 var(--hue));
+  --bg-muted:    oklch(0.900 0.008 var(--hue));
+  --text:        oklch(0.200 0.012 var(--hue));
+  --text-2:      oklch(0.450 0.014 var(--hue));
+  --text-muted:  oklch(0.500 0.012 var(--hue));
+  --border:      oklch(0.880 0.008 var(--hue));
+  --border-strong: oklch(0.730 0.012 var(--hue));
+  --accent:      oklch(0.480 0.130 var(--accent-hue));
+  --accent-hover: oklch(from var(--accent) calc(l - 0.06) c h);
+  --accent-fg:   oklch(0.990 0.002 var(--accent-hue));
+  --accent-subtle: color-mix(in oklch, var(--accent) 10%, var(--bg-canvas));
+  --success: oklch(0.460 0.115 150);
+  --warning: oklch(0.540 0.115 70);
+  --danger:  oklch(0.520 0.190 25);
+  --focus-ring: var(--accent);
+
+  /* Type scale (fluid 375→1440). Ratio ~1.2 small end, ~1.25 large end. */
+  --text-xs:   clamp(0.75rem,  0.728rem + 0.094vw, 0.8125rem);
+  --text-sm:   clamp(0.875rem, 0.864rem + 0.047vw, 0.906rem);
+  --text-base: clamp(1rem,     0.978rem + 0.094vw, 1.0625rem);
+  --text-lg:   clamp(1.125rem, 1.081rem + 0.188vw, 1.25rem);
+  --text-xl:   clamp(1.3125rem,1.2025rem + 0.47vw, 1.625rem);
+  --text-2xl:  clamp(1.625rem, 1.405rem + 0.939vw, 2.25rem);
+  --text-3xl:  clamp(2rem,     1.648rem + 1.502vw, 3rem);
+  --text-4xl:  clamp(2.5rem,   1.972rem + 2.254vw, 4rem);
+  --leading-display: 1.08;  --leading-heading: 1.2;
+  --leading-ui: 1.35;       --leading-body: 1.6;
+  --tracking-display: -0.025em;  --tracking-heading: -0.015em;  --tracking-caps: 0.07em;
+
+  /* Spacing, 4px base */
+  --space-1: 0.25rem; --space-2: 0.5rem;  --space-3: 0.75rem; --space-4: 1rem;
+  --space-5: 1.25rem; --space-6: 1.5rem;  --space-8: 2rem;    --space-12: 3rem;
+  --space-16: 4rem;   --space-24: 6rem;   --space-32: 8rem;
+
+  /* Radius: nested radius = outer − padding. Change the set per brand
+     (sharp 0–2px, soft 8–12px), but keep the ratios. */
+  --radius-xs: 4px; --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; --radius-full: 9999px;
+
+  /* Elevation: one light source, tinted by --hue */
+  --shadow-sm: 0.5px 1px 1px oklch(0.2 0.015 var(--hue) / 0.06), 1px 2px 3px -0.5px oklch(0.2 0.015 var(--hue) / 0.05);
+  --shadow-md: 0.5px 1px 1px oklch(0.2 0.015 var(--hue) / 0.05), 1.5px 3px 4px -1px oklch(0.2 0.015 var(--hue) / 0.06), 3px 6px 10px -2px oklch(0.2 0.015 var(--hue) / 0.07);
+  --shadow-lg: 1px 2px 2px oklch(0.2 0.015 var(--hue) / 0.05), 3px 6px 8px -2px oklch(0.2 0.015 var(--hue) / 0.07), 6px 12px 20px -4px oklch(0.2 0.015 var(--hue) / 0.09);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 125ms; --dur-normal: 180ms; --dur-slow: 260ms;
+}
+
+:root[data-theme="dark"], .dark {
+  color-scheme: dark;
+  --bg-canvas:   oklch(0.160 0.006 var(--hue));
+  --bg-surface:  oklch(0.200 0.007 var(--hue));
+  --bg-subtle:   oklch(0.235 0.008 var(--hue));
+  --bg-muted:    oklch(0.285 0.010 var(--hue));
+  --text:        oklch(0.950 0.005 var(--hue));
+  --text-2:      oklch(0.730 0.008 var(--hue));
+  --text-muted:  oklch(0.640 0.008 var(--hue));
+  --border:      oklch(0.290 0.008 var(--hue));
+  --border-strong: oklch(0.400 0.012 var(--hue));
+  --accent:      oklch(0.740 0.130 var(--accent-hue));
+  --accent-hover: oklch(from var(--accent) calc(l + 0.05) c h);
+  --accent-fg:   oklch(0.160 0.010 var(--accent-hue));
+  --accent-subtle: color-mix(in oklch, var(--accent) 16%, var(--bg-canvas));
+  --success: oklch(0.730 0.145 150);
+  --warning: oklch(0.800 0.140 78);
+  --danger:  oklch(0.680 0.185 25);
+  /* Dark: surfaces step up in lightness instead of casting shadows */
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.45), inset 0 1px 0 oklch(1 0 0 / 0.04);
+  --shadow-md: 0 4px 12px oklch(0 0 0 / 0.55), inset 0 1px 0 oklch(1 0 0 / 0.05);
+  --shadow-lg: 0 12px 32px oklch(0 0 0 / 0.65), inset 0 1px 0 oklch(1 0 0 / 0.06);
+}
+
+/* ---- Example hue pairs (starting points only; never copy without the §2 check) ----
+   Oxblood  --hue:65  --accent-hue:20     warm paper + deep red
+   Pine     --hue:145 --accent-hue:155    sage paper + green
+   Graphite --hue:260 --accent-hue:168    dark mode, mint accent
+   Navy     --hue:240 --accent-hue:82     dark mode, amber accent (raise accent L to ~0.80)
+   Vermilion--hue:250 --accent-hue:28     cool gray + red
+   Safety orange needs L ≤ 0.50 for text-size use; at 0.56 it only passes 3:1. */
+
+/* Tailwind v4 bridge (put in app.css, after @import "tailwindcss"; @import "./tokens.css";)
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+@theme inline {
+  --color-canvas: var(--bg-canvas);  --color-surface: var(--bg-surface);
+  --color-subtle: var(--bg-subtle);  --color-muted: var(--bg-muted);
+  --color-ink: var(--text);          --color-ink-2: var(--text-2);  --color-ink-muted: var(--text-muted);
+  --color-line: var(--border);       --color-line-strong: var(--border-strong);
+  --color-accent: var(--accent);     --color-accent-hover: var(--accent-hover); --color-accent-fg: var(--accent-fg);
+  --color-success: var(--success);   --color-warning: var(--warning); --color-danger: var(--danger);
+  --font-display: var(--font-display); --font-sans: var(--font-body); --font-mono: var(--font-mono);
+}
+*/
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

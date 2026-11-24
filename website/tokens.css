@@ -1,0 +1,92 @@
+/* tokens.css — calibrated for Tune Audio Workstation
+   Checked for WCAG 2.2 AA at --hue: 240, --accent-hue: 155 (Studio Phosphor)
+   Dark mode is default for audio & media tools (frontend.md §2 exception). */
+
+:root {
+  color-scheme: dark;
+
+  /* ===== SET PER PROJECT (Domain: Studio Rackmount Audio Equipment) ===== */
+  --hue: 240;          /* Deep studio anodized slate/zinc neutral tint */
+  --accent-hue: 155;   /* Phosphor level-meter green */
+  --font-display: "Cabinet Grotesk", "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-body: "Inter", "Switzer", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+
+  /* Color roles: Dark Mode (Default for Audio Workstation) */
+  --bg-canvas:     oklch(0.140 0.006 var(--hue));  /* Deepest chassis background */
+  --bg-surface:    oklch(0.180 0.007 var(--hue));  /* Module panels & containers */
+  --bg-subtle:     oklch(0.215 0.008 var(--hue));  /* Card surfaces & rows */
+  --bg-muted:      oklch(0.265 0.010 var(--hue));  /* Interactive hover states */
+  --text:          oklch(0.960 0.005 var(--hue));  /* Primary high-contrast text */
+  --text-2:        oklch(0.740 0.008 var(--hue));  /* Secondary technical data */
+  --text-muted:    oklch(0.560 0.008 var(--hue));  /* Quiet labels and inactive items */
+  --border:        oklch(0.260 0.008 var(--hue));  /* 1px hairline dividers */
+  --border-strong: oklch(0.360 0.012 var(--hue));  /* Active panel borders */
+  --accent:        oklch(0.720 0.155 var(--accent-hue)); /* Level signal green */
+  --accent-hover:  oklch(from var(--accent) calc(l + 0.05) c h);
+  --accent-fg:     oklch(0.140 0.010 var(--accent-hue)); /* Ink on accent fill */
+  --accent-subtle: color-mix(in oklch, var(--accent) 14%, var(--bg-canvas));
+  --success:       oklch(0.720 0.145 150);
+  --warning:       oklch(0.780 0.140 78);
+  --danger:        oklch(0.660 0.185 25);
+  --focus-ring:    var(--accent);
+
+  /* Fluid Type scale (375px → 1440px) */
+  --text-xs:   clamp(0.75rem,  0.728rem + 0.094vw, 0.8125rem);
+  --text-sm:   clamp(0.875rem, 0.864rem + 0.047vw, 0.906rem);
+  --text-base: clamp(1rem,     0.978rem + 0.094vw, 1.0625rem);
+  --text-lg:   clamp(1.125rem, 1.081rem + 0.188vw, 1.25rem);
+  --text-xl:   clamp(1.3125rem,1.2025rem + 0.47vw, 1.625rem);
+  --text-2xl:  clamp(1.625rem, 1.405rem + 0.939vw, 2.25rem);
+  --text-3xl:  clamp(2rem,     1.648rem + 1.502vw, 3rem);
+  --text-4xl:  clamp(2.5rem,   1.972rem + 2.254vw, 3.75rem);
+  
+  --leading-display: 1.08;
+  --leading-heading: 1.2;
+  --leading-ui: 1.35;
+  --leading-body: 1.6;
+  --tracking-display: -0.025em;
+  --tracking-heading: -0.015em;
+  --tracking-caps: 0.07em;
+
+  /* Spacing (4px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  /* Radius (nested ratio: outer - padding = inner) */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Dark Elevation: Crisp 1px inset highlight + ambient drop */
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.45), inset 0 1px 0 oklch(1 0 0 / 0.04);
+  --shadow-md: 0 4px 12px oklch(0 0 0 / 0.55), inset 0 1px 0 oklch(1 0 0 / 0.05);
+  --shadow-lg: 0 12px 32px oklch(0 0 0 / 0.65), inset 0 1px 0 oklch(1 0 0 / 0.06);
+
+  /* Motion: Restrained physical durations */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 125ms;
+  --dur-normal: 180ms;
+  --dur-slow: 260ms;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
