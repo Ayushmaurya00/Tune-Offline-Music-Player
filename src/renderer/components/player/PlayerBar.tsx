@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ListMusic, Heart, Mic2, Sliders, Moon, Minimize2, Play, Pause, SkipForward, Repeat, Repeat1, Radio } from 'lucide-react';
+import { ListMusic, Heart, Mic2, Sliders, Moon, Minimize2, Maximize2, Play, Pause, SkipForward, Repeat, Repeat1, Radio } from 'lucide-react';
 import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { PlaybackControls } from './PlaybackControls';
@@ -59,7 +59,14 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   const isLiked = currentSong ? isSongLiked(currentSong.id) : false;
 
   return (
-    <footer className="relative h-20 md:h-24 bg-tune-surface/95 backdrop-blur-md border-t border-tune-border px-4 flex items-center justify-between select-none z-30 shadow-2xl">
+    <footer
+      onClick={() => {
+        if (currentSong) {
+          setIsMobileFullPlayerOpen(true);
+        }
+      }}
+      className="relative h-20 md:h-24 bg-tune-surface/95 backdrop-blur-md border-t border-tune-border px-4 flex items-center justify-between select-none z-30 shadow-2xl cursor-pointer"
+    >
       {/* Interactive top progress scrubber line for mobile */}
       <div
         className="md:hidden absolute -top-1.5 left-0 right-0 h-4 z-40 touch-none cursor-pointer flex items-center"
@@ -99,11 +106,12 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
       {/* Left: Now Playing Info */}
       <div
         onClick={() => {
-          if (currentSong && window.innerWidth < 768) {
+          if (currentSong) {
             setIsMobileFullPlayerOpen(true);
           }
         }}
-        className="flex items-center gap-3 w-auto md:w-1/4 min-w-0 md:min-w-[200px] flex-1 md:flex-initial cursor-pointer md:cursor-default"
+        className="flex items-center gap-3 w-auto md:w-1/4 min-w-0 md:min-w-[200px] flex-1 md:flex-initial cursor-pointer group/nowplaying"
+        title="Open Now Playing Screen"
       >
         {currentSong ? (
           <>
@@ -226,13 +234,19 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
       </div>
 
       {/* Center: Playback Controls & Waveform Seek Bar (Desktop) */}
-      <div className="hidden md:flex flex-col items-center gap-1.5 flex-1 max-w-xl px-4">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="hidden md:flex flex-col items-center gap-1.5 flex-1 max-w-xl px-4 cursor-default"
+      >
         <PlaybackControls />
         <WaveformSeekBar accentColor={accentColor} />
       </div>
 
       {/* Right: Controls, Lyrics, EQ, Queue & Volume (Desktop) */}
-      <div className="hidden md:flex items-center justify-end gap-2 w-1/3 min-w-[280px]">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="hidden md:flex items-center justify-end gap-2 w-1/3 min-w-[280px] cursor-default"
+      >
         {/* Playback Speed Selector */}
         <SpeedSelector accentColor={accentColor} />
 
@@ -268,6 +282,15 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
             <Radio size={18} />
           </button>
         )}
+
+        {/* Full-Screen Now Playing View Button */}
+        <button
+          onClick={() => setIsMobileFullPlayerOpen(true)}
+          className="p-2 rounded-lg transition hover:bg-tune-card text-tune-textSecondary hover:text-white"
+          title="Open Full Now Playing Screen (Poster & Controls)"
+        >
+          <Maximize2 size={18} />
+        </button>
 
         {/* Mini Player Mode Button */}
         <button

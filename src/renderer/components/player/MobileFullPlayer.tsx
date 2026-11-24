@@ -44,9 +44,19 @@ export const MobileFullPlayer: React.FC<MobileFullPlayerProps> = ({
 
   const isLiked = isSongLiked(currentSong.id);
 
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   return (
-    <div className="fixed inset-0 z-50 bg-[#0a0a0a]/98 backdrop-blur-2xl flex flex-col justify-between p-6 select-none animate-in slide-in-from-bottom duration-300">
-      {/* Top Header */}
+    <div className="fixed inset-0 z-50 bg-[#0a0a0a]/98 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 select-none animate-in slide-in-from-bottom duration-300 overflow-y-auto">
+      <div className="w-full max-w-md md:max-w-lg mx-auto flex flex-col justify-between h-full min-h-[580px]">
+        {/* Top Header */}
       <div className="flex items-center justify-between pt-2">
         <button
           onClick={onClose}
@@ -163,6 +173,7 @@ export const MobileFullPlayer: React.FC<MobileFullPlayerProps> = ({
           <ListMusic size={20} />
           <span>Queue</span>
         </button>
+      </div>
       </div>
     </div>
   );
