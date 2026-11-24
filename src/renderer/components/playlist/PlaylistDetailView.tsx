@@ -1,33 +1,64 @@
 import React from 'react';
-import { Play, Shuffle, Heart, Music } from 'lucide-react';
+import { Play, Shuffle, Heart, Music, Flame, Sparkles, Clock, ChevronLeft } from 'lucide-react';
 import { Song, Playlist } from '@/types/music';
 import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
+import { useLibraryStore } from '../../store/libraryStore';
 import { SongRow } from '../library/SongRow';
 import { formatDuration } from '../../utils/formatters';
+import {
+  getMostPlayedSongs,
+  getRecentlyAddedSongs,
+  getRecentlyPlayedSongs
+} from '../../services/smartPlaylistService';
 
 interface PlaylistDetailViewProps {
   isLikedView?: boolean;
+  smartType?: 'most-played' | 'recently-added' | 'recently-played';
   playlist?: Playlist;
   allSongs: Song[];
 }
 
 export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
   isLikedView = false,
+  smartType,
   playlist,
   allSongs
 }) => {
   const { playSong } = usePlayerStore();
   const { likedSongIds, removeSongFromPlaylist } = usePlaylistStore();
+  const { setActiveView } = useLibraryStore();
 
   let songs: Song[] = [];
   let title = 'Playlist';
   let description = '';
+  let badge = 'Playlist';
+  let icon = <Music size={48} className="sm:w-16 sm:h-16 text-white" />;
 
   if (isLikedView) {
     title = 'Liked Songs';
     description = 'Your favorite offline tracks in one place';
+    badge = 'Auto Collection';
+    icon = <Heart size={48} className="sm:w-16 sm:h-16 text-white" fill="white" />;
     songs = allSongs.filter((s) => likedSongIds.has(s.id));
+  } else if (smartType === 'most-played') {
+    title = 'Most Played';
+    description = 'Your highest-rotation offline tracks based on listening history';
+    badge = 'Smart Collection';
+    icon = <Flame size={48} className="sm:w-16 sm:h-16 text-orange-400 fill-orange-400/30" />;
+    songs = getMostPlayedSongs(allSongs);
+  } else if (smartType === 'recently-added') {
+    title = 'Recently Added';
+    description = 'Your newest scanned & imported offline audio tracks';
+    badge = 'Smart Collection';
+    icon = <Sparkles size={48} className="sm:w-16 sm:h-16 text-yellow-400" />;
+    songs = getRecentlyAddedSongs(allSongs);
+  } else if (smartType === 'recently-played') {
+    title = 'Recently Played';
+    description = 'Jump back into tracks from your latest listening sessions';
+    badge = 'Smart Collection';
+    icon = <Clock size={48} className="sm:w-16 sm:h-16 text-tune-accent" />;
+    songs = getRecentlyPlayedSongs(allSongs);
   } else if (playlist) {
     title = playlist.name;
     description = playlist.description || 'Custom Playlist';
@@ -53,18 +84,27 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
 
   return (
     <div className="flex-1 flex flex-col overflow-y-auto">
+      {/* Back button for smart collections and playlists */}
+      {(smartType || playlist) && (
+        <div className="px-4 sm:px-8 pt-4 pb-0">
+          <button
+            onClick={() => setActiveView('playlists')}
+            className="flex items-center gap-1.5 text-xs font-semibold text-tune-textSecondary hover:text-white transition"
+          >
+            <ChevronLeft size={16} />
+            <span>Back to Playlists</span>
+          </button>
+        </div>
+      )}
+
       <div className="p-4 sm:p-8 bg-gradient-to-b from-neutral-800/80 to-transparent flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6 text-center sm:text-left border-b border-tune-border/40">
-        <div className="w-32 h-32 sm:w-44 sm:h-44 rounded-xl bg-gradient-to-br from-tune-card to-neutral-800 border border-tune-border shadow-2xl flex items-center justify-center flex-shrink-0 text-white">
-          {isLikedView ? (
-            <Heart size={48} className="sm:w-16 sm:h-16 text-white" fill="white" />
-          ) : (
-            <Music size={48} className="sm:w-16 sm:h-16 text-white" />
-          )}
+        <div className="w-32 h-32 sm:w-44 sm:h-44 rounded-2xl bg-gradient-to-br from-tune-card to-neutral-800 border border-tune-border shadow-2xl flex items-center justify-center flex-shrink-0 text-white">
+          {icon}
         </div>
 
         <div className="flex flex-col gap-1.5 sm:gap-2 min-w-0">
           <span className="text-xs uppercase font-bold tracking-widest text-tune-textMuted">
-            {isLikedView ? 'Auto Playlist' : 'Playlist'}
+            {badge}
           </span>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight truncate">
             {title}

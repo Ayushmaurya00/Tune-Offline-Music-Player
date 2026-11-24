@@ -13,7 +13,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({
 }) => {
   const { activeView, setActiveView } = useLibraryStore();
 
-  const isPlaylistsActive = activeView === 'playlists' || activeView === 'playlist';
+  const isPlaylistsActive =
+    activeView === 'playlists' || activeView === 'playlist' || activeView.startsWith('smart-');
 
   return (
     <nav className="md:hidden flex items-center justify-around bg-tune-surface/98 backdrop-blur-lg border-t border-tune-border py-2 px-1 z-30 flex-shrink-0">

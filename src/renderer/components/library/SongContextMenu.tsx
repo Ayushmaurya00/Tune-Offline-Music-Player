@@ -8,7 +8,8 @@ import {
   Trash2,
   ChevronRight,
   Music2,
-  Plus
+  Plus,
+  Tag
 } from 'lucide-react';
 import { Song, Playlist } from '@/types/music';
 
@@ -23,6 +24,7 @@ interface SongContextMenuProps {
   onAddToQueue: () => void;
   onAddToPlaylist: (playlistId: string) => void;
   onCreatePlaylist?: () => void;
+  onEditTags?: () => void;
   onShowInFolder?: () => void;
   onDelete?: () => void;
 }
@@ -38,6 +40,7 @@ export const SongContextMenu: React.FC<SongContextMenuProps> = ({
   onAddToQueue,
   onAddToPlaylist,
   onCreatePlaylist,
+  onEditTags,
   onShowInFolder,
   onDelete
 }) => {
@@ -167,6 +170,20 @@ export const SongContextMenu: React.FC<SongContextMenuProps> = ({
       </div>
 
       <div className="my-1 border-t border-[#262626]" />
+
+      {/* Edit Tags */}
+      {onEditTags && (
+        <button
+          onClick={() => {
+            onEditTags();
+            onClose();
+          }}
+          className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg hover:bg-tune-card hover:text-tune-accent transition text-left"
+        >
+          <Tag size={14} className="text-tune-accent" />
+          <span>Edit Song Info</span>
+        </button>
+      )}
 
       {/* Show in Explorer */}
       {onShowInFolder && (

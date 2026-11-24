@@ -5,6 +5,7 @@ import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { AlbumArt } from '../shared/AlbumArt';
 import { SongContextMenu } from './SongContextMenu';
+import { TagEditorModal } from './TagEditorModal';
 import { formatDuration, formatDate } from '../../utils/formatters';
 
 interface SongRowProps {
@@ -23,6 +24,7 @@ export const SongRow: React.FC<SongRowProps> = ({
   onShowInFolder
 }) => {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const { currentSong, isPlaying, playSong, togglePlay, addToQueue, playNext } = usePlayerStore();
   const { isSongLiked, toggleLikeSong, playlists, addSongToPlaylist } = usePlaylistStore();
 
@@ -164,10 +166,17 @@ export const SongRow: React.FC<SongRowProps> = ({
         onPlayNext={() => playNext(song)}
         onAddToQueue={() => addToQueue(song)}
         onAddToPlaylist={(playlistId) => addSongToPlaylist(playlistId, song.id)}
+        onEditTags={() => setIsTagModalOpen(true)}
         onShowInFolder={onShowInFolder ? () => onShowInFolder(song) : undefined}
         onDelete={onDelete ? () => onDelete(song) : undefined}
       />
     )}
+
+    <TagEditorModal
+      isOpen={isTagModalOpen}
+      song={song}
+      onClose={() => setIsTagModalOpen(false)}
+    />
   </>
 );
 };

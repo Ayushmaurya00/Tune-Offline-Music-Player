@@ -22,6 +22,7 @@ import { recordSongPlay } from './utils/statsTracker';
 import { mediaSessionService } from './services/mediaSession';
 import { coverArtService } from './services/coverArtService';
 import { backButtonService } from './services/backButtonService';
+import { applyTagOverrides } from './services/tagOverrideService';
 import { Song } from '@/types/music';
 
 export const App: React.FC = () => {
@@ -111,7 +112,8 @@ export const App: React.FC = () => {
         }
 
         const prevCount = songs.length;
-        setSongs(scannedSongs);
+        const patchedSongs = applyTagOverrides(scannedSongs);
+        setSongs(patchedSongs);
 
         await window.tuneAPI.startWatching(folder);
 
@@ -155,7 +157,8 @@ export const App: React.FC = () => {
     ) => {
       setWatchedFolder(folderPath);
       const prevCount = songs.length;
-      setSongs(scannedSongs);
+      const patchedSongs = applyTagOverrides(scannedSongs);
+      setSongs(patchedSongs);
 
       const newSongsCount = Math.max(0, scannedSongs.length - prevCount);
       const formatCounts: Record<string, number> = {};

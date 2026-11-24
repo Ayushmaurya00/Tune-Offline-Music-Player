@@ -74,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           onClick={() => setActiveView('playlists')}
           className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-            activeView === 'playlists' || activeView === 'playlist'
+            activeView === 'playlists' || activeView === 'playlist' || activeView.startsWith('smart-')
               ? 'bg-tune-elevated text-white'
               : 'text-tune-textSecondary hover:text-white hover:bg-tune-elevated/50'
           }`}

@@ -71,6 +71,18 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     return <PlaylistDetailView isLikedView allSongs={songs} />;
   }
 
+  if (activeView === 'smart-most-played') {
+    return <PlaylistDetailView smartType="most-played" allSongs={songs} />;
+  }
+
+  if (activeView === 'smart-recently-added') {
+    return <PlaylistDetailView smartType="recently-added" allSongs={songs} />;
+  }
+
+  if (activeView === 'smart-recently-played') {
+    return <PlaylistDetailView smartType="recently-played" allSongs={songs} />;
+  }
+
   if (activeView === 'playlists') {
     return (
       <PlaylistsView

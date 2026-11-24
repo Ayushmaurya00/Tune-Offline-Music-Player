@@ -4,6 +4,61 @@ export interface LyricLine {
 }
 
 const lyricsCache = new Map<string, LyricLine[]>();
+const CUSTOM_LYRICS_PREFIX = 'tune_custom_lyrics_';
+
+export function getCustomLyricsRaw(songId: string): string {
+  try {
+    return localStorage.getItem(CUSTOM_LYRICS_PREFIX + songId) || '';
+  } catch {
+    return '';
+  }
+}
+
+export function getCustomLyrics(songId: string, duration = 180): LyricLine[] | null {
+  const raw = getCustomLyricsRaw(songId);
+  if (!raw.trim()) return null;
+
+  const parsed = parseLRC(raw);
+  if (parsed.length > 0) return parsed;
+
+  // If plain text without timestamps, evenly distribute across duration
+  const plainLines = raw
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  if (plainLines.length === 0) return null;
+
+  return plainLines.map((text, idx, arr) => ({
+    time: (duration / Math.max(1, arr.length)) * idx,
+    text
+  }));
+}
+
+export function saveCustomLyrics(
+  songId: string,
+  rawContent: string,
+  duration = 180
+): LyricLine[] {
+  try {
+    localStorage.setItem(CUSTOM_LYRICS_PREFIX + songId, rawContent);
+  } catch {
+    // ignore
+  }
+
+  const parsed = getCustomLyrics(songId, duration) || [];
+  lyricsCache.set(songId, parsed);
+  return parsed;
+}
+
+export function clearCustomLyrics(songId: string): void {
+  try {
+    localStorage.removeItem(CUSTOM_LYRICS_PREFIX + songId);
+  } catch {
+    // ignore
+  }
+  lyricsCache.delete(songId);
+}
 
 export function parseLRC(lrcContent: string): LyricLine[] {
   const lines = lrcContent.split('\n');
@@ -43,6 +98,13 @@ export async function fetchLyrics(
   artist: string,
   duration: number
 ): Promise<LyricLine[]> {
+  // Check custom user-provided lyrics first
+  const custom = getCustomLyrics(songId, duration);
+  if (custom && custom.length > 0) {
+    lyricsCache.set(songId, custom);
+    return custom;
+  }
+
   if (lyricsCache.has(songId)) {
     return lyricsCache.get(songId)!;
   }

@@ -29,3 +29,4 @@ export function triggerHaptic(type: HapticType = 'light'): void {
     // Vibration not permitted or unsupported
   }
 }
+
