@@ -36,7 +36,7 @@ export const SeekBar: React.FC = () => {
         />
       </div>
 
-      <span className="w-9">{formatDuration(duration)}</span>
+      <span className="w-9">{duration > 0 ? formatDuration(duration) : '--:--'}</span>
     </div>
   );
 };

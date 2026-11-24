@@ -97,7 +97,9 @@ export const SongRow: React.FC<SongRowProps> = ({
         {formatDate(song.fileModified || song.dateAdded)}
       </div>
 
-      <div className="hidden md:block text-tune-textMuted font-mono">{formatDuration(song.duration)}</div>
+      <div className="hidden md:block text-tune-textMuted font-mono">
+        {song.duration > 0 ? formatDuration(song.duration) : '--:--'}
+      </div>
 
       <div className="flex items-center justify-end gap-1 md:gap-2" onClick={(e) => e.stopPropagation()}>
         <button

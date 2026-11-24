@@ -25,7 +25,7 @@ async function scanMobileDirectory(dir: Directory, path = ''): Promise<Song[]> {
           title: cleanTitle,
           artist: 'Mobile Audio',
           album: 'Device Music',
-          duration: 180,
+          duration: 0,
           format: file.name.split('.').pop() || 'mp3',
           fileSize: file.size || 0,
           dateAdded: Date.now(),

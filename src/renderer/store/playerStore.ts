@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { Song, QueueItem, RepeatMode } from '@/types/music';
+import { useLibraryStore } from './libraryStore';
 import { audioController } from '../audio/audioController';
 import { sleepTimerService } from '../audio/sleepTimerService';
 import { mediaSessionService } from '../services/mediaSession';
@@ -114,7 +115,18 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
       },
       (currentTime) => {
         set({ currentTime });
-        mediaSessionService.updatePositionState(song.duration, currentTime, get().playbackRate);
+        mediaSessionService.updatePositionState(get().duration || song.duration, currentTime, get().playbackRate);
+      },
+      (actualDuration) => {
+        if (actualDuration > 0 && get().duration !== actualDuration) {
+          set({ duration: actualDuration });
+          const current = get().currentSong;
+          if (current && current.id === song.id && current.duration !== actualDuration) {
+            set({ currentSong: { ...current, duration: actualDuration } });
+          }
+          useLibraryStore.getState().updateSong(song.id, { duration: actualDuration });
+          mediaSessionService.updatePositionState(actualDuration, get().currentTime, get().playbackRate);
+        }
       }
     );
 

@@ -7,6 +7,7 @@ class AudioController {
   private howl: Howl | null = null;
   private onTimeUpdateCallback?: (currentTime: number) => void;
   private onEndCallback?: () => void;
+  private onDurationLoadCallback?: (duration: number) => void;
   private timerId: number | null = null;
   private playbackRate: number = 1.0;
   private pendingPlayTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -15,7 +16,8 @@ class AudioController {
     song: Song,
     volume: number,
     onEnd: () => void,
-    onTimeUpdate: (currentTime: number) => void
+    onTimeUpdate: (currentTime: number) => void,
+    onDurationLoad?: (duration: number) => void
   ) {
     if (this.pendingPlayTimeout) {
       clearTimeout(this.pendingPlayTimeout);
@@ -24,6 +26,7 @@ class AudioController {
 
     this.onEndCallback = onEnd;
     this.onTimeUpdateCallback = onTimeUpdate;
+    this.onDurationLoadCallback = onDurationLoad;
 
     const mediaUrl = resolveMediaUrl(song.filePath);
 
@@ -70,6 +73,12 @@ class AudioController {
         html5: true,
         volume: initialVolume,
         rate: this.playbackRate,
+        onload: () => {
+          const actualDuration = Math.round(this.howl?.duration() || 0);
+          if (actualDuration > 0 && this.onDurationLoadCallback) {
+            this.onDurationLoadCallback(actualDuration);
+          }
+        },
         onend: () => {
           this.stopTimer();
           if (this.onEndCallback) this.onEndCallback();
@@ -77,6 +86,12 @@ class AudioController {
         onplay: () => {
           this.startTimer();
           eqService.init();
+
+          // Sync real duration on play in case onload already completed
+          const actualDuration = Math.round(this.howl?.duration() || 0);
+          if (actualDuration > 0 && this.onDurationLoadCallback) {
+            this.onDurationLoadCallback(actualDuration);
+          }
 
           // Fade in new track
           if (shouldCrossfade && this.howl) {
@@ -177,10 +192,14 @@ class AudioController {
   private startTimer() {
     this.stopTimer();
     this.timerId = window.setInterval(() => {
-      if (this.howl && this.howl.playing() && this.onTimeUpdateCallback) {
+      if (this.howl && this.howl.playing()) {
         const seek = this.howl.seek();
-        if (typeof seek === 'number') {
+        if (typeof seek === 'number' && this.onTimeUpdateCallback) {
           this.onTimeUpdateCallback(seek);
+        }
+        const dur = Math.round(this.howl.duration() || 0);
+        if (dur > 0 && this.onDurationLoadCallback) {
+          this.onDurationLoadCallback(dur);
         }
       }
     }, 250);

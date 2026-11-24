@@ -63,7 +63,7 @@ export const QueueItemRow: React.FC<QueueItemRowProps> = ({ item, onRemove, onPl
       </div>
 
       <span className="text-[11px] font-mono text-tune-textMuted mr-1">
-        {formatDuration(item.song.duration)}
+        {item.song.duration > 0 ? formatDuration(item.song.duration) : '--:--'}
       </span>
 
       <button

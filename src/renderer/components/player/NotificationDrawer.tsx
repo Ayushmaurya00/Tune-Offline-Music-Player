@@ -141,7 +141,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
           </div>
 
           <span className="text-[10px] font-mono text-tune-textMuted w-9">
-            {formatDuration(duration)}
+            {duration > 0 ? formatDuration(duration) : '--:--'}
           </span>
         </div>
 

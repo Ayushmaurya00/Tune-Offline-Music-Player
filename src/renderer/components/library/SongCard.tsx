@@ -83,7 +83,7 @@ export const SongCard: React.FC<SongCardProps> = ({
       </div>
 
       <div className="flex items-center justify-between mt-2 pt-2 border-t border-tune-border/40 text-[11px] text-tune-textMuted">
-        <span className="font-mono">{formatDuration(song.duration)}</span>
+        <span className="font-mono">{song.duration > 0 ? formatDuration(song.duration) : '--:--'}</span>
 
         <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition">
           <button

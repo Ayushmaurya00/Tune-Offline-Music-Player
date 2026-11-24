@@ -2,8 +2,32 @@ import { Song } from '@/types/music';
 import { coverArtService } from '../services/coverArtService';
 import { parseFileID3 } from './id3Extractor';
 import { isElectron } from '../services/platform';
+import { useLibraryStore } from '../store/libraryStore';
 
 const AUDIO_EXTENSIONS = ['.mp3', '.m4a', '.wav', '.flac', '.ogg', '.aac', '.opus'];
+
+export function getAudioFileDuration(file: File): Promise<number> {
+  return new Promise((resolve) => {
+    const audio = document.createElement('audio');
+    const objectUrl = URL.createObjectURL(file);
+    audio.preload = 'metadata';
+    const cleanup = () => {
+      URL.revokeObjectURL(objectUrl);
+      audio.removeAttribute('src');
+      audio.load();
+    };
+    audio.onloadedmetadata = () => {
+      const d = Math.round(audio.duration);
+      cleanup();
+      resolve(Number.isFinite(d) && d > 0 ? d : 0);
+    };
+    audio.onerror = () => {
+      cleanup();
+      resolve(0);
+    };
+    audio.src = objectUrl;
+  });
+}
 
 export interface PickFolderResult {
   folderPath: string;
@@ -106,7 +130,7 @@ export function convertFileListToSongs(files: File[]): PickFolderResult {
       title: cleanTitle || file.name.replace(/\.[^/.]+$/, ''),
       artist: cleanArtist || 'Offline Artist',
       album: folderName,
-      duration: 180,
+      duration: 0,
       format: file.name.split('.').pop() || 'mp3',
       fileSize: file.size,
       dateAdded: Date.now(),
@@ -114,6 +138,14 @@ export function convertFileListToSongs(files: File[]): PickFolderResult {
       playCount: 0,
       coverArt: null
     };
+
+    // Asynchronously resolve true audio duration
+    getAudioFileDuration(file).then((realDuration) => {
+      if (realDuration > 0) {
+        songItem.duration = realDuration;
+        useLibraryStore.getState().updateSong(songItem.id, { duration: realDuration });
+      }
+    });
 
     // Asynchronously extract embedded ID3 picture if available
     parseFileID3(file).then((id3) => {

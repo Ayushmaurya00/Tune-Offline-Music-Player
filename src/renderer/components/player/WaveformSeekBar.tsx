@@ -208,7 +208,7 @@ export const WaveformSeekBar: React.FC<WaveformSeekBarProps> = ({
       </div>
 
       <span className="w-9 text-left text-tune-textMuted">
-        {formatDuration(duration)}
+        {duration > 0 ? formatDuration(duration) : '--:--'}
       </span>
     </div>
   );
