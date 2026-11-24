@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, Mic2, RefreshCw } from 'lucide-react';
+import { X, Mic2, RefreshCw, ChevronDown } from 'lucide-react';
 import { usePlayerStore } from '../../store/playerStore';
 import { fetchLyrics, LyricLine } from '../../utils/lyricsService';
 import { AlbumArt } from '../shared/AlbumArt';
+import { backButtonService } from '../../services/backButtonService';
 
 interface LyricsModalProps {
   isOpen: boolean;
@@ -20,6 +21,22 @@ export const LyricsModal: React.FC<LyricsModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const activeLineRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  // Register with Android / Browser back button service
+  useEffect(() => {
+    if (!isOpen) return;
+    return backButtonService.register(onClose);
+  }, [isOpen, onClose]);
+
+  // Keyboard Escape listener
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     if (!isOpen || !currentSong) return;
@@ -64,7 +81,10 @@ export const LyricsModal: React.FC<LyricsModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl animate-in fade-in duration-200">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-xl animate-in fade-in duration-200"
+    >
       {/* Background ambient album art glow */}
       {currentSong?.coverArt && (
         <div
@@ -74,10 +94,22 @@ export const LyricsModal: React.FC<LyricsModalProps> = ({
       )}
 
       {/* Main Container */}
-      <div className="relative w-full max-w-2xl h-[85vh] flex flex-col bg-tune-surface/90 border border-tune-border/60 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-md">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl h-full sm:h-[85vh] flex flex-col bg-tune-surface/98 sm:bg-tune-surface/90 border-0 sm:border border-tune-border/60 rounded-none sm:rounded-3xl shadow-2xl overflow-hidden backdrop-blur-md"
+      >
         {/* Header */}
-        <div className="px-6 py-4 flex items-center justify-between border-b border-tune-border/50">
-          <div className="flex items-center gap-3">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between border-b border-tune-border/50 flex-shrink-0 z-10 bg-tune-surface/95 backdrop-blur-md">
+          {/* Left: Mobile Collapse Button + Album Art + Song Info */}
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 pr-2">
+            <button
+              onClick={onClose}
+              className="p-1.5 -ml-1 text-white hover:text-tune-accent transition rounded-full flex-shrink-0 active:scale-90"
+              title="Close Lyrics"
+            >
+              <ChevronDown size={28} />
+            </button>
+
             {currentSong && (
               <AlbumArt
                 coverArt={currentSong.coverArt}
@@ -86,7 +118,8 @@ export const LyricsModal: React.FC<LyricsModalProps> = ({
                 iconSize={16}
               />
             )}
-            <div className="flex flex-col min-w-0">
+
+            <div className="flex flex-col min-w-0 flex-1">
               <span className="text-sm font-bold text-white truncate">
                 {currentSong?.title || 'Lyrics'}
               </span>
@@ -96,17 +129,23 @@ export const LyricsModal: React.FC<LyricsModalProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-tune-elevated text-xs font-semibold" style={{ color: accentColor }}>
+          {/* Right: Synced Lyrics Badge (Desktop) + Obvious Close Cross Button */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <div
+              className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-tune-elevated text-xs font-semibold"
+              style={{ color: accentColor }}
+            >
               <Mic2 size={14} />
               <span>Synced Lyrics</span>
             </div>
 
             <button
               onClick={onClose}
-              className="p-1.5 text-tune-textMuted hover:text-white rounded-full hover:bg-tune-elevated transition"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white transition flex-shrink-0 shadow active:scale-95 border border-white/15"
+              title="Close Lyrics"
+              aria-label="Close Lyrics"
             >
-              <X size={18} />
+              <X size={20} className="text-white" />
             </button>
           </div>
         </div>
@@ -114,7 +153,7 @@ export const LyricsModal: React.FC<LyricsModalProps> = ({
         {/* Lyrics Scrollable Body */}
         <div
           ref={containerRef}
-          className="flex-1 overflow-y-auto px-8 py-16 space-y-7 text-center select-none scroll-smooth"
+          className="flex-1 overflow-y-auto px-4 sm:px-8 py-10 sm:py-16 space-y-6 sm:space-y-7 text-center select-none scroll-smooth"
         >
           {isLoading ? (
             <div className="h-full flex flex-col items-center justify-center text-tune-textMuted gap-3">
@@ -158,4 +197,3 @@ export const LyricsModal: React.FC<LyricsModalProps> = ({
     </div>
   );
 };
-

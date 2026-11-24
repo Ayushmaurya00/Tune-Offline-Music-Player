@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Music } from 'lucide-react';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { useLibraryStore } from '../../store/libraryStore';
+import { backButtonService } from '../../services/backButtonService';
 
 interface NewPlaylistModalProps {
   isOpen: boolean;
@@ -13,6 +14,11 @@ export const NewPlaylistModal: React.FC<NewPlaylistModalProps> = ({ isOpen, onCl
   const [description, setDescription] = useState('');
   const { createPlaylist } = usePlaylistStore();
   const { setActiveView } = useLibraryStore();
+
+  useEffect(() => {
+    if (!isOpen) return;
+    return backButtonService.register(onClose);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

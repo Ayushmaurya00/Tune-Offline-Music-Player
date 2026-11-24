@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Sliders, RotateCcw, Zap } from 'lucide-react';
 import { eqService, EQ_FREQUENCIES, EQ_PRESETS } from '../../audio/eqService';
+import { backButtonService } from '../../services/backButtonService';
 
 interface EqualizerModalProps {
   isOpen: boolean;
@@ -14,6 +15,11 @@ export const EqualizerModal: React.FC<EqualizerModalProps> = ({
   accentColor = '#1db954'
 }) => {
   const [settings, setSettings] = useState(eqService.getSettings());
+
+  useEffect(() => {
+    if (!isOpen) return;
+    return backButtonService.register(onClose);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

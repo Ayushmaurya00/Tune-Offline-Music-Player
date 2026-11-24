@@ -21,6 +21,7 @@ import { extractDominantColor } from './utils/colorExtractor';
 import { recordSongPlay } from './utils/statsTracker';
 import { mediaSessionService } from './services/mediaSession';
 import { coverArtService } from './services/coverArtService';
+import { backButtonService } from './services/backButtonService';
 import { Song } from '@/types/music';
 
 export const App: React.FC = () => {
@@ -43,6 +44,11 @@ export const App: React.FC = () => {
     useLibraryStore();
   const { currentSong, togglePlay, nextTrack, prevTrack, seek, currentTime, playSong, toggleMute, toggleQueue } =
     usePlayerStore();
+
+  // Initialize Android Hardware & Browser Back Button Management
+  useEffect(() => {
+    backButtonService.init();
+  }, []);
 
   // Dynamic Album Art Palette Extraction, Online Poster Resolution & Stats Tracking
   useEffect(() => {

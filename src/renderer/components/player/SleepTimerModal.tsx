@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Moon, Clock, Volume2, Check } from 'lucide-react';
 import { sleepTimerService, SleepTimerState } from '../../audio/sleepTimerService';
+import { backButtonService } from '../../services/backButtonService';
 
 interface SleepTimerModalProps {
   isOpen: boolean;
@@ -24,6 +25,11 @@ export const SleepTimerModal: React.FC<SleepTimerModalProps> = ({
       setTimerState(state);
     });
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    return backButtonService.register(onClose);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

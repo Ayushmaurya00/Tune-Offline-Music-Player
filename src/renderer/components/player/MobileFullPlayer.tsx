@@ -14,6 +14,7 @@ import { WaveformSeekBar } from './WaveformSeekBar';
 import { AlbumArt } from '../shared/AlbumArt';
 import { SpeedSelector } from './SpeedSelector';
 import { sleepTimerService } from '../../audio/sleepTimerService';
+import { backButtonService } from '../../services/backButtonService';
 
 interface MobileFullPlayerProps {
   isOpen: boolean;
@@ -43,6 +44,11 @@ export const MobileFullPlayer: React.FC<MobileFullPlayerProps> = ({
   if (!isOpen || !currentSong) return null;
 
   const isLiked = isSongLiked(currentSong.id);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    return backButtonService.register(onClose);
+  }, [isOpen, onClose]);
 
   React.useEffect(() => {
     if (!isOpen) return;

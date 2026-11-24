@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Search, CheckCircle2, XCircle, ArrowRight, Music2, RefreshCw } from 'lucide-react';
 import { Song, SpotifyPlaylistResult } from '@/types/music';
 import { matchSpotifyTracks, MatchResult } from '../../utils/songMatcher';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { useLibraryStore } from '../../store/libraryStore';
+import { backButtonService } from '../../services/backButtonService';
 
 interface SpotifyImportModalProps {
   isOpen: boolean;
@@ -24,6 +25,11 @@ export const SpotifyImportModal: React.FC<SpotifyImportModalProps> = ({
 
   const { createPlaylist, addSongToPlaylist } = usePlaylistStore();
   const { setActiveView } = useLibraryStore();
+
+  useEffect(() => {
+    if (!isOpen) return;
+    return backButtonService.register(onClose);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

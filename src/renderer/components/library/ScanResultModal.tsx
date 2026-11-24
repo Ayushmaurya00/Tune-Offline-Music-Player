@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X, CheckCircle2, Folder, Clock, Music, Play, AlertCircle } from 'lucide-react';
+import { backButtonService } from '../../services/backButtonService';
 
 export interface ScanResultData {
   folderPath: string;
@@ -28,6 +29,11 @@ export const ScanResultModal: React.FC<ScanResultModalProps> = ({
   onChangeFolder,
   accentColor = '#1db954'
 }) => {
+  useEffect(() => {
+    if (!isOpen) return;
+    return backButtonService.register(onClose);
+  }, [isOpen, onClose]);
+
   if (!isOpen || !result) return null;
 
   const durationFormatted =
