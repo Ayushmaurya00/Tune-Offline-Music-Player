@@ -3,15 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tune — Your Music, Purely Offline | Free & Open Source Music Player</title>
-  <meta name="description" content="Tune is a modern, privacy-first offline music player for Windows and Android. Studio-grade 10-band equalizer, bass boost, synced karaoke lyrics, mobile swipe gestures, and zero subscriptions." />
-  <meta name="keywords" content="offline music player, tune music, windows music player, android music player, flac player, synced lyrics player, bass boost equalizer" />
-  <meta property="og:title" content="Tune — Modern Offline Music Player" />
-  <meta property="og:description" content="No subscriptions. No ads. 100% offline. 10-band EQ, bass boost, synced karaoke lyrics, and smart playlists." />
-  <meta property="og:type" content="website" />
-  <meta name="theme-color" content="#0a0a0a" />
+  <title>Tune — High-Performance Offline Music Player</title>
+  <meta name="description" content="A studio-grade, privacy-first offline music player for Windows and Android. 10-band cascaded biquad equalizer, synchronized LRC karaoke lyrics, ID3 tag editor, and bit-perfect local playback. Zero subscriptions. Zero tracking." />
+  <meta name="keywords" content="Tune, offline music player, Windows audio player, Android FLAC player, 10-band equalizer, bit-perfect, LRC lyrics, open source music player" />
 
-  <!-- Tailwind CSS CDN with custom config -->
+  <!-- OpenGraph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Tune — High-Performance Offline Music Player" />
+  <meta property="og:description" content="Local audio playback without compromise. 10-band studio EQ, synchronized LRC lyrics, and zero telemetry for Windows & Android." />
+  <meta property="og:image" content="icon-512.png" />
+  <meta name="theme-color" content="#070709" />
+
+  <!-- Real App Icons -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="favicon.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -20,20 +28,23 @@
         extend: {
           colors: {
             tune: {
-              accent: '#1db954',
-              accentHover: '#1ed760',
-              bg: '#0a0a0a',
-              surface: '#121212',
-              card: '#181818',
-              elevated: '#242424',
-              border: '#2a2a2a',
-              textSecondary: '#a7a7a7',
-              textMuted: '#727272'
+              accent: '#10b981',
+              accentHover: '#059669',
+              spotifyGreen: '#1db954',
+              bg: '#070709',
+              surface: '#0e0e13',
+              card: '#13131a',
+              elevated: '#1a1a24',
+              border: '#232330',
+              borderHover: '#343446',
+              textPrimary: '#f4f4f5',
+              textSecondary: '#a1a1aa',
+              textMuted: '#71717a'
             }
           },
           fontFamily: {
-            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace']
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'SF Mono', 'Menlo', 'Consolas', 'monospace']
           }
         }
       }
@@ -41,277 +52,491 @@
   </script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
     body {
-      background-color: #0a0a0a;
-      color: #ffffff;
+      background-color: #070709;
+      color: #f4f4f5;
       font-family: 'Inter', sans-serif;
       overflow-x: hidden;
+      selection-background-color: #10b981;
     }
 
-    /* Ambient background gradient */
+    ::selection {
+      background: #10b981;
+      color: #000000;
+    }
+
+    /* Subtle Technical Grid Background */
+    .bg-tech-grid {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    }
+
+    /* Ambient Hero Radial Glow */
     .hero-glow {
-      background: radial-gradient(circle at 50% -20%, rgba(29, 185, 84, 0.22) 0%, rgba(10, 10, 10, 0) 70%);
+      background: radial-gradient(circle at 50% -10%, rgba(16, 185, 129, 0.16) 0%, rgba(7, 7, 9, 0) 70%);
     }
 
-    .card-glow:hover {
-      box-shadow: 0 0 35px -5px rgba(29, 185, 84, 0.25);
+    /* Sleek card hover border highlight */
+    .craft-card {
+      background: #111117;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .craft-card:hover {
+      border-color: rgba(16, 185, 129, 0.4);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(16, 185, 129, 0.15);
     }
 
-    /* Live EQ Animation */
-    @keyframes eq-bounce-1 { 0%, 100% { height: 20%; } 50% { height: 90%; } }
-    @keyframes eq-bounce-2 { 0%, 100% { height: 75%; } 50% { height: 30%; } }
-    @keyframes eq-bounce-3 { 0%, 100% { height: 40%; } 50% { height: 100%; } }
-    @keyframes eq-bounce-4 { 0%, 100% { height: 95%; } 50% { height: 45%; } }
-    @keyframes eq-bounce-5 { 0%, 100% { height: 50%; } 50% { height: 85%; } }
+    /* Frequency EQ Bar Animations */
+    @keyframes vu-bounce-1 { 0%, 100% { height: 18%; } 50% { height: 85%; } }
+    @keyframes vu-bounce-2 { 0%, 100% { height: 60%; } 50% { height: 25%; } }
+    @keyframes vu-bounce-3 { 0%, 100% { height: 35%; } 50% { height: 95%; } }
+    @keyframes vu-bounce-4 { 0%, 100% { height: 80%; } 50% { height: 40%; } }
+    @keyframes vu-bounce-5 { 0%, 100% { height: 45%; } 50% { height: 75%; } }
 
-    .animate-eq-1 { animation: eq-bounce-1 1.1s ease-in-out infinite; }
-    .animate-eq-2 { animation: eq-bounce-2 0.9s ease-in-out infinite; }
-    .animate-eq-3 { animation: eq-bounce-3 1.3s ease-in-out infinite; }
-    .animate-eq-4 { animation: eq-bounce-4 0.8s ease-in-out infinite; }
-    .animate-eq-5 { animation: eq-bounce-5 1.0s ease-in-out infinite; }
+    .vu-bar-1 { animation: vu-bounce-1 1.2s ease-in-out infinite; }
+    .vu-bar-2 { animation: vu-bounce-2 0.85s ease-in-out infinite; }
+    .vu-bar-3 { animation: vu-bounce-3 1.4s ease-in-out infinite; }
+    .vu-bar-4 { animation: vu-bounce-4 0.95s ease-in-out infinite; }
+    .vu-bar-5 { animation: vu-bounce-5 1.1s ease-in-out infinite; }
   </style>
 </head>
-<body class="selection:bg-tune-accent selection:text-black">
+<body class="bg-tech-grid text-tune-textPrimary antialiased">
 
-  <!-- Navigation Bar -->
-  <header class="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-tune-border/60">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
-      <!-- Brand Logo -->
+  <!-- Minimal Precision Navigation -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-[#070709]/80 backdrop-blur-md border-b border-white/[0.06]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Real Tune Logo & Wordmark -->
       <a href="#" class="flex items-center gap-3 group">
-        <div class="w-10 h-10 rounded-xl bg-tune-accent flex items-center justify-center shadow-lg shadow-tune-accent/30 group-hover:scale-105 transition-transform">
-          <svg class="w-6 h-6 text-black fill-current" viewBox="0 0 24 24">
-            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-          </svg>
-        </div>
-        <div class="flex items-baseline gap-1.5">
-          <span class="text-xl font-extrabold tracking-tight text-white">Tune</span>
-          <span class="text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-tune-elevated text-tune-accent border border-tune-border">Offline</span>
+        <img 
+          src="logo.png" 
+          alt="Tune Logo" 
+          class="w-8 h-8 rounded-lg shadow-sm flex-shrink-0 object-contain transition-transform group-hover:scale-105"
+        />
+        <div class="flex flex-col">
+          <div class="flex items-baseline gap-0.5">
+            <span class="font-black text-lg tracking-tight lowercase text-white">tune</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-tune-accent ml-0.5"></span>
+          </div>
+          <span class="text-[9px] text-tune-textMuted uppercase font-bold tracking-widest -mt-0.5">
+            YOUR MUSIC, OFFLINE
+          </span>
         </div>
       </a>
 
-      <!-- Desktop Nav Links -->
-      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-tune-textSecondary">
-        <a href="#features" class="hover:text-white transition">Features</a>
-        <a href="#preview" class="hover:text-white transition">Screenshots</a>
-        <a href="#compare" class="hover:text-white transition">Why Tune</a>
+      <!-- Desktop Links -->
+      <nav class="hidden md:flex items-center gap-7 text-xs font-medium text-tune-textSecondary">
+        <a href="#workstation" class="hover:text-white transition">Workstation</a>
+        <a href="#dsp-pipeline" class="hover:text-white transition">DSP Engine</a>
+        <a href="#features" class="hover:text-white transition">Architecture</a>
+        <a href="#compare" class="hover:text-white transition">Comparison</a>
+        <a href="#shortcuts" class="hover:text-white transition">Shortcuts</a>
         <a href="#faq" class="hover:text-white transition">FAQ</a>
-        <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player" target="_blank" class="flex items-center gap-2 hover:text-white transition">
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+      </nav>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-3">
+        <a 
+          href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player" 
+          target="_blank" 
+          class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-tune-textSecondary hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] transition"
+        >
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
             <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
           </svg>
           <span>GitHub</span>
         </a>
-      </nav>
 
-      <!-- Primary Download CTA -->
-      <div class="flex items-center gap-3">
-        <a href="#download" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-tune-accent hover:bg-tune-accentHover text-black text-xs sm:text-sm font-bold transition shadow-lg shadow-tune-accent/25 hover:scale-105 active:scale-95">
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+        <a 
+          id="nav-cta"
+          href="#download" 
+          class="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-tune-accent hover:bg-tune-accentHover text-black text-xs font-bold transition shadow-sm hover:scale-[1.02] active:scale-95"
+        >
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
             <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
           </svg>
-          <span id="nav-download-label-web">Download Free</span>
+          <span id="nav-cta-text">Download</span>
         </a>
       </div>
     </div>
   </header>
 
   <!-- Hero Section -->
-  <section class="relative pt-32 pb-20 sm:pt-44 sm:pb-32 hero-glow">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <!-- Pill Badge -->
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-tune-surface border border-tune-border/80 shadow-md mb-8 animate-fade-in">
-        <span class="w-2 h-2 rounded-full bg-tune-accent animate-ping"></span>
-        <span class="text-xs font-semibold text-tune-textSecondary">Tune v1.0 Released • 100% Free & Open Source</span>
+  <section class="relative pt-32 pb-16 sm:pt-40 sm:pb-24 hero-glow">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      
+      <!-- Tech Badge -->
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-tune-surface border border-white/[0.08] shadow-sm mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-tune-accent animate-pulse"></span>
+        <span class="text-[11px] font-mono tracking-wide text-tune-textSecondary">
+          Tune v1.0 • Bit-Perfect Engine • Windows & Android
+        </span>
       </div>
 
-      <!-- Main Heading -->
-      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.1]">
-        Your Music, <br class="hidden sm:block"/>
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-tune-accent via-emerald-400 to-teal-300">
-          Purely Offline.
-        </span>
+      <!-- Main Heading (Grounded, direct, no generic AI buzzwords) -->
+      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.08]">
+        The music player built for people who own their sound.
       </h1>
 
-      <!-- Subheadline -->
-      <p class="mt-6 text-base sm:text-xl text-tune-textSecondary max-w-2xl mx-auto leading-relaxed">
-        A studio-grade music player for Windows and Android. No subscriptions, zero tracking, synchronized karaoke lyrics, 10-band pro equalizer with bass boost, and fluid mobile swipe gestures.
+      <!-- Technical Subtitle -->
+      <p class="mt-6 text-sm sm:text-lg text-tune-textSecondary max-w-2xl mx-auto leading-relaxed">
+        Bit-perfect local playback, a cascaded 10-band studio equalizer, synchronized LRC karaoke lyrics, and low-latency mobile swipe gestures. No accounts. No subscriptions. Zero telemetry.
       </p>
 
-      <!-- Download Action Buttons with OS Auto-Detection -->
-      <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
-        <!-- Dynamic Primary Download Button -->
-        <a id="primary-hero-btn" href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" class="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-tune-accent hover:bg-tune-accentHover text-black font-extrabold text-base transition shadow-2xl shadow-tune-accent/30 hover:scale-105 active:scale-95 group">
-          <svg id="primary-hero-icon" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+      <!-- Auto-Detecting Download Bar -->
+      <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5 max-w-lg mx-auto">
+        <!-- Primary OS-Detected Button -->
+        <a 
+          id="hero-primary-btn" 
+          href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" 
+          class="w-full sm:w-auto flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl bg-tune-accent hover:bg-tune-accentHover text-black font-bold text-sm transition shadow-lg shadow-tune-accent/20 hover:scale-[1.02] active:scale-95"
+        >
+          <svg id="hero-primary-icon" class="w-4 h-4 fill-current" viewBox="0 0 24 24">
             <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
           </svg>
           <div class="text-left">
-            <div id="primary-hero-text" class="leading-none">Download for Windows</div>
-            <div id="primary-hero-sub" class="text-[11px] font-medium opacity-80 mt-1">Windows 10/11 • 64-bit .exe</div>
+            <div id="hero-primary-title" class="leading-none text-xs uppercase tracking-wider font-extrabold">Download for Windows</div>
+            <div id="hero-primary-spec" class="text-[10px] font-mono opacity-80 mt-0.5">64-bit Installer (.exe)</div>
           </div>
         </a>
 
-        <!-- Secondary Download (Android or Alt) -->
-        <a id="secondary-hero-btn" href="#download" class="w-full sm:w-auto flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-tune-surface hover:bg-tune-card text-white font-bold text-sm border border-tune-border hover:border-tune-accent/50 transition active:scale-95">
-          <svg class="w-5 h-5 fill-current text-tune-accent" viewBox="0 0 24 24">
+        <!-- Secondary Platform Option -->
+        <a 
+          id="hero-secondary-btn" 
+          href="#download" 
+          class="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-tune-surface hover:bg-tune-card text-tune-textPrimary font-semibold text-xs border border-white/[0.08] hover:border-white/[0.18] transition active:scale-95"
+        >
+          <svg class="w-4 h-4 fill-current text-tune-accent" viewBox="0 0 24 24">
             <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4116 13.8533 8.083 12 8.083c-1.8534 0-3.5903.3286-5.1367.8667L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>
           </svg>
           <span>Android APK</span>
         </a>
       </div>
 
-      <!-- Trust Badges -->
-      <div class="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-tune-textMuted">
+      <!-- Specs / Micro Metric Bar -->
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-6 text-[11px] font-mono text-tune-textMuted">
         <span class="flex items-center gap-1.5">
-          <svg class="w-4 h-4 text-tune-accent fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-          No Ads or Audio Commercials
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          FLAC · MP3 · WAV · M4A · OGG · OPUS
         </span>
         <span class="flex items-center gap-1.5">
-          <svg class="w-4 h-4 text-tune-accent fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-          Zero Accounts & Telemetry
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          Cascaded 10-Band Biquad IIR
         </span>
         <span class="flex items-center gap-1.5">
-          <svg class="w-4 h-4 text-tune-accent fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-          Supports MP3, FLAC, M4A, WAV
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          0 Network Outbound
+        </span>
+        <span class="flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          Sub-3ms Seek Latency
         </span>
       </div>
 
-      <!-- App Showcase Preview Mockup -->
-      <div id="preview" class="mt-16 sm:mt-24 relative max-w-5xl mx-auto">
-        <!-- Glowing Ambient Behind Window -->
-        <div class="absolute -inset-1.5 bg-gradient-to-r from-tune-accent via-emerald-500 to-teal-500 rounded-3xl blur-2xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+      <!-- Authentic Workstation Interface Mockup -->
+      <div id="workstation" class="mt-14 relative max-w-5xl mx-auto text-left">
+        <!-- Ambient Back Glow -->
+        <div class="absolute -inset-1 bg-gradient-to-r from-tune-accent/20 via-emerald-600/10 to-teal-500/20 rounded-2xl blur-xl opacity-60"></div>
 
-        <!-- Window Container -->
-        <div class="relative bg-tune-surface border border-tune-border rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden text-left">
-          <!-- Window Header Titlebar -->
-          <div class="h-10 bg-black/60 border-b border-tune-border flex items-center justify-between px-4">
+        <!-- Window Chassis -->
+        <div class="relative bg-tune-surface border border-white/[0.08] rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden">
+          
+          <!-- Window Header (Electron Titlebar) -->
+          <div class="h-10 bg-[#09090c] border-b border-white/[0.06] flex items-center justify-between px-4">
+            <!-- Window Traffic Lights -->
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
-              <span class="w-3 h-3 rounded-full bg-yellow-500/80"></span>
-              <span class="w-3 h-3 rounded-full bg-green-500/80"></span>
+              <span class="w-3 h-3 rounded-full bg-[#ff5f56]/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-[#ffbd2e]/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-[#27c93f]/80 inline-block"></span>
             </div>
-            <span class="text-xs font-mono text-tune-textMuted font-semibold">Tune Music — Pro Audio Desktop</span>
-            <div class="w-12"></div>
+            
+            <!-- Window App Title with Actual Logo Mark -->
+            <div class="flex items-center gap-2">
+              <img src="logo.png" alt="Tune" class="w-3.5 h-3.5 object-contain" />
+              <span class="text-xs font-mono text-tune-textSecondary font-medium">tune — local audio workstation</span>
+            </div>
+
+            <!-- Watched Folder indicator -->
+            <div class="hidden sm:flex items-center gap-1.5 text-[10px] font-mono text-tune-textMuted bg-white/[0.03] px-2 py-0.5 rounded border border-white/[0.04]">
+              <span class="w-1.5 h-1.5 rounded-full bg-tune-accent"></span>
+              <span>Watched: D:/Music/Lossless</span>
+            </div>
           </div>
 
-          <!-- Mockup Inside Content: Desktop App Preview -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[460px] bg-[#0c0c0c]">
-            <!-- Left Sidebar -->
-            <div class="hidden lg:flex lg:col-span-3 border-r border-tune-border p-4 flex-col justify-between bg-tune-surface/50">
+          <!-- Inside App UI Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[460px] bg-[#09090c]">
+            
+            <!-- Sidebar (Replicating Tune's actual Sidebar.tsx) -->
+            <div class="hidden lg:flex lg:col-span-3 border-r border-white/[0.06] p-4 flex-col justify-between bg-tune-surface/30">
               <div class="space-y-4">
-                <div class="flex items-center gap-2 text-tune-accent font-bold text-sm">
-                  <div class="w-6 h-6 rounded-lg bg-tune-accent text-black flex items-center justify-center font-bold text-xs">T</div>
-                  <span>Tune Library</span>
-                </div>
-                <div class="space-y-1 text-xs font-medium">
-                  <div class="px-3 py-2 rounded-lg bg-tune-elevated text-white flex items-center justify-between">
-                    <span>All Songs</span>
-                    <span class="text-[10px] font-mono text-tune-textMuted">1,248</span>
-                  </div>
-                  <div class="px-3 py-2 text-tune-textSecondary hover:text-white">Liked Songs</div>
-                  <div class="px-3 py-2 text-tune-textSecondary hover:text-white">Folder Mode</div>
-                  <div class="px-3 py-2 text-tune-textSecondary hover:text-white">Playlists</div>
+                <!-- Brand in Sidebar -->
+                <div class="flex items-center gap-2">
+                  <img src="logo.png" alt="Tune" class="w-6 h-6 rounded object-contain" />
+                  <span class="font-extrabold text-sm text-white tracking-tight lowercase">tune<span class="text-tune-accent">.</span></span>
                 </div>
 
-                <div class="pt-3 border-t border-tune-border/60">
-                  <span class="text-[10px] font-bold text-tune-textMuted uppercase tracking-wider block mb-2">Smart Auto-Playlists</span>
+                <!-- Navigation List -->
+                <div class="space-y-1 text-xs font-medium">
+                  <div class="px-3 py-2 rounded-lg bg-tune-elevated text-white flex items-center justify-between border border-white/[0.05]">
+                    <span class="flex items-center gap-2.5">
+                      <svg class="w-4 h-4 text-tune-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                      Library
+                    </span>
+                    <span class="font-mono text-[10px] text-tune-textMuted">1,248</span>
+                  </div>
+
+                  <div class="px-3 py-2 text-tune-textSecondary hover:text-white flex items-center gap-2.5">
+                    <svg class="w-4 h-4 text-rose-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    Liked Songs
+                  </div>
+
+                  <div class="px-3 py-2 text-tune-textSecondary hover:text-white flex items-center gap-2.5">
+                    <svg class="w-4 h-4 text-tune-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    Folder Mode
+                  </div>
+                </div>
+
+                <!-- Auto Smart Playlists -->
+                <div class="pt-3 border-t border-white/[0.06]">
+                  <span class="text-[9px] font-mono text-tune-textMuted uppercase tracking-wider block mb-2 font-bold">
+                    Smart Playlists
+                  </span>
                   <div class="space-y-1 text-xs">
-                    <div class="px-2 py-1.5 rounded-lg text-orange-400 bg-orange-950/20 border border-orange-500/20 flex items-center justify-between">
-                      <span>🔥 Most Played</span>
-                      <span class="text-[10px] font-mono">120 tracks</span>
+                    <div class="px-2.5 py-1.5 rounded text-orange-400 bg-orange-500/10 border border-orange-500/20 flex items-center justify-between text-[11px]">
+                      <span>Most Played</span>
+                      <span class="font-mono text-[10px]">120</span>
                     </div>
-                    <div class="px-2 py-1.5 text-yellow-400 flex items-center justify-between">
-                      <span>⚡ Recently Added</span>
-                      <span class="text-[10px] font-mono">45 tracks</span>
+                    <div class="px-2.5 py-1.5 text-yellow-400/90 flex items-center justify-between text-[11px]">
+                      <span>Recently Added</span>
+                      <span class="font-mono text-[10px]">45</span>
                     </div>
-                    <div class="px-2 py-1.5 text-tune-accent flex items-center justify-between">
-                      <span>🕒 Recently Played</span>
-                      <span class="text-[10px] font-mono">30 tracks</span>
+                    <div class="px-2.5 py-1.5 text-tune-textSecondary flex items-center justify-between text-[11px]">
+                      <span>Recently Played</span>
+                      <span class="font-mono text-[10px]">30</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Storage Badge -->
-              <div class="p-2.5 rounded-xl bg-tune-card border border-tune-border text-[11px] text-tune-textSecondary">
-                <div class="flex items-center justify-between font-semibold text-white mb-1">
-                  <span>Watched Folder</span>
-                  <span class="text-tune-accent">Active</span>
+              <!-- Spotify Importer Callout in Sidebar -->
+              <div class="p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.06] text-[11px]">
+                <div class="flex items-center gap-1.5 text-white font-medium mb-1">
+                  <span class="w-2 h-2 rounded-full bg-tune-spotifyGreen"></span>
+                  <span>Spotify Importer</span>
                 </div>
-                <span class="font-mono text-[10px] text-tune-textMuted">C:/Music/Lossless-FLAC</span>
+                <div class="text-[10px] text-tune-textMuted">Matches local storage from Spotify playlist URL</div>
               </div>
             </div>
 
-            <!-- Center Library & Equalizer Highlight -->
-            <div class="lg:col-span-9 p-4 sm:p-6 flex flex-col justify-between">
-              <!-- Top Search & EQ Badge -->
-              <div class="flex items-center justify-between gap-4 pb-4 border-b border-tune-border/50">
-                <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-tune-card border border-tune-border text-xs text-tune-textMuted w-full max-w-sm">
+            <!-- Main Track Table & Live Equalizer Preview -->
+            <div class="lg:col-span-9 p-4 sm:p-5 flex flex-col justify-between">
+              
+              <!-- Top Search and DSP Hardware Specs -->
+              <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/[0.06]">
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-tune-card border border-white/[0.06] text-xs text-tune-textMuted w-full max-w-xs font-mono">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                  <span>Search tracks, artists, albums...</span>
+                  <span>Filter by title, artist, codec...</span>
                 </div>
-                <div class="flex items-center gap-2">
-                  <span class="px-2.5 py-1 rounded-full bg-tune-accent/15 text-tune-accent border border-tune-accent/30 text-[11px] font-bold">10-Band EQ Active</span>
-                  <span class="px-2.5 py-1 rounded-full bg-tune-elevated text-white border border-tune-border text-[11px] font-bold">Bass Boost +65%</span>
+
+                <div class="flex items-center gap-2 text-[10px] font-mono">
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    EQ: 10-Band Active
+                  </span>
+                  <span class="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                    Bass: +4.5dB
+                  </span>
+                  <span class="px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                    Spatial: 3500Hz
+                  </span>
                 </div>
               </div>
 
-              <!-- Song Rows Preview -->
-              <div class="my-4 space-y-1.5">
-                <div class="grid grid-cols-12 items-center px-3 py-2.5 rounded-xl bg-tune-card/90 border border-tune-accent/40 text-xs">
-                  <div class="col-span-1 text-tune-accent font-bold">▶</div>
-                  <div class="col-span-6 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded bg-gradient-to-br from-emerald-500 to-teal-800 flex items-center justify-center font-bold text-black text-xs">T</div>
-                    <div>
-                      <div class="font-bold text-tune-accent">Starboy (Lossless Studio Master)</div>
-                      <div class="text-[10px] text-tune-textMuted">The Weeknd • Daft Punk</div>
-                    </div>
+              <!-- Real Track Rows with Codec Badges -->
+              <div class="my-3 space-y-1.5">
+                
+                <!-- Active Playing Track -->
+                <div class="grid grid-cols-12 items-center px-3 py-2.5 rounded-xl bg-tune-elevated/70 border border-tune-accent/30 text-xs">
+                  <div class="col-span-1 text-tune-accent font-bold">
+                    <svg class="w-3.5 h-3.5 fill-current animate-pulse" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                   </div>
-                  <div class="col-span-3 text-tune-textSecondary text-[11px]">Starboy (FLAC 24-bit)</div>
-                  <div class="col-span-2 text-right font-mono text-[11px] text-tune-accent">3:50</div>
+                  <div class="col-span-5">
+                    <div class="font-bold text-white flex items-center gap-2">
+                      <span>Starboy</span>
+                      <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">FLAC 24-bit</span>
+                    </div>
+                    <div class="text-[10px] text-tune-textSecondary">The Weeknd, Daft Punk</div>
+                  </div>
+                  <div class="col-span-4 text-tune-textMuted text-[11px] truncate">Starboy (Studio Master)</div>
+                  <div class="col-span-2 text-right font-mono text-[11px] text-tune-accent font-medium">3:50</div>
                 </div>
 
-                <div class="grid grid-cols-12 items-center px-3 py-2 rounded-xl hover:bg-tune-card/40 text-xs text-tune-textSecondary">
-                  <div class="col-span-1 font-mono text-tune-textMuted">2</div>
-                  <div class="col-span-6 font-semibold text-white">Midnight City (M4A 320kbps)</div>
-                  <div class="col-span-3 text-[11px]">Hurry Up, We're Dreaming</div>
+                <!-- Track 2 -->
+                <div class="grid grid-cols-12 items-center px-3 py-2 rounded-lg hover:bg-white/[0.02] text-xs text-tune-textSecondary transition">
+                  <div class="col-span-1 font-mono text-[11px] text-tune-textMuted">02</div>
+                  <div class="col-span-5">
+                    <div class="font-medium text-white flex items-center gap-2">
+                      <span>Midnight City</span>
+                      <span class="text-[9px] font-mono px-1 py-0.2 rounded bg-white/[0.05] text-tune-textMuted border border-white/[0.08]">MP3 320k</span>
+                    </div>
+                    <div class="text-[10px] text-tune-textMuted">M83</div>
+                  </div>
+                  <div class="col-span-4 text-tune-textMuted text-[11px] truncate">Hurry Up, We're Dreaming</div>
                   <div class="col-span-2 text-right font-mono text-[11px] text-tune-textMuted">4:04</div>
                 </div>
 
-                <div class="grid grid-cols-12 items-center px-3 py-2 rounded-xl hover:bg-tune-card/40 text-xs text-tune-textSecondary">
-                  <div class="col-span-1 font-mono text-tune-textMuted">3</div>
-                  <div class="col-span-6 font-semibold text-white">Blinding Lights (High-Res Audio)</div>
-                  <div class="col-span-3 text-[11px]">After Hours</div>
-                  <div class="col-span-2 text-right font-mono text-[11px] text-tune-textMuted">3:20</div>
+                <!-- Track 3 -->
+                <div class="grid grid-cols-12 items-center px-3 py-2 rounded-lg hover:bg-white/[0.02] text-xs text-tune-textSecondary transition">
+                  <div class="col-span-1 font-mono text-[11px] text-tune-textMuted">03</div>
+                  <div class="col-span-5">
+                    <div class="font-medium text-white flex items-center gap-2">
+                      <span>Instant Crush</span>
+                      <span class="text-[9px] font-mono px-1 py-0.2 rounded bg-white/[0.05] text-tune-textMuted border border-white/[0.08]">ALAC Lossless</span>
+                    </div>
+                    <div class="text-[10px] text-tune-textMuted">Daft Punk ft. Julian Casablancas</div>
+                  </div>
+                  <div class="col-span-4 text-tune-textMuted text-[11px] truncate">Random Access Memories</div>
+                  <div class="col-span-2 text-right font-mono text-[11px] text-tune-textMuted">5:37</div>
+                </div>
+
+                <!-- Track 4 -->
+                <div class="grid grid-cols-12 items-center px-3 py-2 rounded-lg hover:bg-white/[0.02] text-xs text-tune-textSecondary transition">
+                  <div class="col-span-1 font-mono text-[11px] text-tune-textMuted">04</div>
+                  <div class="col-span-5">
+                    <div class="font-medium text-white flex items-center gap-2">
+                      <span>Resonance</span>
+                      <span class="text-[9px] font-mono px-1 py-0.2 rounded bg-white/[0.05] text-tune-textMuted border border-white/[0.08]">WAV 1411k</span>
+                    </div>
+                    <div class="text-[10px] text-tune-textMuted">HOME</div>
+                  </div>
+                  <div class="col-span-4 text-tune-textMuted text-[11px] truncate">Odyssey</div>
+                  <div class="col-span-2 text-right font-mono text-[11px] text-tune-textMuted">3:32</div>
                 </div>
               </div>
 
-              <!-- Bottom Player Bar Mockup -->
-              <div class="p-3.5 rounded-2xl bg-tune-surface border border-tune-border flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-tune-accent to-emerald-400 flex items-center justify-center text-black font-black">♪</div>
-                  <div>
-                    <span class="text-xs font-bold text-white block">Starboy</span>
-                    <span class="text-[10px] text-tune-textSecondary">The Weeknd</span>
+              <!-- Real Equalizer Slider Strip Preview -->
+              <div class="p-3 rounded-xl bg-tune-card/90 border border-white/[0.06] mb-3">
+                <div class="flex items-center justify-between text-[10px] font-mono text-tune-textMuted mb-2">
+                  <span class="text-white font-semibold flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-tune-accent"></span>
+                    10-Band IIR Peaking Filter Response (Q=1.414)
+                  </span>
+                  <div class="flex gap-2">
+                    <button class="px-1.5 py-0.5 rounded bg-white/[0.04] text-white hover:bg-tune-accent hover:text-black transition">Flat</button>
+                    <button class="px-1.5 py-0.5 rounded bg-tune-accent text-black font-bold">Bass Boost</button>
+                    <button class="px-1.5 py-0.5 rounded bg-white/[0.04] text-white hover:bg-tune-accent hover:text-black transition">Vocal</button>
+                    <button class="px-1.5 py-0.5 rounded bg-white/[0.04] text-white hover:bg-tune-accent hover:text-black transition">Rock</button>
                   </div>
                 </div>
 
-                <!-- Animated Equalizer Bars -->
-                <div class="flex items-end gap-1 h-6 px-4">
-                  <span class="w-1 bg-tune-accent rounded-full animate-eq-1"></span>
-                  <span class="w-1 bg-tune-accent rounded-full animate-eq-2"></span>
-                  <span class="w-1 bg-tune-accent rounded-full animate-eq-3"></span>
-                  <span class="w-1 bg-tune-accent rounded-full animate-eq-4"></span>
-                  <span class="w-1 bg-tune-accent rounded-full animate-eq-5"></span>
-                  <span class="w-1 bg-tune-accent rounded-full animate-eq-2"></span>
-                  <span class="w-1 bg-tune-accent rounded-full animate-eq-4"></span>
+                <!-- 10 Sliders Graphic -->
+                <div class="grid grid-cols-10 gap-1.5 items-end h-14 pt-1">
+                  <!-- 31Hz -->
+                  <div class="flex flex-col items-center gap-1 h-full justify-end">
+                    <div class="w-full bg-tune-accent/30 rounded-t h-[75%] relative">
+                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
+                    </div>
+                    <span class="text-[8px] font-mono text-tune-textMuted">31</span>
+                  </div>
+                  <!-- 62Hz -->
+                  <div class="flex flex-col items-center gap-1 h-full justify-end">
+                    <div class="w-full bg-tune-accent/30 rounded-t h-[85%] relative">
+                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
+                    </div>
+                    <span class="text-[8px] font-mono text-tune-textMuted">62</span>
+                  </div>
+                  <!-- 125Hz -->
+                  <div class="flex flex-col items-center gap-1 h-full justify-end">
+                    <div class="w-full bg-tune-accent/30 rounded-t h-[65%] relative">
+                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
+                    </div>
+                    <span class="text-[8px] font-mono text-tune-textMuted">125</span>
+                  </div>
+                  <!-- 250Hz -->
+                  <div class="flex flex-col items-center gap-1 h-full justify-end">
+                    <div class="w-full bg-tune-accent/30 rounded-t h-[50%] relative">
+                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
+                    </div>
+                    <span class="text-[8px] font-mono text-tune-textMuted">250</span>
+                  </div>
+                  <!-- 500Hz -->
+                  <div class="flex flex-col items-center gap-1 h-full justify-end">
+                    <div class="w-full bg-tune-accent/30 rounded-t h-[48%] relative">
+                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
+                    </div>
+                    <span class="text-[8px] font-mono text-tune-textMuted">500</span>
+                  </div>
+                  <!-- 1kHz -->
+                  <div class="flex flex-col items-center gap-1 h-full justify-end">
+                    <div class="w-full bg-tune-accent/30 rounded-t h-[52%] relative">
+                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
+                    </div>
+                    <span class="text-[8px] font-mono text-tune-textMuted">1k</span>
+                  </div>
+                  <!-- 2kHz -->
+                  <div class="flex flex-col items-center gap-1 h-full justify-end">
+                    <div class="w-full bg-tune-accent/30 rounded-t h-[60%] relative">
+                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
+                    </div>
+                    <span class="text-[8px] font-mono text-tune-textMuted">2k</span>
+                  </div>
+                  <!-- 4kHz -->
+                  <div class="flex flex-col items-center gap-1 h-full justify-end">
+                    <div class="w-full bg-tune-accent/30 rounded-t h-[70%] relative">
+                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
+                    </div>
+                    <span class="text-[8px] font-mono text-tune-textMuted">4k</span>
+                  </div>
+                  <!-- 8kHz -->
+                  <div class="flex flex-col items-center gap-1 h-full justify-end">
+                    <div class="w-full bg-tune-accent/30 rounded-t h-[65%] relative">
+                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
+                    </div>
+                    <span class="text-[8px] font-mono text-tune-textMuted">8k</span>
+                  </div>
+                  <!-- 16kHz -->
+                  <div class="flex flex-col items-center gap-1 h-full justify-end">
+                    <div class="w-full bg-tune-accent/30 rounded-t h-[58%] relative">
+                      <div class="absolute top-0 inset-x-0 h-1 bg-tune-accent rounded-full"></div>
+                    </div>
+                    <span class="text-[8px] font-mono text-tune-textMuted">16k</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Player Dock Bar with Live Synced Karaoke Line -->
+              <div class="p-3 rounded-xl bg-tune-surface border border-white/[0.08] flex items-center justify-between gap-4">
+                
+                <!-- Track Thumbnail & Controls -->
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center">
+                    <img src="logo.png" alt="Tune" class="w-6 h-6 object-contain" />
+                  </div>
+                  <div>
+                    <div class="text-xs font-bold text-white leading-tight">Starboy</div>
+                    <div class="text-[10px] text-tune-textMuted">01:42 / 03:50</div>
+                  </div>
                 </div>
 
-                <!-- Live Synced Karaoke Line -->
-                <div class="hidden sm:flex flex-col text-right">
-                  <span class="text-[10px] uppercase font-bold text-tune-accent">Synced Karaoke</span>
-                  <span class="text-xs font-semibold text-white">"I'm tryna put you in the worst mood, ah"</span>
+                <!-- Live Animated VU Meter Bars -->
+                <div class="flex items-end gap-1 h-5 px-3">
+                  <span class="w-1 bg-tune-accent rounded-full vu-bar-1"></span>
+                  <span class="w-1 bg-tune-accent rounded-full vu-bar-2"></span>
+                  <span class="w-1 bg-tune-accent rounded-full vu-bar-3"></span>
+                  <span class="w-1 bg-tune-accent rounded-full vu-bar-4"></span>
+                  <span class="w-1 bg-tune-accent rounded-full vu-bar-5"></span>
+                  <span class="w-1 bg-tune-accent rounded-full vu-bar-2"></span>
+                  <span class="w-1 bg-tune-accent rounded-full vu-bar-4"></span>
+                </div>
+
+                <!-- Synced LRC Karaoke Realtime Display -->
+                <div class="hidden md:flex flex-col text-right">
+                  <span class="text-[9px] font-mono uppercase tracking-widest text-tune-accent font-bold">[01:42.50] LRC SYNCED</span>
+                  <span class="text-xs font-semibold text-white tracking-wide">"I'm tryna put you in the worst mood, ah"</span>
                 </div>
               </div>
             </div>
@@ -321,305 +546,505 @@
     </div>
   </section>
 
-  <!-- Core Superpowers Feature Grid -->
-  <section id="features" class="py-20 sm:py-32 bg-tune-surface/50 border-t border-tune-border">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
-        <h2 class="text-xs uppercase font-extrabold tracking-widest text-tune-accent mb-3">Engineered for Music Lovers</h2>
-        <h3 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Audio Superpowers, Built-in.</h3>
-        <p class="mt-4 text-base text-tune-textSecondary">
-          Every feature in Tune is designed to give you complete control over your offline library without gatekeeping or internet dependency.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-        <!-- Feature 1: Pro Equalizer -->
-        <div class="p-6 sm:p-8 rounded-3xl bg-tune-card border border-tune-border card-glow transition flex flex-col justify-between">
-          <div>
-            <div class="w-12 h-12 rounded-2xl bg-tune-accent/15 border border-tune-accent/30 text-tune-accent flex items-center justify-center mb-6">
-              <svg class="w-6 h-6 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-              </svg>
-            </div>
-            <h4 class="text-xl font-bold text-white mb-2">10-Band Pro Equalizer</h4>
-            <p class="text-sm text-tune-textSecondary leading-relaxed">
-              Fine-tune frequencies from 32Hz to 16kHz with studio-grade peaking and shelving biquad filters. Includes 7 master presets like Rock, Electronic, Vocal, and Flat.
-            </p>
-          </div>
-          <div class="mt-6 pt-4 border-t border-tune-border/60 flex items-center justify-between text-xs font-mono text-tune-accent">
-            <span>32Hz — 16kHz</span>
-            <span>±12 dB Precision</span>
-          </div>
-        </div>
-
-        <!-- Feature 2: Bass Boost & 3D Virtualizer -->
-        <div class="p-6 sm:p-8 rounded-3xl bg-tune-card border border-tune-border card-glow transition flex flex-col justify-between">
-          <div>
-            <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-6">
-              <svg class="w-6 h-6 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-              </svg>
-            </div>
-            <h4 class="text-xl font-bold text-white mb-2">Bass Booster & 3D Virtualizer</h4>
-            <p class="text-sm text-tune-textSecondary leading-relaxed">
-              Experience deep, punchy low-end with an 80Hz low-shelf acoustic booster, coupled with a 3500Hz spatial presence filter that expands headphone stereo width.
-            </p>
-          </div>
-          <div class="mt-6 pt-4 border-t border-tune-border/60 flex items-center justify-between text-xs font-mono text-emerald-400">
-            <span>Sub-Bass Enhancement</span>
-            <span>Spatial Soundstage</span>
-          </div>
-        </div>
-
-        <!-- Feature 3: Synced Karaoke Lyrics -->
-        <div class="p-6 sm:p-8 rounded-3xl bg-tune-card border border-tune-border card-glow transition flex flex-col justify-between">
-          <div>
-            <div class="w-12 h-12 rounded-2xl bg-teal-500/15 border border-teal-500/30 text-teal-300 flex items-center justify-center mb-6">
-              <svg class="w-6 h-6 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"/>
-              </svg>
-            </div>
-            <h4 class="text-xl font-bold text-white mb-2">Synchronized Karaoke Lyrics</h4>
-            <p class="text-sm text-tune-textSecondary leading-relaxed">
-              Auto-fetches timed karaoke lyrics line-by-line. Missing lyrics? Paste your own .LRC or upload text files directly in the built-in custom lyrics editor.
-            </p>
-          </div>
-          <div class="mt-6 pt-4 border-t border-tune-border/60 flex items-center justify-between text-xs font-mono text-teal-300">
-            <span>Auto-Scroll Synced</span>
-            <span>.LRC File Upload</span>
-          </div>
-        </div>
-
-        <!-- Feature 4: Smart Volume Normalization -->
-        <div class="p-6 sm:p-8 rounded-3xl bg-tune-card border border-tune-border card-glow transition flex flex-col justify-between">
-          <div>
-            <div class="w-12 h-12 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mb-6">
-              <svg class="w-6 h-6 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
-              </svg>
-            </div>
-            <h4 class="text-xl font-bold text-white mb-2">Smart Volume Normalization</h4>
-            <p class="text-sm text-tune-textSecondary leading-relaxed">
-              Tired of one song blasting your ears while the next is a whisper? Built-in Web Audio dynamics compression auto-levels volume peaks across your entire library.
-            </p>
-          </div>
-          <div class="mt-6 pt-4 border-t border-tune-border/60 flex items-center justify-between text-xs font-mono text-cyan-400">
-            <span>Dynamics Compressor</span>
-            <span>Zero Ear-Fatigue</span>
-          </div>
-        </div>
-
-        <!-- Feature 5: Mobile Gestures & Haptics -->
-        <div class="p-6 sm:p-8 rounded-3xl bg-tune-card border border-tune-border card-glow transition flex flex-col justify-between">
-          <div>
-            <div class="w-12 h-12 rounded-2xl bg-lime-500/15 border border-lime-500/30 text-lime-400 flex items-center justify-center mb-6">
-              <svg class="w-6 h-6 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-              </svg>
-            </div>
-            <h4 class="text-xl font-bold text-white mb-2">Mobile Gestures & Haptics</h4>
-            <p class="text-sm text-tune-textSecondary leading-relaxed">
-              Swipe left or right on the album art to skip tracks with silky physics. Responsive haptic vibration ticks on Android deliver tactile feedback for likes and controls.
-            </p>
-          </div>
-          <div class="mt-6 pt-4 border-t border-tune-border/60 flex items-center justify-between text-xs font-mono text-lime-400">
-            <span>Swipe-to-Skip</span>
-            <span>Vibration Ticks</span>
-          </div>
-        </div>
-
-        <!-- Feature 6: Smart Auto-Playlists -->
-        <div class="p-6 sm:p-8 rounded-3xl bg-tune-card border border-tune-border card-glow transition flex flex-col justify-between">
-          <div>
-            <div class="w-12 h-12 rounded-2xl bg-orange-500/15 border border-orange-500/30 text-orange-400 flex items-center justify-center mb-6">
-              <svg class="w-6 h-6 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
-              </svg>
-            </div>
-            <h4 class="text-xl font-bold text-white mb-2">Smart Auto-Playlists</h4>
-            <p class="text-sm text-tune-textSecondary leading-relaxed">
-              Instant dynamic playlists generated automatically from your offline listening habits: <strong>Most Played</strong>, <strong>Recently Added</strong>, and <strong>Recently Played</strong>.
-            </p>
-          </div>
-          <div class="mt-6 pt-4 border-t border-tune-border/60 flex items-center justify-between text-xs font-mono text-orange-400">
-            <span>Listening Analytics</span>
-            <span>Zero Manual Work</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Comparison Section: Tune vs Others -->
-  <section id="compare" class="py-20 sm:py-32">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-16">
-        <h2 class="text-xs uppercase font-extrabold tracking-widest text-tune-accent mb-3">Honest Comparison</h2>
-        <h3 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Why Choose Tune?</h3>
-        <p class="mt-4 text-base text-tune-textSecondary">
-          How Tune compares to mainstream streaming apps and legacy desktop players.
-        </p>
-      </div>
-
-      <div class="rounded-3xl bg-tune-card border border-tune-border overflow-x-auto shadow-2xl">
-        <table class="w-full text-left text-sm">
-          <thead>
-            <tr class="border-b border-tune-border bg-tune-surface/80">
-              <th class="p-4 sm:p-6 font-bold text-white">Feature</th>
-              <th class="p-4 sm:p-6 font-extrabold text-tune-accent bg-tune-accent/5">Tune (This App)</th>
-              <th class="p-4 sm:p-6 font-semibold text-tune-textMuted">Spotify</th>
-              <th class="p-4 sm:p-6 font-semibold text-tune-textMuted">Default Media Player</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-tune-border/60 text-xs sm:text-sm">
-            <tr>
-              <td class="p-4 sm:p-6 font-medium text-white">100% Offline (No Internet Needed)</td>
-              <td class="p-4 sm:p-6 font-bold text-tune-accent bg-tune-accent/5">✓ Full Offline</td>
-              <td class="p-4 sm:p-6 text-red-400">✗ Premium Only</td>
-              <td class="p-4 sm:p-6 text-tune-textSecondary">✓ Yes</td>
-            </tr>
-            <tr>
-              <td class="p-4 sm:p-6 font-medium text-white">Zero Subscriptions or Ads</td>
-              <td class="p-4 sm:p-6 font-bold text-tune-accent bg-tune-accent/5">✓ Free Forever</td>
-              <td class="p-4 sm:p-6 text-red-400">✗ $11.99/month</td>
-              <td class="p-4 sm:p-6 text-tune-textSecondary">✓ Free</td>
-            </tr>
-            <tr>
-              <td class="p-4 sm:p-6 font-medium text-white">10-Band EQ & Bass Booster</td>
-              <td class="p-4 sm:p-6 font-bold text-tune-accent bg-tune-accent/5">✓ Studio Grade</td>
-              <td class="p-4 sm:p-6 text-tune-textSecondary">Limited 6-band</td>
-              <td class="p-4 sm:p-6 text-red-400">✗ Basic or None</td>
-            </tr>
-            <tr>
-              <td class="p-4 sm:p-6 font-medium text-white">Custom Synced Karaoke Lyrics</td>
-              <td class="p-4 sm:p-6 font-bold text-tune-accent bg-tune-accent/5">✓ Auto + LRC Upload</td>
-              <td class="p-4 sm:p-6 text-tune-textSecondary">Online Only</td>
-              <td class="p-4 sm:p-6 text-red-400">✗ None</td>
-            </tr>
-            <tr>
-              <td class="p-4 sm:p-6 font-medium text-white">In-App Song Tag Editor</td>
-              <td class="p-4 sm:p-6 font-bold text-tune-accent bg-tune-accent/5">✓ iTunes Auto-Match</td>
-              <td class="p-4 sm:p-6 text-red-400">✗ None</td>
-              <td class="p-4 sm:p-6 text-tune-textSecondary">Clunky / None</td>
-            </tr>
-            <tr>
-              <td class="p-4 sm:p-6 font-medium text-white">Smart Volume Normalization</td>
-              <td class="p-4 sm:p-6 font-bold text-tune-accent bg-tune-accent/5">✓ Dynamics Compressor</td>
-              <td class="p-4 sm:p-6 text-tune-textSecondary">ReplayGain</td>
-              <td class="p-4 sm:p-6 text-red-400">✗ None</td>
-            </tr>
-            <tr>
-              <td class="p-4 sm:p-6 font-medium text-white">Privacy & Telemetry</td>
-              <td class="p-4 sm:p-6 font-bold text-tune-accent bg-tune-accent/5">✓ Zero Tracking</td>
-              <td class="p-4 sm:p-6 text-red-400">Heavy Tracking</td>
-              <td class="p-4 sm:p-6 text-tune-textSecondary">OS Telemetry</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- Download Hub Section -->
-  <section id="download" class="py-20 sm:py-32 bg-tune-surface/40 border-t border-tune-border">
+  <!-- Section 2: Audio Engineering & DSP Architecture -->
+  <section id="dsp-pipeline" class="py-20 sm:py-28 border-t border-white/[0.06] bg-[#09090d]">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-3xl mx-auto mb-16">
-        <h2 class="text-xs uppercase font-extrabold tracking-widest text-tune-accent mb-3">Install on Your Devices</h2>
-        <h3 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Download Tune Free</h3>
-        <p class="mt-4 text-base text-tune-textSecondary">
-          Pick your platform below. Fast, standalone installers with zero bloatware.
+      
+      <!-- Section Header -->
+      <div class="max-w-2xl mb-14 text-left">
+        <div class="text-xs font-mono uppercase tracking-widest text-tune-accent mb-2">Acoustic Signal Processing</div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          Studio-grade signal chain. Direct to your hardware.
+        </h2>
+        <p class="mt-3 text-sm text-tune-textSecondary leading-relaxed">
+          Audio isn't just decoded; it passes through a cascaded Web Audio DSP node graph calibrated for bit-perfection, transient preservation, and speaker acoustic correction.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <!-- Card 1: Windows -->
-        <div class="p-8 rounded-3xl bg-tune-card border border-tune-border flex flex-col justify-between hover:border-tune-accent/60 transition group card-glow">
+      <!-- DSP Flow Diagram -->
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-12">
+        
+        <!-- Node 1 -->
+        <div class="p-4 rounded-xl bg-tune-card border border-white/[0.06] flex flex-col justify-between">
           <div>
-            <div class="w-14 h-14 rounded-2xl bg-blue-500/15 border border-blue-500/30 text-blue-400 flex items-center justify-center mb-6 group-hover:scale-105 transition">
-              <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-1">01. Source</div>
+            <h4 class="text-sm font-bold text-white mb-1">Audio Buffer</h4>
+            <p class="text-xs text-tune-textSecondary leading-normal">
+              IndexedDB Blob or Electron IPC stream with zero resampling.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/[0.06] text-[10px] font-mono text-tune-accent">
+            PCM · 44.1k/96kHz
+          </div>
+        </div>
+
+        <!-- Node 2 -->
+        <div class="p-4 rounded-xl bg-tune-card border border-white/[0.06] flex flex-col justify-between">
+          <div>
+            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-1">02. Preamplifier</div>
+            <h4 class="text-sm font-bold text-white mb-1">Gain Control</h4>
+            <p class="text-xs text-tune-textSecondary leading-normal">
+              Linear gain scalar with smooth exponential ramp-to-value to eliminate clicks.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/[0.06] text-[10px] font-mono text-tune-accent">
+            0.0 to 1.0 (Log)
+          </div>
+        </div>
+
+        <!-- Node 3 -->
+        <div class="p-4 rounded-xl bg-tune-card border border-tune-accent/30 flex flex-col justify-between relative shadow-lg shadow-tune-accent/5">
+          <div class="absolute -top-2.5 right-3 px-2 py-0.5 rounded bg-tune-accent text-black font-mono text-[9px] font-bold">CORE</div>
+          <div>
+            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-1">03. EQ Bank</div>
+            <h4 class="text-sm font-bold text-white mb-1">10-Band Biquad</h4>
+            <p class="text-xs text-tune-textSecondary leading-normal">
+              Cascaded second-order IIR peaking and shelving filters from 31Hz to 16kHz.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/[0.06] text-[10px] font-mono text-tune-accent">
+            ±12 dB · Q = 1.414
+          </div>
+        </div>
+
+        <!-- Node 4 -->
+        <div class="p-4 rounded-xl bg-tune-card border border-white/[0.06] flex flex-col justify-between">
+          <div>
+            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-1">04. Spatializer</div>
+            <h4 class="text-sm font-bold text-white mb-1">Stereo Widener</h4>
+            <p class="text-xs text-tune-textSecondary leading-normal">
+              3500Hz acoustic presence boost and Haas stereo channel panning.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/[0.06] text-[10px] font-mono text-tune-accent">
+            Headphone 3D
+          </div>
+        </div>
+
+        <!-- Node 5 -->
+        <div class="p-4 rounded-xl bg-tune-card border border-white/[0.06] flex flex-col justify-between">
+          <div>
+            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-1">05. Protection</div>
+            <h4 class="text-sm font-bold text-white mb-1">Dynamics Leveler</h4>
+            <p class="text-xs text-tune-textSecondary leading-normal">
+              Compression limiter preventing digital clipping during heavy bass boost.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/[0.06] text-[10px] font-mono text-tune-accent">
+            -24dB / 3ms Attack
+          </div>
+        </div>
+      </div>
+
+      <!-- DSP Specification Details -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="craft-card p-6 rounded-2xl">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-white mb-1.5">Zero Lossless Compromise</h3>
+          <p class="text-xs text-tune-textSecondary leading-relaxed">
+            Direct hardware decoding via native Chromium audio streams. Whether you play 24-bit 192kHz FLAC, ALAC, or standard 320kbps MP3s, bits are handled without forced downsampling.
+          </p>
+        </div>
+
+        <div class="craft-card p-6 rounded-2xl">
+          <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-white mb-1.5">Sub-3ms Seek Latency</h3>
+          <p class="text-xs text-tune-textSecondary leading-relaxed">
+            Local track indexing in memory coupled with IndexedDB blob caches eliminates buffering lag completely. Instant scrubber response even on multi-hour DJ sets.
+          </p>
+        </div>
+
+        <div class="craft-card p-6 rounded-2xl">
+          <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-white mb-1.5">100% Air-Gapped Capable</h3>
+          <p class="text-xs text-tune-textSecondary leading-relaxed">
+            Tune operates completely isolated from the internet. No background pings, no telemetry daemons, no usage heatmaps. Your listening history never leaves your device.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Pillars & Architecture Details -->
+  <section id="features" class="py-20 sm:py-28 border-t border-white/[0.06]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="max-w-2xl mb-14 text-left">
+        <div class="text-xs font-mono uppercase tracking-widest text-tune-accent mb-2">Software Architecture</div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          Engineered for power users.
+        </h2>
+        <p class="mt-3 text-sm text-tune-textSecondary leading-relaxed">
+          Built on Electron, React, TypeScript, and Capacitor for zero overhead on desktop and mobile.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Feature 1: Synced LRC Karaoke -->
+        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
+          <div>
+            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-2">Lyric Synchronization</div>
+            <h3 class="text-base font-bold text-white mb-2">Sub-Second LRC Karaoke</h3>
+            <p class="text-xs text-tune-textSecondary leading-relaxed">
+              Auto-fetches timestamped lyrics via LRCLIB and renders real-time auto-scrolling karaoke. Supports manual .LRC file uploads, timestamp offsets (±50ms), and custom text pasting.
+            </p>
+          </div>
+          <div class="mt-6 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-tune-accent">
+            <span>[mm:ss.xx] Standard</span>
+            <span>Local & Network</span>
+          </div>
+        </div>
+
+        <!-- Feature 2: ID3 Tag Editor -->
+        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
+          <div>
+            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-2">Library Hygiene</div>
+            <h3 class="text-base font-bold text-white mb-2">In-App ID3 Tag Editor</h3>
+            <p class="text-xs text-tune-textSecondary leading-relaxed">
+              Edit Title, Artist, Album, Year, and Genre directly in the app. Automatic iTunes Search API integration identifies missing track metadata and downloads high-res album covers.
+            </p>
+          </div>
+          <div class="mt-6 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-tune-accent">
+            <span>ID3v2.3 / ID3v2.4</span>
+            <span>iTunes Match</span>
+          </div>
+        </div>
+
+        <!-- Feature 3: Spotify Playlist Importer -->
+        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
+          <div>
+            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-2">Data Portability</div>
+            <h3 class="text-base font-bold text-white mb-2">Spotify Playlist Importer</h3>
+            <p class="text-xs text-tune-textSecondary leading-relaxed">
+              Migrate away from streaming without losing your curation. Paste any public playlist link; Tune parses the tracklist and matches available audio files in your local folders.
+            </p>
+          </div>
+          <div class="mt-6 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-tune-accent">
+            <span>Zero API Keys</span>
+            <span>Fuzzy Matcher</span>
+          </div>
+        </div>
+
+        <!-- Feature 4: Mobile Gestures & Haptics -->
+        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
+          <div>
+            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-2">Mobile Physics</div>
+            <h3 class="text-base font-bold text-white mb-2">Inertial Swipe & Haptics</h3>
+            <p class="text-xs text-tune-textSecondary leading-relaxed">
+              Swipe album art left or right to skip tracks with resistance physics. Subtle vibration pulses via Capacitor Haptics deliver tactile confirmation on Android.
+            </p>
+          </div>
+          <div class="mt-6 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-tune-accent">
+            <span>Touch Physics</span>
+            <span>Android Haptics</span>
+          </div>
+        </div>
+
+        <!-- Feature 5: Smart Auto-Playlists -->
+        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
+          <div>
+            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-2">Automated Curation</div>
+            <h3 class="text-base font-bold text-white mb-2">Algorithmic Playlists</h3>
+            <p class="text-xs text-tune-textSecondary leading-relaxed">
+              Dynamically generated smart collections computed locally: <strong>Most Played</strong> (weighted by play counts), <strong>Recently Added</strong> (file mtime), and <strong>Recently Played</strong>.
+            </p>
+          </div>
+          <div class="mt-6 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-tune-accent">
+            <span>Local Indexing</span>
+            <span>Zero Manual Sorting</span>
+          </div>
+        </div>
+
+        <!-- Feature 6: Mini Player & Global Keys -->
+        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
+          <div>
+            <div class="text-[10px] font-mono text-tune-textMuted uppercase mb-2">Desktop Integration</div>
+            <h3 class="text-base font-bold text-white mb-2">Always-on-Top Mini Player</h3>
+            <p class="text-xs text-tune-textSecondary leading-relaxed">
+              Compact floating widget for multitasking. Includes Windows global media keys support (Play/Pause, Next, Previous) and Discord Rich Presence integration.
+            </p>
+          </div>
+          <div class="mt-6 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-tune-accent">
+            <span>Global Media Keys</span>
+            <span>Discord RPC</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: Honest Objective Comparison -->
+  <section id="compare" class="py-20 sm:py-28 border-t border-white/[0.06] bg-[#09090d]">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="max-w-2xl mb-12 text-left">
+        <div class="text-xs font-mono uppercase tracking-widest text-tune-accent mb-2">Architectural Audit</div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          How Tune compares.
+        </h2>
+        <p class="mt-3 text-sm text-tune-textSecondary leading-relaxed">
+          Comparing architecture, privacy, and audio fidelity against streaming services and default players.
+        </p>
+      </div>
+
+      <div class="rounded-2xl border border-white/[0.08] overflow-hidden bg-tune-card">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead>
+              <tr class="border-b border-white/[0.08] bg-[#0e0e13]">
+                <th class="p-4 sm:p-5 font-mono text-[11px] uppercase tracking-wider text-tune-textMuted">Attribute</th>
+                <th class="p-4 sm:p-5 font-bold text-white bg-tune-accent/[0.08] border-x border-white/[0.06]">
+                  <div class="flex items-center gap-2">
+                    <img src="logo.png" alt="Tune" class="w-4 h-4 object-contain" />
+                    <span>Tune</span>
+                  </div>
+                </th>
+                <th class="p-4 sm:p-5 font-semibold text-tune-textMuted">Spotify</th>
+                <th class="p-4 sm:p-5 font-semibold text-tune-textMuted">Default Media Player</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/[0.06] font-mono text-xs">
+              <tr>
+                <td class="p-4 sm:p-5 font-sans font-medium text-white">Playback Model</td>
+                <td class="p-4 sm:p-5 text-tune-accent font-semibold bg-tune-accent/[0.08] border-x border-white/[0.06]">
+                  100% Local / Offline
+                </td>
+                <td class="p-4 sm:p-5 text-rose-400">Stream-First (DRM cached)</td>
+                <td class="p-4 sm:p-5 text-tune-textSecondary">Local File System</td>
+              </tr>
+              <tr>
+                <td class="p-4 sm:p-5 font-sans font-medium text-white">Pricing / Monetization</td>
+                <td class="p-4 sm:p-5 text-tune-accent font-semibold bg-tune-accent/[0.08] border-x border-white/[0.06]">
+                  Free / Open Source (MIT)
+                </td>
+                <td class="p-4 sm:p-5 text-rose-400">$11.99 / mo subscription</td>
+                <td class="p-4 sm:p-5 text-tune-textSecondary">Bundled with OS</td>
+              </tr>
+              <tr>
+                <td class="p-4 sm:p-5 font-sans font-medium text-white">Equalizer Pipeline</td>
+                <td class="p-4 sm:p-5 text-tune-accent font-semibold bg-tune-accent/[0.08] border-x border-white/[0.06]">
+                  10-Band Cascaded Biquad
+                </td>
+                <td class="p-4 sm:p-5 text-tune-textSecondary">Basic 6-Band</td>
+                <td class="p-4 sm:p-5 text-rose-400">None or Basic Presets</td>
+              </tr>
+              <tr>
+                <td class="p-4 sm:p-5 font-sans font-medium text-white">Lyrics Synchronization</td>
+                <td class="p-4 sm:p-5 text-tune-accent font-semibold bg-tune-accent/[0.08] border-x border-white/[0.06]">
+                  Auto + Custom .LRC File Support
+                </td>
+                <td class="p-4 sm:p-5 text-tune-textSecondary">Server-gated Musixmatch</td>
+                <td class="p-4 sm:p-5 text-rose-400">Not Supported</td>
+              </tr>
+              <tr>
+                <td class="p-4 sm:p-5 font-sans font-medium text-white">Privacy & Telemetry</td>
+                <td class="p-4 sm:p-5 text-tune-accent font-semibold bg-tune-accent/[0.08] border-x border-white/[0.06]">
+                  0 Telemetry Packets
+                </td>
+                <td class="p-4 sm:p-5 text-rose-400">Ad Identifiers & Listening Logs</td>
+                <td class="p-4 sm:p-5 text-tune-textSecondary">OS Diagnostics</td>
+              </tr>
+              <tr>
+                <td class="p-4 sm:p-5 font-sans font-medium text-white">RAM Consumption</td>
+                <td class="p-4 sm:p-5 text-tune-accent font-semibold bg-tune-accent/[0.08] border-x border-white/[0.06]">
+                  ~65 MB (Idle)
+                </td>
+                <td class="p-4 sm:p-5 text-rose-400">650 MB - 1.2 GB</td>
+                <td class="p-4 sm:p-5 text-tune-textSecondary">~120 MB</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: Keyboard Shortcuts HUD -->
+  <section id="shortcuts" class="py-16 sm:py-24 border-t border-white/[0.06]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-xl mx-auto mb-10">
+        <div class="text-xs font-mono uppercase tracking-widest text-tune-accent mb-2">Designed for Velocity</div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Desktop Keyboard Navigation</h2>
+        <p class="mt-2 text-xs sm:text-sm text-tune-textSecondary">
+          Control playback instantly without lifting your hands from the keyboard.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
+          <span class="text-xs text-tune-textSecondary">Play / Pause</span>
+          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">Space</kbd>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
+          <span class="text-xs text-tune-textSecondary">Seek -5 Seconds</span>
+          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">J</kbd>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
+          <span class="text-xs text-tune-textSecondary">Seek +5 Seconds</span>
+          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">L</kbd>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
+          <span class="text-xs text-tune-textSecondary">Toggle Mute</span>
+          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">M</kbd>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
+          <span class="text-xs text-tune-textSecondary">Search Library</span>
+          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">F</kbd>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
+          <span class="text-xs text-tune-textSecondary">Equalizer Panel</span>
+          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">E</kbd>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
+          <span class="text-xs text-tune-textSecondary">Toggle Shuffle</span>
+          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">S</kbd>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-tune-card border border-white/[0.06] flex items-center justify-between">
+          <span class="text-xs text-tune-textSecondary">Keyboard Help</span>
+          <kbd class="px-2 py-1 rounded bg-white/[0.06] text-white font-mono text-[11px] border border-white/[0.1]">?</kbd>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 6: Direct Platform Downloads -->
+  <section id="download" class="py-20 sm:py-28 border-t border-white/[0.06] bg-[#09090d]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-14">
+        <div class="text-xs font-mono uppercase tracking-widest text-tune-accent mb-2">Self-Contained Binaries</div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Download Tune</h2>
+        <p class="mt-3 text-sm text-tune-textSecondary">
+          Free and open-source. Select your platform below.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Windows Card -->
+        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mb-5">
+              <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
                 <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
               </svg>
             </div>
-            <h4 class="text-2xl font-bold text-white mb-2">Windows</h4>
-            <p class="text-xs text-tune-textSecondary leading-relaxed mb-4">
-              Native desktop experience with mini-player, global media keys, Discord Rich Presence, and folder watching.
+            <h3 class="text-lg font-bold text-white mb-1">Windows</h3>
+            <p class="text-xs text-tune-textSecondary mb-4">
+              Native desktop build with Mini-Player, Windows Global Media Keys, and automatic folder watcher.
             </p>
             <div class="text-[11px] font-mono text-tune-textMuted space-y-1 mb-6">
-              <div>• Windows 10 & 11 (64-bit)</div>
-              <div>• File size: ~85 MB</div>
-              <div>• Standard NSIS Setup & Portable</div>
+              <div>• Windows 10 & 11 (x64)</div>
+              <div>• Package: NSIS Setup / Portable</div>
+              <div>• SHA-256 Verified Release</div>
             </div>
           </div>
 
           <div class="space-y-2">
-            <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" class="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-tune-accent hover:bg-tune-accentHover text-black text-sm font-extrabold transition shadow-lg shadow-tune-accent/20 active:scale-95">
+            <a 
+              href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" 
+              class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-tune-accent hover:bg-tune-accentHover text-black text-xs font-bold transition shadow-sm active:scale-95"
+            >
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
               <span>Download (.EXE)</span>
             </a>
-            <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" class="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-semibold text-tune-textMuted hover:text-white transition">
+            <a 
+              href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" 
+              class="w-full flex items-center justify-center py-1.5 text-[11px] font-mono text-tune-textMuted hover:text-white transition"
+            >
               <span>View Portable (.zip) Releases ↗</span>
             </a>
           </div>
         </div>
 
-        <!-- Card 2: Android -->
-        <div class="p-8 rounded-3xl bg-tune-card border border-tune-border flex flex-col justify-between hover:border-tune-accent/60 transition group card-glow">
+        <!-- Android Card -->
+        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
           <div>
-            <div class="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-6 group-hover:scale-105 transition">
-              <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-5">
+              <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
                 <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4116 13.8533 8.083 12 8.083c-1.8534 0-3.5903.3286-5.1367.8667L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>
               </svg>
             </div>
-            <h4 class="text-2xl font-bold text-white mb-2">Android</h4>
-            <p class="text-xs text-tune-textSecondary leading-relaxed mb-4">
-              Optimized for mobile touchscreens with album art swipe gestures, haptic feedback, notification controls, and background audio.
+            <h3 class="text-lg font-bold text-white mb-1">Android</h3>
+            <p class="text-xs text-tune-textSecondary mb-4">
+              Touchscreen optimized with album art inertial swipe physics, Capacitor haptic vibration, and lockscreen controls.
             </p>
             <div class="text-[11px] font-mono text-tune-textMuted space-y-1 mb-6">
-              <div>• Android 8.0 (Oreo) and above</div>
-              <div>• File size: ~15 MB</div>
-              <div>• Standalone .APK Sideload</div>
+              <div>• Android 8.0 (API 26) or newer</div>
+              <div>• Direct Sideload (.apk)</div>
+              <div>• Background Audio + Notification Bar</div>
             </div>
           </div>
 
           <div class="space-y-2">
-            <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" class="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-tune-accent hover:bg-tune-accentHover text-black text-sm font-extrabold transition shadow-lg shadow-tune-accent/20 active:scale-95">
+            <a 
+              href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest" 
+              class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-tune-accent hover:bg-tune-accentHover text-black text-xs font-bold transition shadow-sm active:scale-95"
+            >
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
               <span>Download APK</span>
             </a>
-            <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases" class="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-semibold text-tune-textMuted hover:text-white transition">
+            <a 
+              href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases" 
+              class="w-full flex items-center justify-center py-1.5 text-[11px] font-mono text-tune-textMuted hover:text-white transition"
+            >
               <span>View Release Notes ↗</span>
             </a>
           </div>
         </div>
 
-        <!-- Card 3: Web Player & Source -->
-        <div class="p-8 rounded-3xl bg-tune-card border border-tune-border flex flex-col justify-between hover:border-tune-accent/60 transition group card-glow">
+        <!-- Build from Source Card -->
+        <div class="craft-card p-6 rounded-2xl flex flex-col justify-between">
           <div>
-            <div class="w-14 h-14 rounded-2xl bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center mb-6 group-hover:scale-105 transition">
-              <svg class="w-7 h-7 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+            <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mb-5">
+              <svg class="w-6 h-6 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
               </svg>
             </div>
-            <h4 class="text-2xl font-bold text-white mb-2">Web & PWA</h4>
-            <p class="text-xs text-tune-textSecondary leading-relaxed mb-4">
-              Run Tune directly in your browser without installing anything. Play local tracks via drag-and-drop or folder picking.
+            <h3 class="text-lg font-bold text-white mb-1">Build from Source</h3>
+            <p class="text-xs text-tune-textSecondary mb-4">
+              Compile Tune on your own machine. Requires Node.js 18+ and standard developer toolchains.
             </p>
-            <div class="text-[11px] font-mono text-tune-textMuted space-y-1 mb-6">
-              <div>• Chrome, Edge, Safari, Firefox</div>
-              <div>• Installable as PWA desktop app</div>
-              <div>• 100% Client-Side Audio</div>
+            <div class="p-2.5 rounded-lg bg-black/60 border border-white/[0.06] text-[10px] font-mono text-tune-textSecondary space-y-1 mb-6">
+              <div class="text-tune-accent">$ git clone https://github.com/...</div>
+              <div>$ npm install</div>
+              <div>$ npm run electron:build</div>
             </div>
           </div>
 
           <div class="space-y-2">
-            <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player" target="_blank" class="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-tune-elevated hover:bg-tune-border text-white text-sm font-extrabold transition border border-tune-border active:scale-95">
-              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <a 
+              href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player" 
+              target="_blank" 
+              class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-white text-xs font-bold transition border border-white/[0.08] active:scale-95"
+            >
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
               </svg>
               <span>GitHub Repository</span>
             </a>
-            <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player#build-from-source" target="_blank" class="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-semibold text-tune-textMuted hover:text-white transition">
-              <span>Build From Source Instructions ↗</span>
+            <a 
+              href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player#build-from-source" 
+              target="_blank" 
+              class="w-full flex items-center justify-center py-1.5 text-[11px] font-mono text-tune-textMuted hover:text-white transition"
+            >
+              <span>Compilation Guide ↗</span>
             </a>
           </div>
         </div>
@@ -627,65 +1052,67 @@
     </div>
   </section>
 
-  <!-- FAQ Section -->
-  <section id="faq" class="py-20 sm:py-32">
+  <!-- Section 7: Technical FAQ -->
+  <section id="faq" class="py-20 sm:py-28 border-t border-white/[0.06]">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-16">
-        <h2 class="text-xs uppercase font-extrabold tracking-widest text-tune-accent mb-3">Answers & Details</h2>
-        <h3 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Frequently Asked Questions</h3>
+      
+      <div class="text-left mb-12">
+        <div class="text-xs font-mono uppercase tracking-widest text-tune-accent mb-2">Technical Questions</div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">FAQ</h2>
       </div>
 
-      <div class="space-y-4">
-        <!-- Q1 -->
-        <div class="p-6 rounded-2xl bg-tune-card border border-tune-border">
-          <h4 class="text-base font-bold text-white mb-2">Does Tune require an internet connection?</h4>
-          <p class="text-sm text-tune-textSecondary leading-relaxed">
-            No! Tune is 100% offline first. All audio playback, equalizer processing, waveform rendering, and playlist management happen locally on your computer or phone. Internet access is only optionally used when fetching online album cover art or synchronized lyrics.
+      <div class="space-y-3">
+        <div class="p-5 rounded-xl bg-tune-card border border-white/[0.06]">
+          <h4 class="text-sm font-bold text-white mb-1.5">Where is library and playback data stored?</h4>
+          <p class="text-xs text-tune-textSecondary leading-relaxed">
+            All database tables, playlist indices, and track configurations are persisted in local browser storage (IndexedDB) or local JSON application state within the user's OS AppData directory. Nothing is synchronized to any external server.
           </p>
         </div>
 
-        <!-- Q2 -->
-        <div class="p-6 rounded-2xl bg-tune-card border border-tune-border">
-          <h4 class="text-base font-bold text-white mb-2">What audio formats are supported?</h4>
-          <p class="text-sm text-tune-textSecondary leading-relaxed">
-            Tune supports all major lossless and lossy audio codecs including <strong>MP3, FLAC, M4A, WAV, OGG, AAC, OPUS, and MP4</strong> audio.
+        <div class="p-5 rounded-xl bg-tune-card border border-white/[0.06]">
+          <h4 class="text-sm font-bold text-white mb-1.5">Does the 10-band equalizer introduce phase distortion?</h4>
+          <p class="text-xs text-tune-textSecondary leading-relaxed">
+            No. The equalizer utilizes standard second-order biquadratic filter nodes provided natively by the Web Audio specification. With Q-factors clamped to 1.414, transitions between octave bands remain smooth without audible ringing or phase cancellation.
           </p>
         </div>
 
-        <!-- Q3 -->
-        <div class="p-6 rounded-2xl bg-tune-card border border-tune-border">
-          <h4 class="text-base font-bold text-white mb-2">How does the Spotify Playlist Importer work?</h4>
-          <p class="text-sm text-tune-textSecondary leading-relaxed">
-            Paste any public Spotify playlist URL into Tune. Tune extracts the tracklist and automatically scans your offline music library to match songs. You can then download missing songs through your preferred tools.
+        <div class="p-5 rounded-xl bg-tune-card border border-white/[0.06]">
+          <h4 class="text-sm font-bold text-white mb-1.5">How does Tune handle album cover fetching?</h4>
+          <p class="text-xs text-tune-textSecondary leading-relaxed">
+            Tune first extracts embedded APIC / ID3 picture frames directly from your audio files. If absent, you can trigger the Tag Editor's iTunes Lookup, which fetches artwork directly from Apple's public catalog without needing an account.
           </p>
         </div>
 
-        <!-- Q4 -->
-        <div class="p-6 rounded-2xl bg-tune-card border border-tune-border">
-          <h4 class="text-base font-bold text-white mb-2">Is Tune free and open source?</h4>
-          <p class="text-sm text-tune-textSecondary leading-relaxed">
-            Yes, Tune is completely free under the open-source MIT license. There are no paywalls, locked features, tracking analytics, or hidden charges.
+        <div class="p-5 rounded-xl bg-tune-card border border-white/[0.06]">
+          <h4 class="text-sm font-bold text-white mb-1.5">Is Tune free of telemetry and analytics?</h4>
+          <p class="text-xs text-tune-textSecondary leading-relaxed">
+            Yes. There are zero analytics SDKs (no Google Analytics, no Sentry, no Mixpanel, no PostHog). The only network calls made by the application are direct fetches to lrclib.net (for lyrics) and itunes.apple.com (for tags), both of which can be completely avoided in offline mode.
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="py-12 border-t border-tune-border/60 bg-black text-center text-xs text-tune-textMuted">
+  <!-- Clean Footer with Real Logo -->
+  <footer class="py-12 border-t border-white/[0.06] bg-[#050507] text-xs text-tune-textMuted">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2">
-        <div class="w-6 h-6 rounded-md bg-tune-accent text-black flex items-center justify-center font-bold text-xs">T</div>
-        <span class="font-bold text-white">Tune Music</span>
-        <span>•</span>
-        <span>Released under MIT License</span>
+      
+      <!-- Logo + Copyright -->
+      <div class="flex items-center gap-3">
+        <img src="logo.png" alt="Tune" class="w-6 h-6 rounded object-contain" />
+        <div class="flex items-baseline gap-1">
+          <span class="font-extrabold text-white lowercase">tune<span class="text-tune-accent">.</span></span>
+          <span class="text-[10px] font-mono text-tune-textMuted ml-1">— Open Source (MIT)</span>
+        </div>
       </div>
 
-      <div class="flex items-center gap-6">
-        <a href="#features" class="hover:text-white transition">Features</a>
+      <!-- Links -->
+      <div class="flex items-center gap-6 font-mono text-[11px]">
+        <a href="#workstation" class="hover:text-white transition">Workstation</a>
+        <a href="#dsp-pipeline" class="hover:text-white transition">DSP Pipeline</a>
         <a href="#download" class="hover:text-white transition">Downloads</a>
         <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player" target="_blank" class="hover:text-white transition">GitHub</a>
-        <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/issues" target="_blank" class="hover:text-white transition">Report an Issue</a>
+        <a href="https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/issues" target="_blank" class="hover:text-white transition">Issues</a>
       </div>
     </div>
   </footer>
@@ -697,26 +1124,25 @@
       const isAndroid = /android/i.test(userAgent);
       const isWindows = /windows nt/i.test(userAgent);
 
-      const primaryBtn = document.getElementById('primary-hero-btn');
-      const primaryText = document.getElementById('primary-hero-text');
-      const primarySub = document.getElementById('primary-hero-sub');
-      const primaryIcon = document.getElementById('primary-hero-icon');
-      const navDownloadLabel = document.getElementById('nav-download-label-web');
+      const heroBtn = document.getElementById('hero-primary-btn');
+      const heroTitle = document.getElementById('hero-primary-title');
+      const heroSpec = document.getElementById('hero-primary-spec');
+      const heroIcon = document.getElementById('hero-primary-icon');
+      const navCtaText = document.getElementById('nav-cta-text');
 
       if (isAndroid) {
-        primaryText.textContent = 'Download for Android';
-        primarySub.textContent = 'Android 8.0+ • APK Sideload';
-        primaryBtn.href = 'https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest';
-        navDownloadLabel.textContent = 'Download APK';
-        primaryIcon.innerHTML = '<path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4116 13.8533 8.083 12 8.083c-1.8534 0-3.5903.3286-5.1367.8667L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>';
+        heroTitle.textContent = 'Download for Android';
+        heroSpec.textContent = 'Android 8.0+ • APK Sideload';
+        heroBtn.href = 'https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest';
+        navCtaText.textContent = 'Download APK';
+        heroIcon.innerHTML = '<path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4116 13.8533 8.083 12 8.083c-1.8534 0-3.5903.3286-5.1367.8667L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>';
       } else if (isWindows) {
-        primaryText.textContent = 'Download for Windows';
-        primarySub.textContent = 'Windows 10/11 • 64-bit .exe';
-        primaryBtn.href = 'https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest';
-        navDownloadLabel.textContent = 'Download for Windows';
+        heroTitle.textContent = 'Download for Windows';
+        heroSpec.textContent = '64-bit Installer (.exe)';
+        heroBtn.href = 'https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest';
+        navCtaText.textContent = 'Download for Windows';
       }
     })();
   </script>
 </body>
 </html>
-

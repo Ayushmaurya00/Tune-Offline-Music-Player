@@ -78,4 +78,5 @@ To test and view the website locally before deploying:
 
 Open `index.html` in any text editor to customize:
 - Release URLs (replace `https://github.com/Ayushmaurya00/Tune-Offline-Music-Player/releases/latest` with your own hosted binaries if desired).
-- Web Player URL (replace `https://ayushmaurya00.github.io/Tune-Offline-Music-Player/` in the PWA card if your web player is hosted elsewhere).
+- Repository URL (replace with your custom repository or organization link if needed).
+
