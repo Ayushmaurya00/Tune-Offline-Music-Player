@@ -97,3 +97,4 @@ export function getRecentlyPlayedSongs(allSongs: Song[], limit = 60): Song[] {
 
   return recentSongs.length > 0 ? recentSongs : allSongs.slice(0, 20);
 }
+

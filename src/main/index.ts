@@ -1,4 +1,5 @@
-import { app, BrowserWindow, ipcMain, protocol, net } from 'electron';
+import { app, BrowserWindow, ipcMain, protocol, net, shell } from 'electron';
+import fs from 'node:fs';
 import path from 'node:path';
 import url, { fileURLToPath } from 'node:url';
 import { scanDirectory, scanDirectoryDetailed, parseAudioFile } from './services/scanner';
@@ -35,6 +36,22 @@ protocol.registerSchemesAsPrivileged([
   }
 ]);
 
+const ALLOWED_STREAM_EXTENSIONS = new Set([
+  '.mp3',
+  '.m4a',
+  '.wav',
+  '.flac',
+  '.ogg',
+  '.aac',
+  '.opus',
+  '.mp4',
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.webp',
+  '.svg'
+]);
+
 function createWindow() {
   win = new BrowserWindow({
     width: 1280,
@@ -51,13 +68,32 @@ function createWindow() {
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
-      sandbox: false,
+      sandbox: true,
       contextIsolation: true,
       nodeIntegration: false
     }
   });
 
-  // Handle local audio file streaming through tune-media://
+  // Security Guard: Prevent internal window opening; route safe web links to user default browser
+  win.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
+    if (targetUrl.startsWith('https:') || targetUrl.startsWith('http:')) {
+      shell.openExternal(targetUrl);
+    }
+    return { action: 'deny' };
+  });
+
+  // Security Guard: Prevent in-app navigation away from application UI
+  win.webContents.on('will-navigate', (event, navigationUrl) => {
+    const currentUrl = win?.webContents.getURL();
+    if (currentUrl && navigationUrl !== currentUrl) {
+      event.preventDefault();
+      if (navigationUrl.startsWith('https:') || navigationUrl.startsWith('http:')) {
+        shell.openExternal(navigationUrl);
+      }
+    }
+  });
+
+  // Handle local audio file streaming through tune-media:// with extension validation
   protocol.handle('tune-media', (request) => {
     try {
       const parsedUrl = new URL(request.url);
@@ -67,7 +103,20 @@ function createWindow() {
         filePath = filePath.slice(1);
       }
 
-      return net.fetch(url.pathToFileURL(filePath).toString());
+      const resolved = path.resolve(filePath);
+      const ext = path.extname(resolved).toLowerCase();
+
+      // Guard: Only stream allowed media files
+      if (!ALLOWED_STREAM_EXTENSIONS.has(ext)) {
+        console.warn(`Blocked unauthorized tune-media request: ${resolved}`);
+        return new Response('Forbidden: Non-media resource', { status: 403 });
+      }
+
+      if (!fs.existsSync(resolved)) {
+        return new Response('File not found', { status: 404 });
+      }
+
+      return net.fetch(url.pathToFileURL(resolved).toString());
     } catch (err) {
       console.error('tune-media protocol error:', err);
       return new Response('File not found', { status: 404 });
@@ -89,21 +138,29 @@ function createWindow() {
   );
 }
 
-// IPC Handlers
+// IPC Handlers with input validation
 ipcMain.handle('tune:get-downloads-path', () => {
   return app.getPath('downloads');
 });
 
 ipcMain.handle('tune:scan-folder', async (_, folderPath: string) => {
+  if (!folderPath || typeof folderPath !== 'string' || !fs.existsSync(folderPath)) {
+    return [];
+  }
   return await scanDirectory(folderPath);
 });
 
 ipcMain.handle('tune:scan-folder-detailed', async (_, folderPath: string) => {
+  if (!folderPath || typeof folderPath !== 'string' || !fs.existsSync(folderPath)) {
+    return { songs: [], rejectedCount: 0, rejectedNames: [] };
+  }
   return await scanDirectoryDetailed(folderPath);
 });
 
 ipcMain.handle('tune:start-watching', async (_, folderPath: string) => {
-  if (!win) return false;
+  if (!win || !folderPath || typeof folderPath !== 'string' || !fs.existsSync(folderPath)) {
+    return false;
+  }
   return setupFolderWatcher(folderPath, win);
 });
 

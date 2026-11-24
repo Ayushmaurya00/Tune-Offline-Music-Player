@@ -116,3 +116,4 @@ export async function fetchMetadataSuggestions(query: string): Promise<TagSugges
     return [];
   }
 }
+
