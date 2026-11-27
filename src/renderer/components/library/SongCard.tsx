@@ -36,8 +36,8 @@ export const SongCard: React.FC<SongCardProps> = ({
   return (
     <div
       onClick={handlePlayClick}
-      className={`group relative p-3 rounded-xl bg-tune-elevated/40 hover:bg-tune-card/80 border border-tune-border/40 hover:border-tune-border transition-all duration-200 cursor-pointer flex flex-col ${
-        isCurrent ? 'border-tune-accent/50 bg-tune-elevated' : ''
+      className={`group relative p-3 rounded-lg bg-tune-surface hover:bg-tune-card border border-transparent hover:border-transparent transition-all duration-200 cursor-pointer flex flex-col ${
+        isCurrent ? 'bg-tune-card' : ''
       }`}
     >
       <div className="relative aspect-square w-full rounded-lg overflow-hidden mb-3 shadow-md">
@@ -51,8 +51,8 @@ export const SongCard: React.FC<SongCardProps> = ({
 
         <button
           onClick={handlePlayClick}
-          className={`absolute bottom-2.5 right-2.5 w-11 h-11 rounded-full bg-tune-accent text-black flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-105 active:scale-95 ${
-            isPlayingThis ? 'opacity-100 translate-y-0' : 'opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0'
+          className={`absolute bottom-2.5 right-2.5 w-11 h-11 rounded-full bg-tune-accent text-tune-bg flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-105 active:scale-95 ${
+            isPlayingThis ? 'opacity-100 translate-y-0' : 'opacity-100 md:opacity-0 md:group-hover:opacity-100 translate-y-0 md:translate-y-2 md:group-hover:translate-y-0'
           }`}
           title={isPlayingThis ? 'Pause' : 'Play'}
         >

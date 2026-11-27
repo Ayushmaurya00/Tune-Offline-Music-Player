@@ -8,7 +8,7 @@ interface FileDropOverlayProps {
 
 export const FileDropOverlay: React.FC<FileDropOverlayProps> = ({
   onFilesDropped,
-  accentColor = '#1db954'
+  accentColor = '#1ed760'
 }) => {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -69,7 +69,7 @@ export const FileDropOverlay: React.FC<FileDropOverlayProps> = ({
         style={{ borderColor: accentColor }}
       >
         <div
-          className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg animate-bounce"
+          className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg animate-pulse"
           style={{ backgroundColor: `${accentColor}20`, color: accentColor }}
         >
           <FolderDown size={40} />
@@ -82,4 +82,3 @@ export const FileDropOverlay: React.FC<FileDropOverlayProps> = ({
     </div>
   );
 };
-

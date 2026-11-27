@@ -54,7 +54,7 @@ export const PlaybackControls: React.FC = () => {
       {/* Play / Pause Primary Button */}
       <button
         onClick={togglePlay}
-        className="w-9 h-9 flex items-center justify-center bg-white text-black rounded-full hover:scale-105 active:scale-95 transition shadow-md"
+        className="w-9 h-9 flex items-center justify-center bg-tune-accent text-tune-bg rounded-full hover:scale-105 active:scale-95 transition"
         title={isPlaying ? 'Pause' : 'Play'}
       >
         {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-0.5" />}
@@ -94,4 +94,3 @@ export const PlaybackControls: React.FC = () => {
     </div>
   );
 };
-

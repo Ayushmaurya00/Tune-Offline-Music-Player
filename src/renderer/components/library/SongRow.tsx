@@ -50,8 +50,8 @@ export const SongRow: React.FC<SongRowProps> = ({
       <div
         onClick={handleRowClick}
         onContextMenu={handleContextMenu}
-        className={`group grid grid-cols-[28px_1fr_auto] md:grid-cols-[36px_minmax(200px,2fr)_minmax(120px,1.5fr)_minmax(100px,1fr)_80px_100px] items-center px-3 md:px-4 py-2.5 rounded-lg text-xs cursor-pointer select-none transition ${
-          isCurrent ? 'bg-tune-elevated text-tune-accent font-medium' : 'hover:bg-tune-card/60 text-tune-textSecondary'
+        className={`group grid min-h-16 grid-cols-[28px_1fr_auto] md:grid-cols-[36px_minmax(200px,2fr)_minmax(120px,1.5fr)_minmax(100px,1fr)_80px_100px] items-center px-3 md:px-4 py-2.5 rounded-lg text-xs cursor-pointer select-none transition ${
+          isCurrent ? 'bg-tune-card text-tune-accent font-medium' : 'hover:bg-tune-elevated text-tune-textSecondary'
         }`}
       >
         <div className="flex items-center justify-start text-tune-textMuted font-mono">
@@ -104,7 +104,7 @@ export const SongRow: React.FC<SongRowProps> = ({
       <div className="flex items-center justify-end gap-1 md:gap-2" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={() => toggleLikeSong(song)}
-          className={`p-1.5 transition rounded-full hover:scale-110 ${
+          className={`min-w-10 min-h-10 flex items-center justify-center p-1.5 transition rounded-full hover:scale-110 ${
             isLiked
               ? 'text-tune-accent opacity-100'
               : 'text-tune-textMuted hover:text-white md:opacity-0 md:group-hover:opacity-100'
@@ -149,7 +149,7 @@ export const SongRow: React.FC<SongRowProps> = ({
             const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
             setContextMenu({ x: rect.left - 160, y: rect.bottom + 4 });
           }}
-          className="p-1.5 text-tune-textMuted hover:text-white transition rounded-full"
+          className="min-w-10 min-h-10 flex items-center justify-center p-1.5 text-tune-textMuted hover:text-white transition rounded-full"
           title="More options"
         >
           <MoreVertical size={16} />

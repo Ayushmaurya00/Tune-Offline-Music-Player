@@ -1,34 +1,27 @@
-/* tokens.css — calibrated for Tune Audio Workstation
-   Checked for WCAG 2.2 AA at --hue: 240, --accent-hue: 155 (Studio Phosphor)
-   Dark mode is default for audio & media tools (frontend.md §2 exception). */
+/* tokens.css — Tune album-sleeve palette */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+  --hue: 250;
+  --accent-hue: 258;
 
-  /* ===== SET PER PROJECT (Domain: Studio Rackmount Audio Equipment) ===== */
-  --hue: 240;          /* Deep studio anodized slate/zinc neutral tint */
-  --accent-hue: 155;   /* Phosphor level-meter green */
-  --font-display: "Cabinet Grotesk", "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-body: "Inter", "Switzer", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-
-  /* Color roles: Dark Mode (Default for Audio Workstation) */
-  --bg-canvas:     oklch(0.140 0.006 var(--hue));  /* Deepest chassis background */
-  --bg-surface:    oklch(0.180 0.007 var(--hue));  /* Module panels & containers */
-  --bg-subtle:     oklch(0.215 0.008 var(--hue));  /* Card surfaces & rows */
-  --bg-muted:      oklch(0.265 0.010 var(--hue));  /* Interactive hover states */
-  --text:          oklch(0.960 0.005 var(--hue));  /* Primary high-contrast text */
-  --text-2:        oklch(0.740 0.008 var(--hue));  /* Secondary technical data */
-  --text-muted:    oklch(0.560 0.008 var(--hue));  /* Quiet labels and inactive items */
-  --border:        oklch(0.260 0.008 var(--hue));  /* 1px hairline dividers */
-  --border-strong: oklch(0.360 0.012 var(--hue));  /* Active panel borders */
-  --accent:        oklch(0.720 0.155 var(--accent-hue)); /* Level signal green */
-  --accent-hover:  oklch(from var(--accent) calc(l + 0.05) c h);
-  --accent-fg:     oklch(0.140 0.010 var(--accent-hue)); /* Ink on accent fill */
-  --accent-subtle: color-mix(in oklch, var(--accent) 14%, var(--bg-canvas));
-  --success:       oklch(0.720 0.145 150);
-  --warning:       oklch(0.780 0.140 78);
-  --danger:        oklch(0.660 0.185 25);
+  --bg-canvas: oklch(0.975 0.008 var(--hue));
+  --bg-surface: oklch(0.995 0.004 var(--hue));
+  --bg-subtle: oklch(0.945 0.010 var(--hue));
+  --bg-muted: oklch(0.920 0.012 var(--hue));
+  --text: oklch(0.205 0.025 var(--hue));
+  --text-2: oklch(0.405 0.018 var(--hue));
+  --text-muted: oklch(0.520 0.014 var(--hue));
+  --border: oklch(0.860 0.012 var(--hue));
+  --border-strong: oklch(0.740 0.018 var(--hue));
+  --accent: oklch(0.520 0.220 var(--accent-hue));
+  --accent-hover: oklch(0.470 0.220 var(--accent-hue));
+  --accent-fg: oklch(0.990 0.004 var(--hue));
+  --accent-subtle: oklch(0.920 0.055 var(--accent-hue));
+  --album-blue: oklch(0.620 0.150 245);
+  --album-sun: oklch(0.860 0.145 92);
+  --album-line: oklch(0.280 0.080 245);
+  --album-ink: oklch(0.120 0.020 245);
   --focus-ring:    var(--accent);
 
   /* Fluid Type scale (375px → 1440px) */
@@ -40,6 +33,7 @@
   --text-2xl:  clamp(1.625rem, 1.405rem + 0.939vw, 2.25rem);
   --text-3xl:  clamp(2rem,     1.648rem + 1.502vw, 3rem);
   --text-4xl:  clamp(2.5rem,   1.972rem + 2.254vw, 3.75rem);
+  --text-5xl:  clamp(3.75rem, 3.050rem + 2.992vw, 5.25rem);
   
   --leading-display: 1.08;
   --leading-heading: 1.2;
@@ -90,4 +84,3 @@
     scroll-behavior: auto !important;
   }
 }
-

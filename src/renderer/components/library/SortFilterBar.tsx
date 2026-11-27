@@ -30,12 +30,12 @@ export const SortFilterBar: React.FC<SortFilterBarProps> = ({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search by title, artist, album..."
-          className="w-full pl-9 pr-4 py-2 bg-tune-elevated rounded-full text-xs text-white placeholder-tune-textMuted border border-tune-border focus:border-tune-accent focus:outline-none transition"
+          className="w-full min-h-11 pl-10 pr-4 py-2.5 bg-tune-elevated rounded-full text-sm text-white placeholder-tune-textMuted border border-transparent focus:border-tune-accent focus:outline-none transition"
         />
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1.5 bg-tune-elevated border border-tune-border rounded-lg px-2.5 py-1.5 text-xs text-tune-textSecondary">
+        <div className="min-h-10 flex items-center gap-1.5 bg-tune-elevated border border-transparent rounded-full px-3 py-1.5 text-xs text-tune-textSecondary">
           <ArrowUpDown size={14} className="text-tune-accent" />
           <span className="text-[11px] text-tune-textMuted uppercase font-semibold">Sort:</span>
           <select

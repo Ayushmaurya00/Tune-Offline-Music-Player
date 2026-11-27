@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Tune - Modern Offline Music Player",
-  "main": "dist-electron/main.cjs",
+  "main": "dist-electron/main.mjs",
   "scripts": {
     "start": "electron .",
     "dev": "vite",

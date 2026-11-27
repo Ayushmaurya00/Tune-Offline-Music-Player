@@ -26,8 +26,8 @@ export default defineConfig(({ mode }) => {
               rollupOptions: {
                 external: ['music-metadata', 'chokidar', 'discord-rpc'],
                 output: {
-                  format: 'cjs',
-                  entryFileNames: 'main.cjs'
+                  format: 'es',
+                  entryFileNames: 'main.mjs'
                 }
               }
             }

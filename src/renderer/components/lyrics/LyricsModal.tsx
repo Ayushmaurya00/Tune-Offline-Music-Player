@@ -21,7 +21,7 @@ interface LyricsModalProps {
 export const LyricsModal: React.FC<LyricsModalProps> = ({
   isOpen,
   onClose,
-  accentColor = '#1db954'
+  accentColor = '#1ed760'
 }) => {
   const { currentSong, currentTime, seek } = usePlayerStore();
   const [lyrics, setLyrics] = useState<LyricLine[]>([]);

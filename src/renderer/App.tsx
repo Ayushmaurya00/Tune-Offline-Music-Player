@@ -36,9 +36,9 @@ export const App: React.FC = () => {
   const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
   const [scanResult, setScanResult] = useState<ScanResultData | null>(null);
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
-  const [accentColor, setAccentColor] = useState('#1db954');
+  const [accentColor, setAccentColor] = useState('#1ed760');
   const [ambientGradient, setAmbientGradient] = useState(
-    'radial-gradient(ellipse at top, rgba(29, 185, 84, 0.12) 0%, transparent 70%)'
+    'radial-gradient(ellipse at top, rgba(30, 215, 96, 0.07) 0%, transparent 68%)'
   );
 
   const { songs, setSongs, addSong, updateSong, removeSong, setWatchedFolder, setIsLoading, watchedFolderPath } =
@@ -54,8 +54,8 @@ export const App: React.FC = () => {
   // Dynamic Album Art Palette Extraction, Online Poster Resolution & Stats Tracking
   useEffect(() => {
     if (!currentSong) {
-      setAccentColor('#1db954');
-      setAmbientGradient('radial-gradient(ellipse at top, rgba(29, 185, 84, 0.12) 0%, transparent 70%)');
+      setAccentColor('#1ed760');
+      setAmbientGradient('radial-gradient(ellipse at top, rgba(30, 215, 96, 0.07) 0%, transparent 68%)');
       return;
     }
 
@@ -63,7 +63,7 @@ export const App: React.FC = () => {
 
     if (currentSong.coverArt) {
       extractDominantColor(currentSong.coverArt).then((palette) => {
-        setAccentColor(palette.primaryHex);
+        setAccentColor('#1ed760');
         setAmbientGradient(palette.ambientGradient);
       });
     } else {
@@ -80,7 +80,7 @@ export const App: React.FC = () => {
             return state;
           });
           extractDominantColor(artUrl).then((palette) => {
-            setAccentColor(palette.primaryHex);
+            setAccentColor('#1ed760');
             setAmbientGradient(palette.ambientGradient);
           });
         }
@@ -367,7 +367,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="relative flex flex-col h-screen w-screen bg-tune-bg text-white overflow-hidden select-none">
+    <div className="app-shell relative flex flex-col h-screen w-screen bg-tune-bg text-white overflow-hidden select-none">
       {/* Top Slide-Down In-App Notification Drawer */}
       <NotificationDrawer
         isOpen={isNotificationDrawerOpen}
@@ -423,7 +423,6 @@ export const App: React.FC = () => {
       {/* Mobile Bottom Navigation Bar */}
       <MobileNav
         onOpenSpotifyModal={() => setIsSpotifyModalOpen(true)}
-        onOpenNewPlaylistModal={() => setIsModalOpen(true)}
       />
 
       {/* Create Playlist Modal */}

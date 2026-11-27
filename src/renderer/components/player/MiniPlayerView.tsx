@@ -11,7 +11,7 @@ interface MiniPlayerViewProps {
 
 export const MiniPlayerView: React.FC<MiniPlayerViewProps> = ({
   onExpand,
-  accentColor = '#1db954'
+  accentColor = '#1ed760'
 }) => {
   const {
     currentSong,
@@ -165,4 +165,3 @@ export const MiniPlayerView: React.FC<MiniPlayerViewProps> = ({
     </div>
   );
 };
-

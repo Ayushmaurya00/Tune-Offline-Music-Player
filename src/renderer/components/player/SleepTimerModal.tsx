@@ -14,7 +14,7 @@ const PRESETS = [5, 10, 15, 30, 45, 60];
 export const SleepTimerModal: React.FC<SleepTimerModalProps> = ({
   isOpen,
   onClose,
-  accentColor = '#1db954'
+  accentColor = '#1ed760'
 }) => {
   const [timerState, setTimerState] = useState<SleepTimerState>(sleepTimerService.getState());
   const [customMinutes, setCustomMinutes] = useState('');
@@ -176,4 +176,3 @@ export const SleepTimerModal: React.FC<SleepTimerModalProps> = ({
     </div>
   );
 };
-

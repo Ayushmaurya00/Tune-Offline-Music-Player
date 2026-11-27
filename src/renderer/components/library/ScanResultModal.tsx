@@ -27,7 +27,7 @@ export const ScanResultModal: React.FC<ScanResultModalProps> = ({
   result,
   onPlayAll,
   onChangeFolder,
-  accentColor = '#1db954'
+  accentColor = '#1ed760'
 }) => {
   useEffect(() => {
     if (!isOpen) return;
@@ -207,4 +207,3 @@ export const ScanResultModal: React.FC<ScanResultModalProps> = ({
     </div>
   );
 };
-

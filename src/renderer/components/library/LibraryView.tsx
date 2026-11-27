@@ -122,7 +122,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
           title="Toggle library details dropdown"
         >
           <h1 className="text-base font-bold text-white flex items-center gap-1.5">
-            <span>Offline Library</span>
+            <span>Your Library</span>
             <ChevronDown
               size={16}
               className={`text-tune-textMuted transition-transform duration-200 ${
@@ -207,11 +207,11 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
       <div className="hidden md:flex p-6 pb-2 items-center justify-between gap-3 app-drag-region">
         <div className="flex flex-col app-no-drag">
           <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-            <span>Offline Library</span>
+            <span>Your library</span>
             {isLoading && <RefreshCw size={18} className="animate-spin text-tune-accent" />}
           </h1>
           <p className="text-xs text-tune-textSecondary mt-0.5">
-            Auto-synced from{' '}
+            {sortedSongs.length} {sortedSongs.length === 1 ? 'track' : 'tracks'} in{' '}
             <span className="font-mono text-tune-accent">
               {watchedFolderPath ? watchedFolderPath : 'Downloads'}
             </span>
@@ -242,31 +242,34 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
       <SortFilterBar isGridView={isGridView} setIsGridView={setIsGridView} />
 
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-5 lg:p-7">
         {sortedSongs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-tune-elevated flex items-center justify-center text-white mb-4 border border-tune-border">
-              <FolderDown size={32} className="text-white" />
+          <div className="min-h-full flex flex-col items-center justify-center py-10 md:py-16 text-center">
+            <div className="relative w-20 h-20 rounded-3xl bg-tune-elevated flex items-center justify-center text-tune-accent mb-6 border border-tune-border">
+              <FolderDown size={34} aria-hidden="true" />
+              <span className="absolute -right-1 -bottom-1 w-7 h-7 rounded-full bg-tune-accent text-tune-bg flex items-center justify-center border-4 border-tune-bg">
+                <Music size={13} aria-hidden="true" />
+              </span>
             </div>
-            <h3 className="text-base font-semibold text-white">No audio files found</h3>
-            <p className="text-xs text-tune-textMuted max-w-sm mt-1.5 leading-relaxed">
-              Drop MP3, WAV, FLAC, or M4A files anywhere into this window, or pick from below:
+            <h3 className="text-xl md:text-2xl font-semibold text-white">Make room for your music.</h3>
+            <p className="text-sm text-tune-textSecondary max-w-md mt-2 leading-relaxed">
+              Choose a folder or a few tracks to start your local collection. Tune keeps your music on this device.
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-3 mt-5">
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-7">
               <button
                 onClick={onSelectFolderDialog}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-tune-accent hover:bg-tune-accentHover text-black text-xs font-bold transition shadow-lg shadow-tune-accent/25 hover:scale-105 active:scale-95"
+                className="min-h-11 flex items-center gap-2 px-6 py-3 rounded-full bg-tune-accent hover:bg-tune-accentHover text-black text-sm font-bold transition active:scale-[0.98]"
               >
-                <FolderOpen size={16} />
+                <FolderOpen size={17} aria-hidden="true" />
                 <span>Choose Music Folder</span>
               </button>
 
               <button
                 onClick={onSelectFilesDialog}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-tune-elevated hover:bg-tune-card text-white text-xs font-semibold border border-tune-border transition hover:border-tune-accent active:scale-95"
+                className="min-h-11 flex items-center gap-2 px-6 py-3 rounded-full bg-tune-elevated hover:bg-tune-card text-white text-sm font-semibold border border-transparent transition active:scale-[0.98]"
               >
-                <Music size={16} />
+                <Music size={17} aria-hidden="true" />
                 <span>Select Audio Files</span>
               </button>
             </div>

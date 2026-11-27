@@ -33,7 +33,7 @@ interface MobileFullPlayerProps {
 export const MobileFullPlayer: React.FC<MobileFullPlayerProps> = ({
   isOpen,
   onClose,
-  accentColor = '#1db954',
+  accentColor = '#1ed760',
   onOpenLyrics,
   onOpenEq,
   onOpenSleepTimer,
@@ -155,7 +155,7 @@ export const MobileFullPlayer: React.FC<MobileFullPlayerProps> = ({
   return createPortal(
     <div
       onClick={(e) => e.stopPropagation()}
-      className="fixed inset-0 z-50 bg-[#0a0a0a]/98 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 select-none animate-in slide-in-from-bottom duration-300 overflow-y-auto"
+      className="fixed inset-0 z-50 bg-tune-bg/98 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 select-none animate-in slide-in-from-bottom duration-300 overflow-y-auto"
     >
       <div className="w-full max-w-md md:max-w-lg mx-auto flex flex-col justify-between h-full min-h-[520px]">
         {/* Top Header */}

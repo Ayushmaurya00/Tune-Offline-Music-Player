@@ -27,7 +27,7 @@ interface NotificationDrawerProps {
 export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
   isOpen,
   onClose,
-  accentColor = '#1db954'
+  accentColor = '#1ed760'
 }) => {
   const {
     currentSong,
@@ -229,4 +229,3 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
     </div>
   );
 };
-

@@ -8,7 +8,7 @@ interface WaveformSeekBarProps {
 }
 
 export const WaveformSeekBar: React.FC<WaveformSeekBarProps> = ({
-  accentColor = '#1db954'
+  accentColor = '#1ed760'
 }) => {
   const { currentSong, currentTime, duration, seek } = usePlayerStore();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);

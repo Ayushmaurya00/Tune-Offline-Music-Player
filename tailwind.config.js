@@ -8,21 +8,20 @@ export default {
     extend: {
       colors: {
         tune: {
-          bg: "#0a0a0a",
-          surface: "#121212",
-          elevated: "#181818",
-          card: "#242424",
-          cardHover: "#2a2a2a",
-          border: "#282828",
-          accent: "#1db954",
-          accentHover: "#1ed760",
+          bg: "#121212",
+          surface: "#181818",
+          elevated: "#242424",
+          card: "#282828",
+          cardHover: "#333333",
+          border: "#3e3e3e",
+          accent: "#1ed760",
+          accentHover: "#3be477",
           textPrimary: "#ffffff",
           textSecondary: "#b3b3b3",
-          textMuted: "#727272"
+          textMuted: "#8a8a8a"
         }
       }
     },
   },
   plugins: [],
 }
-

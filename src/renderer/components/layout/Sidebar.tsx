@@ -26,7 +26,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { playlists, deletePlaylist } = usePlaylistStore();
 
   return (
-    <aside className="hidden md:flex w-64 bg-tune-surface flex-col h-full border-r border-tune-border select-none flex-shrink-0">
+    <aside className="hidden md:flex w-[272px] bg-black flex-col h-full border-r border-black select-none flex-shrink-0">
       {/* App Branding */}
       <div className="p-5 app-drag-region">
         <BrandLogo size={36} showText className="app-no-drag" />
@@ -35,6 +35,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Main Navigation */}
       <div className="px-3 space-y-1">
         <button
+          type="button"
+          aria-current={activeView === 'library' ? 'page' : undefined}
           onClick={() => setActiveView('library')}
           className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
             activeView === 'library'
@@ -48,6 +50,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
 
         <button
+          type="button"
+          aria-current={activeView === 'liked' ? 'page' : undefined}
           onClick={() => setActiveView('liked')}
           className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
             activeView === 'liked'
@@ -55,11 +59,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
               : 'text-tune-textSecondary hover:text-white hover:bg-tune-elevated/50'
           }`}
         >
-          <Heart size={18} className="text-white" />
+          <Heart size={18} />
           <span>Liked Songs</span>
         </button>
 
         <button
+          type="button"
+          aria-current={activeView === 'folders' ? 'page' : undefined}
           onClick={() => setActiveView('folders')}
           className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
             activeView === 'folders'
@@ -67,11 +73,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
               : 'text-tune-textSecondary hover:text-white hover:bg-tune-elevated/50'
           }`}
         >
-          <FolderTree size={18} className="text-white" />
+          <FolderTree size={18} />
           <span>Folder Mode</span>
         </button>
 
         <button
+          type="button"
+          aria-current={activeView === 'playlists' || activeView === 'playlist' || activeView.startsWith('smart-') ? 'page' : undefined}
           onClick={() => setActiveView('playlists')}
           className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
             activeView === 'playlists' || activeView === 'playlist' || activeView.startsWith('smart-')
@@ -79,7 +87,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               : 'text-tune-textSecondary hover:text-white hover:bg-tune-elevated/50'
           }`}
         >
-          <Music2 size={18} className="text-white" />
+          <Music2 size={18} />
           <span>Playlists</span>
           <span className="ml-auto text-xs text-tune-textMuted font-mono">{playlists.length}</span>
         </button>
@@ -89,7 +97,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="mt-4 px-4 py-3 mx-3 bg-tune-elevated/60 border border-tune-border rounded-xl">
         <div className="flex items-center justify-between text-xs font-semibold text-tune-textMuted uppercase tracking-wider mb-1.5">
           <span className="flex items-center gap-1.5">
-            <FolderDown size={14} className="text-white" />
+            <FolderDown size={14} className="text-tune-accent" />
             Watched Folder
           </span>
           <div className="flex items-center gap-2">
@@ -124,13 +132,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex items-center gap-1">
           <button
             onClick={onOpenSpotifyModal}
-            className="px-2 py-0.5 rounded text-[11px] font-semibold text-[#1db954] bg-[#1db954]/10 hover:bg-[#1db954]/20 transition flex items-center gap-1"
+            className="px-2 py-1 rounded-lg text-[11px] font-semibold text-tune-accent bg-tune-accent/10 hover:bg-tune-accent/20 transition flex items-center gap-1"
             title="Import Spotify Playlist"
           >
             <span>+ Spotify</span>
           </button>
 
           <button
+            type="button"
+            aria-label="Create playlist"
             onClick={onOpenNewPlaylistModal}
             className="p-1 rounded-md text-tune-textSecondary hover:text-white hover:bg-tune-elevated transition"
             title="Create Playlist"
@@ -152,27 +162,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
             return (
               <div
                 key={playlist.id}
-                onClick={() => setActiveView('playlist', playlist.id)}
-                className={`group flex items-center justify-between px-3 py-2 rounded-lg text-sm transition cursor-pointer ${
+                className={`group flex items-center justify-between rounded-lg text-sm transition ${
                   isSelected
                     ? 'bg-tune-elevated text-white font-medium'
                     : 'text-tune-textSecondary hover:text-white hover:bg-tune-elevated/50'
                 }`}
               >
-                <div className="flex items-center gap-2.5 truncate">
-                  <Music2 size={16} className="text-white" />
+                <button
+                  type="button"
+                  aria-current={isSelected ? 'page' : undefined}
+                  onClick={() => setActiveView('playlist', playlist.id)}
+                  className="min-w-0 flex-1 flex items-center gap-2.5 px-3 py-2 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-tune-accent rounded-lg"
+                >
+                  <Music2 size={16} className="flex-shrink-0 text-white" aria-hidden="true" />
                   <span className="truncate">{playlist.name}</span>
-                </div>
+                </button>
 
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
+                  type="button"
+                  aria-label={`Delete ${playlist.name} playlist`}
+                  onClick={() => {
                     setPlaylistToDelete(playlist);
                   }}
-                  className="opacity-0 group-hover:opacity-100 p-1 text-tune-textMuted hover:text-red-400 transition"
+                  className="min-h-10 min-w-10 flex items-center justify-center rounded-md text-tune-textMuted opacity-100 transition hover:text-red-400 focus-visible:opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
                   title="Delete playlist"
                 >
-                  <Trash2 size={14} />
+                  <Trash2 size={14} aria-hidden="true" />
                 </button>
               </div>
             );
@@ -225,4 +240,3 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </aside>
   );
 };
-

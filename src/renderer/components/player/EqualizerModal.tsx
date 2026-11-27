@@ -13,7 +13,7 @@ interface EqualizerModalProps {
 export const EqualizerModal: React.FC<EqualizerModalProps> = ({
   isOpen,
   onClose,
-  accentColor = '#1db954'
+  accentColor = '#1ed760'
 }) => {
   const [settings, setSettings] = useState(eqService.getSettings());
 
@@ -337,4 +337,3 @@ export const EqualizerModal: React.FC<EqualizerModalProps> = ({
     </div>
   );
 };
-

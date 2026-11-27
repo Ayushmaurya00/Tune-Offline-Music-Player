@@ -5,9 +5,9 @@ export interface ExtractedPalette {
 }
 
 const DEFAULT_PALETTE: ExtractedPalette = {
-  primaryHex: '#1db954',
-  rgb: [29, 185, 84],
-  ambientGradient: 'radial-gradient(ellipse at top left, rgba(29, 185, 84, 0.15), transparent 70%)'
+  primaryHex: '#1ed760',
+  rgb: [30, 215, 96],
+  ambientGradient: 'radial-gradient(ellipse at top left, rgba(30, 215, 96, 0.07), transparent 70%)'
 };
 
 export async function extractDominantColor(imageSrc?: string | null): Promise<ExtractedPalette> {
@@ -79,4 +79,3 @@ export async function extractDominantColor(imageSrc?: string | null): Promise<Ex
     img.src = imageSrc;
   });
 }
-

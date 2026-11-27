@@ -2,13 +2,14 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="theme-color" content="#121212" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Tune" />
     <meta
@@ -24,7 +25,14 @@
       }
     </script>
   </head>
-  <body class="bg-[#0a0a0a] text-white overflow-hidden select-none">
+  <body class="bg-tune-bg text-tune-textPrimary overflow-hidden select-none">
+    <!--
+      THESIS: Tune gives local music the familiar ease of a modern streaming player, without making the listener give up file ownership.
+      OWN-WORLD: Near-black panels, quiet charcoal elevation, crisp white type, green playback actions, and artwork-led collection tiles.
+      STORY: Browse a personal library, choose a track, and control playback immediately.
+      FIRST VIEWPORT: Desktop pairs a black navigation rail with a charcoal library and anchored transport; Android keeps search, tracks, compact controls, and bottom navigation within thumb reach.
+      FORM: Spotify-inspired music-player grammar, adapted for Tune's local-first workflows and original branding.
+    -->
     <div id="root"></div>
     <script type="module" src="/src/renderer/main.tsx"></script>
   </body>

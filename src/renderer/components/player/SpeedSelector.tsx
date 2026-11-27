@@ -8,7 +8,7 @@ interface SpeedSelectorProps {
   accentColor?: string;
 }
 
-export const SpeedSelector: React.FC<SpeedSelectorProps> = ({ accentColor = '#1db954' }) => {
+export const SpeedSelector: React.FC<SpeedSelectorProps> = ({ accentColor = '#1ed760' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { playbackRate, setPlaybackRate } = usePlayerStore();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -74,4 +74,3 @@ export const SpeedSelector: React.FC<SpeedSelectorProps> = ({ accentColor = '#1d
     </div>
   );
 };
-

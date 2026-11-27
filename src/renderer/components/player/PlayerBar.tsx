@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ListMusic, Heart, Mic2, Sliders, Moon, Minimize2, Maximize2, Play, Pause, SkipForward, Repeat, Repeat1, Radio } from 'lucide-react';
+import { ListMusic, Heart, Mic2, Sliders, Moon, Minimize2, Maximize2, Play, Pause, SkipForward, Radio } from 'lucide-react';
 import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { PlaybackControls } from './PlaybackControls';
@@ -23,7 +23,7 @@ interface PlayerBarProps {
 }
 
 export const PlayerBar: React.FC<PlayerBarProps> = ({
-  accentColor = '#1db954',
+  accentColor = '#1ed760',
   onOpenLyrics,
   isLyricsOpen,
   onOpenEq,
@@ -42,9 +42,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
     nextTrack,
     currentTime,
     duration,
-    seek,
-    repeatMode,
-    toggleRepeat
+    seek
   } = usePlayerStore();
   const { isSongLiked, toggleLikeSong } = usePlaylistStore();
   const [timerState, setTimerState] = useState<SleepTimerState>(sleepTimerService.getState());
@@ -74,7 +72,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   return (
     <footer
       onClick={handleBarClick}
-      className="relative h-20 md:h-24 bg-tune-surface/95 backdrop-blur-md border-t border-tune-border px-4 flex items-center justify-between select-none z-30 shadow-2xl cursor-pointer md:cursor-default"
+      className="relative h-20 md:h-24 bg-tune-surface border-t border-[#282828] px-4 flex items-center justify-between select-none z-30 cursor-pointer md:cursor-default"
     >
       {/* Interactive top progress scrubber line for mobile */}
       <div
@@ -162,83 +160,49 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         )}
       </div>
 
-      {/* Mobile Play, Skip, Repeat, Lyrics & EQ Quick Controls */}
+      {/* Mobile transport stays focused; secondary controls live in the expanded player. */}
       <div className="flex md:hidden items-center gap-1 flex-shrink-0">
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
-            toggleRepeat();
-          }}
-          className={`p-1.5 transition rounded-full ${
-            repeatMode !== 'none' ? 'text-tune-accent font-bold' : 'text-tune-textSecondary hover:text-white'
-          }`}
-          style={repeatMode !== 'none' ? { color: accentColor } : {}}
-          title={`Repeat: ${repeatMode === 'one' ? 'Current Song' : repeatMode === 'all' ? 'All Songs' : 'Off'}`}
-        >
-          {repeatMode === 'one' ? <Repeat1 size={18} /> : <Repeat size={17} />}
-        </button>
-
-        {onToggleNotificationDrawer && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleNotificationDrawer();
-            }}
-            className={`p-1.5 transition rounded-full ${
-              isNotificationDrawerOpen ? 'text-tune-accent' : 'text-tune-textSecondary hover:text-white'
-            }`}
-            style={isNotificationDrawerOpen ? { color: accentColor } : {}}
-            title="Notification Controller"
-          >
-            <Radio size={17} />
-          </button>
-        )}
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onOpenLyrics();
+            toggleQueue();
           }}
           disabled={!currentSong}
-          className="p-1.5 text-tune-textSecondary hover:text-white transition disabled:opacity-30"
-          style={isLyricsOpen ? { color: accentColor } : {}}
-          title="Synced Karaoke Lyrics"
+          className={`min-w-11 min-h-11 flex items-center justify-center rounded-full transition disabled:opacity-30 ${
+            isQueueOpen ? 'text-tune-accent bg-tune-elevated' : 'text-tune-textSecondary active:bg-tune-elevated'
+          }`}
+          title="Open queue"
+          aria-label="Open queue"
         >
-          <Mic2 size={18} />
+          <ListMusic size={19} />
         </button>
-
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onOpenEq();
-          }}
-          className="p-1.5 text-tune-textSecondary hover:text-white transition"
-          style={isEqOpen ? { color: accentColor } : {}}
-          title="10-Band Equalizer"
-        >
-          <Sliders size={18} />
-        </button>
-
-        <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
             togglePlay();
           }}
-          className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 active:scale-95 transition shadow ml-0.5"
+          disabled={!currentSong}
+          className="w-11 h-11 rounded-full bg-tune-accent text-tune-bg flex items-center justify-center active:scale-95 transition ml-0.5 disabled:opacity-40"
           title={isPlaying ? 'Pause' : 'Play'}
+          aria-label={isPlaying ? 'Pause' : 'Play'}
         >
           {isPlaying ? <Pause size={17} fill="currentColor" /> : <Play size={17} fill="currentColor" className="ml-0.5" />}
         </button>
 
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
             nextTrack();
           }}
-          className="p-1.5 text-tune-textSecondary hover:text-white transition"
-          title="Next Track"
+          disabled={!currentSong}
+          className="min-w-11 min-h-11 flex items-center justify-center rounded-full text-tune-textSecondary active:bg-tune-elevated transition disabled:opacity-30"
+          title="Next track"
+          aria-label="Next track"
         >
-          <SkipForward size={19} />
+          <SkipForward size={20} />
         </button>
       </div>
 
