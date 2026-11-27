@@ -3,6 +3,7 @@
   "appId": "com.tune.music",
   "productName": "Tune",
   "copyright": "Copyright © 2026 Tune",
+  "publish": null,
   "directories": {
     "output": "release"
   },
@@ -30,4 +31,3 @@
     "shortcutName": "Tune"
   }
 }
-
